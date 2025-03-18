@@ -1,10 +1,6 @@
 # XDJ-X
  All-in-one Dj System
 
-
-![photo_2025-03-18_16-56-35](https://github.com/user-attachments/assets/776a656b-e4bb-47ea-8eb2-ad1e017a59a6)
-
-
 The XDJ-X is an all-in-one DJ system built on the body parts of the CDJ-1000mk3, such as the jog wheel, buttons, and pitch.
 
 The main goal was to create a 2-channel dj setup, compact, without major compromises. Have full-fledged jog wheels, pads, a mixer layer the same as the DJM-900nxs, with an effects display imitating the vacuum display of the classic DJM.
@@ -14,3 +10,8 @@ Displays in jogs are specially selected classic VFD, not TFT. These displays hav
 The XDJ-X has such advantages as an optical crossfader, a Bluetooth transmitter capable of transmitting a master bus signal or a CUE bus. A built-in battery, the ability to charge the device from a socket or in a car. Built-in speakers (from a MacBook Pro). Support for Rekordbox playlists.
 
 And the most important advantage for me: my source code, scheme, printed circuit board. This will allow adding and testing ideas, algorithms of effects, gui, which in the future will be presented in new models of dj equipment from large companies.
+
+![photo_2025-03-18_16-56-35](https://github.com/user-attachments/assets/776a656b-e4bb-47ea-8eb2-ad1e017a59a6)
+
+
+
