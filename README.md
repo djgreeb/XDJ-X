@@ -13,5 +13,9 @@ And the most important advantage for me: my source code, scheme, printed circuit
 
 ![photo_2025-03-18_16-56-35](https://github.com/user-attachments/assets/776a656b-e4bb-47ea-8eb2-ad1e017a59a6)
 
+OVERALL BLOCK DIAGRAM
+
+![OVERALL BLOCK DIAGRAM](https://github.com/user-attachments/assets/cbc446ae-c7ef-409f-bf2b-90ac37aeba47)
+
 
 
