@@ -11,3 +11,6 @@ The main goal was to create a 2-channel dj setup, compact, without major comprom
 
 Displays in jogs are specially selected classic VFD, not TFT. These displays have a higher response speed, requiring fewer resources. And this is their main task, when scratching.
 
+The XDJ-X has such advantages as an optical crossfader, a Bluetooth transmitter capable of transmitting a master bus signal or a CUE bus. A built-in battery, the ability to charge the device from a socket or in a car. Built-in speakers (from a MacBook Pro). Support for Rekordbox playlists.
+
+And the most important advantage for me: my source code, scheme, printed circuit board. This will allow adding and testing ideas, algorithms of effects, gui, which in the future will be presented in new models of dj equipment from large companies.
