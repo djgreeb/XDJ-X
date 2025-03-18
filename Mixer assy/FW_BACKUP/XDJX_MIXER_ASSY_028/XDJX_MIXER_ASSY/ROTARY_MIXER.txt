@@ -1,0 +1,178 @@
+Configuration	ROTARY_MIXER
+STM32CubeMX 	6.10.0
+Date	03/08/2025
+MCU	STM32H743VITx
+
+
+
+PERIPHERALS	MODES	FUNCTIONS	PINS
+ADC1	Single-ended	ADC1_INP19	PA5
+ADC2	IN18 Single-ended	ADC2_INP18	PA4
+RCC	Crystal/Ceramic Resonator	RCC_OSC_IN	PH0-OSC_IN (PH0)
+RCC	Crystal/Ceramic Resonator	RCC_OSC_OUT	PH1-OSC_OUT (PH1)
+SAI1:SAI A	Master with Master Clock Out	SAI1_SD_A	PE6
+SAI1:SAI A	Master with Master Clock Out	SAI1_SCK_A	PE5
+SAI1:SAI A	Master with Master Clock Out	SAI1_FS_A	PE4
+SAI1:SAI A	Master with Master Clock Out	SAI1_MCLK_A	PE2
+SAI1:External Synchro Out	External Synchro Out	SAI1_VP_$IpInstance_SYNCHRO_EXTERNAL	VP_SAI1_VP_$IpInstance_SYNCHRO_EXTERNAL
+SAI2:SAI A	Synchronous Slave	SAI2_SD_A	PD11
+SAI3:SAI A	Synchronous Slave	SAI3_SD_A	PD1
+SAI3:SAI B	Synchronous Slave	SAI3_SD_B	PD9
+SPI1	Transmit Only Master	SPI1_MOSI	PD7
+SPI1	Transmit Only Master	SPI1_SCK	PB3 (JTDO/TRACESWO)
+SPI2	Transmit Only Master	SPI2_MOSI	PB15
+SPI2	Transmit Only Master	SPI2_SCK	PB10
+SYS	SysTick	SYS_VS_Systick	VP_SYS_VS_Systick
+TIM2	Internal Clock	TIM2_VS_ClockSourceINT	VP_TIM2_VS_ClockSourceINT
+TIM3	Internal Clock	TIM3_VS_ClockSourceINT	VP_TIM3_VS_ClockSourceINT
+TIM3	PWM Generation CH2	TIM3_CH2	PB5
+TIM8	Encoder Mode	TIM8_CH1	PC6
+TIM8	Encoder Mode	TIM8_CH2	PC7
+UART5	Asynchronous	UART5_RX	PB12
+UART5	Asynchronous	UART5_TX	PB13
+USART1	Asynchronous	USART1_RX	PA10
+USART1	Asynchronous	USART1_TX	PB14
+
+
+
+Pin Nb	PINs	FUNCTIONs	LABELs
+1	PE2	SAI1_MCLK_A	
+2	PE3	GPIO_Input	KEY_IN0
+3	PE4	SAI1_FS_A	
+4	PE5	SAI1_SCK_A	
+5	PE6	SAI1_SD_A	
+7	PC13	GPIO_Output	PAEN
+12	PH0-OSC_IN (PH0)	RCC_OSC_IN	
+13	PH1-OSC_OUT (PH1)	RCC_OSC_OUT	
+15	PC0	GPIO_Output	ADDR0
+16	PC1	GPIO_Output	ADDR1
+17	PC2_C	GPIO_Output	ADDR2
+22	PA0	GPIO_Output	BT_BUTT
+28	PA4	ADC2_INP18	
+29	PA5	ADC1_INP19	
+30	PA6	GPIO_Input	BT_LED
+31	PA7	GPIO_Input	KEY_IN1
+36	PB2	GPIO_Input	BT_bBUTT
+38	PE8	GPIO_Output	BT_bLED
+42	PE12	GPIO_Output	BT_PON
+44	PE14	GPIO_Output	MAX_LOAD
+46	PB10	SPI2_SCK	
+47	PB11	GPIO_Input	SHIFT_B
+51	PB12	UART5_RX	
+52	PB13	UART5_TX	
+53	PB14	USART1_TX	
+54	PB15	SPI2_MOSI	
+56	PD9	SAI3_SD_B	
+58	PD11	SAI2_SD_A	
+63	PC6	TIM8_CH1	
+64	PC7	TIM8_CH2	
+69	PA10	USART1_RX	
+82	PD1	SAI3_SD_A	
+84	PD3	GPIO_Input	KEY_IN2
+86	PD5	GPIO_Output	TFT_DC
+87	PD6	GPIO_Output	BSELECT
+88	PD7	SPI1_MOSI	
+89	PB3 (JTDO/TRACESWO)	SPI1_SCK	
+90	PB4 (NJTRST)	GPIO_Output	TFT_RST
+91	PB5	TIM3_CH2	
+92	PB6	GPIO_Output	TFT_CS
+93	PB7	GPIO_Input	KEY_IN3
+PERIPHERALS	MODES	FUNCTIONS	PINS
+ADC1	Single-ended	ADC1_INP19	PA5
+ADC2	IN18 Single-ended	ADC2_INP18	PA4
+RCC	Crystal/Ceramic Resonator	RCC_OSC_IN	PH0-OSC_IN (PH0)
+RCC	Crystal/Ceramic Resonator	RCC_OSC_OUT	PH1-OSC_OUT (PH1)
+SAI1:SAI A	Master with Master Clock Out	SAI1_SD_A	PE6
+SAI1:SAI A	Master with Master Clock Out	SAI1_SCK_A	PE5
+SAI1:SAI A	Master with Master Clock Out	SAI1_FS_A	PE4
+SAI1:SAI A	Master with Master Clock Out	SAI1_MCLK_A	PE2
+SAI1:External Synchro Out	External Synchro Out	SAI1_VP_$IpInstance_SYNCHRO_EXTERNAL	VP_SAI1_VP_$IpInstance_SYNCHRO_EXTERNAL
+SAI2:SAI A	Synchronous Slave	SAI2_SD_A	PD11
+SAI3:SAI A	Synchronous Slave	SAI3_SD_A	PD1
+SAI3:SAI B	Synchronous Slave	SAI3_SD_B	PD9
+SPI1	Transmit Only Master	SPI1_MOSI	PD7
+SPI1	Transmit Only Master	SPI1_SCK	PB3 (JTDO/TRACESWO)
+SPI2	Transmit Only Master	SPI2_MOSI	PB15
+SPI2	Transmit Only Master	SPI2_SCK	PB10
+SYS	SysTick	SYS_VS_Systick	VP_SYS_VS_Systick
+TIM2	Internal Clock	TIM2_VS_ClockSourceINT	VP_TIM2_VS_ClockSourceINT
+TIM3	Internal Clock	TIM3_VS_ClockSourceINT	VP_TIM3_VS_ClockSourceINT
+TIM3	PWM Generation CH2	TIM3_CH2	PB5
+TIM8	Encoder Mode	TIM8_CH1	PC6
+TIM8	Encoder Mode	TIM8_CH2	PC7
+UART5	Asynchronous	UART5_RX	PB12
+UART5	Asynchronous	UART5_TX	PB13
+USART1	Asynchronous	USART1_RX	PA10
+USART1	Asynchronous	USART1_TX	PB14
+
+
+
+Pin Nb	PINs	FUNCTIONs	LABELs
+1	PE2	SAI1_MCLK_A	
+2	PE3	GPIO_Input	KEY_IN0
+3	PE4	SAI1_FS_A	
+4	PE5	SAI1_SCK_A	
+5	PE6	SAI1_SD_A	
+7	PC13	GPIO_Output	PAEN
+12	PH0-OSC_IN (PH0)	RCC_OSC_IN	
+13	PH1-OSC_OUT (PH1)	RCC_OSC_OUT	
+15	PC0	GPIO_Output	ADDR0
+16	PC1	GPIO_Output	ADDR1
+17	PC2_C	GPIO_Output	ADDR2
+22	PA0	GPIO_Output	BT_BUTT
+28	PA4	ADC2_INP18	
+29	PA5	ADC1_INP19	
+30	PA6	GPIO_Input	BT_LED
+31	PA7	GPIO_Input	KEY_IN1
+36	PB2	GPIO_Input	BT_bBUTT
+38	PE8	GPIO_Output	BT_bLED
+42	PE12	GPIO_Output	BT_PON
+44	PE14	GPIO_Output	MAX_LOAD
+46	PB10	SPI2_SCK	
+47	PB11	GPIO_Input	SHIFT_B
+51	PB12	UART5_RX	
+52	PB13	UART5_TX	
+53	PB14	USART1_TX	
+54	PB15	SPI2_MOSI	
+56	PD9	SAI3_SD_B	
+58	PD11	SAI2_SD_A	
+63	PC6	TIM8_CH1	
+64	PC7	TIM8_CH2	
+69	PA10	USART1_RX	
+82	PD1	SAI3_SD_A	
+84	PD3	GPIO_Input	KEY_IN2
+86	PD5	GPIO_Output	TFT_DC
+87	PD6	GPIO_Output	BSELECT
+88	PD7	SPI1_MOSI	
+89	PB3 (JTDO/TRACESWO)	SPI1_SCK	
+90	PB4 (NJTRST)	GPIO_Output	TFT_RST
+91	PB5	TIM3_CH2	
+92	PB6	GPIO_Output	TFT_CS
+93	PB7	GPIO_Input	KEY_IN3
+
+
+
+SOFTWARE PROJECT
+
+Project Settings : 
+Project Name : ROTARY_MIXER
+Project Folder : C:\Keil_v5\My_Project\XDJX_MIXER_ASSY
+Toolchain / IDE : MDK-ARM V5.32
+Firmware Package Name and Version : STM32Cube FW_H7 V1.11.1
+
+
+Code Generation Settings : 
+STM32Cube MCU packages and embedded software packs : Copy all used libraries into the project folder
+Generate peripheral initialization as a pair of '.c/.h' files per peripheral : Yes
+Backup previously generated files when re-generating : No
+Delete previously generated files when not re-generated : No
+Set all free pins as analog (to optimize the power consumption) : No
+
+
+Toolchains Settings : 
+Compiler Optimizations : 
+
+
+
+
+

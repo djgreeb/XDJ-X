@@ -1,0 +1,130 @@
+<html>
+<body>
+<pre>
+<h1>µVision Build Log</h1>
+<h2>Tool Versions:</h2>
+IDE-Version: µVision V5.34.0.0
+Copyright (C) 2021 ARM Ltd and ARM Germany GmbH. All rights reserved.
+License Information: Greeb Greeb, DRecords, LIC=Y2B1Q-NEA42-UMS9A-1NZWY-49UME-XIGH6
+ 
+Tool Versions:
+Toolchain:       MDK-ARM Professional  Version: 5.34.0.0
+Toolchain Path:  C:\Keil_v5\ARM\ARMCC\Bin
+C Compiler:      Armcc.exe V5.06 update 7 (build 960)
+Assembler:       Armasm.exe V5.06 update 7 (build 960)
+Linker/Locator:  ArmLink.exe V5.06 update 7 (build 960)
+Library Manager: ArmAr.exe V5.06 update 7 (build 960)
+Hex Converter:   FromElf.exe V5.06 update 7 (build 960)
+CPU DLL:         SARMCM3.DLL V5.34.0.0
+Dialog DLL:      DCM.DLL V1.17.3.0
+Target DLL:      STLink\ST-LINKIII-KEIL_SWO.dll V3.0.8.0
+Dialog DLL:      TCM.DLL V1.48.0.0
+ 
+<h2>Project:</h2>
+C:\Keil_v5\My_Project\XDJX_MIXER_ASSY\MDK-ARM\ROTARY_MIXER.uvprojx
+Project File Date:  03/12/2025
+
+<h2>Output:</h2>
+*** Using Compiler 'V5.06 update 7 (build 960)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
+Build target 'ROTARY_MIXER'
+compiling main.c...
+../Drivers/CMSIS/Include/arm_math.h(295): warning:  #2803-D: unrecognized GCC pragma
+  #pragma GCC diagnostic push
+../Drivers/CMSIS/Include/arm_math.h(296): warning:  #2803-D: unrecognized GCC pragma
+  #pragma GCC diagnostic ignored "-Wsign-conversion"
+../Drivers/CMSIS/Include/arm_math.h(297): warning:  #2803-D: unrecognized GCC pragma
+  #pragma GCC diagnostic ignored "-Wconversion"
+../Drivers/CMSIS/Include/arm_math.h(298): warning:  #2803-D: unrecognized GCC pragma
+  #pragma GCC diagnostic ignored "-Wunused-parameter"
+../Drivers/CMSIS/Include/arm_math.h(7148): warning:  #2803-D: unrecognized GCC pragma
+  #pragma GCC diagnostic pop
+../Inc/global_variables.h(129): warning:  #1-D: last line of file ends without a newline
+  																																									
+../Inc/audio_handler.h(30): warning:  #167-D: argument of type "uint16_t *" is incompatible with parameter of type "uint8_t *"
+  	HAL_SAI_Transmit_IT(&hsai_BlockA1, &SINED[2*rs], 2);		
+../Inc/audio_handler.h(42): warning:  #167-D: argument of type "uint16_t *" is incompatible with parameter of type "uint8_t *"
+  	HAL_SAI_Transmit_IT(&hsai_BlockA2, &SINED[2*rs], 2);	
+../Inc/audio_handler.h(54): warning:  #167-D: argument of type "int16_t *" is incompatible with parameter of type "uint8_t *"
+  	HAL_SAI_Receive_IT(&hsai_BlockA3, CH2IN, 2);
+../Inc/audio_handler.h(56): warning:  #167-D: argument of type "int16_t *" is incompatible with parameter of type "uint8_t *"
+  	HAL_SAI_Receive_IT(&hsai_BlockB3, CH1IN, 2);	
+../Inc/tft_gui.h(188): warning:  #223-D: function "sprintf" declared implicitly
+  	sprintf((char*)STR_BUFF, "123");	
+../Inc/tft_gui.h(191): warning:  #167-D: argument of type "uint8_t *" is incompatible with parameter of type "char *"
+  	TFT_String(38, 77, STR_BUFF);	
+../Inc/tft_gui.h(193): warning:  #167-D: argument of type "uint8_t *" is incompatible with parameter of type "char *"
+  	TFT_String(38, 106, STR_BUFF);			
+../Inc/tft_gui.h(291): warning:  #223-D: function "sprintf" declared implicitly
+  			sprintf((char*)STR_BUFF, "DELAY  ");	
+../Inc/tft_gui.h(295): warning:  #223-D: function "sprintf" declared implicitly
+  			sprintf((char*)STR_BUFF, "ECHO   ");	
+../Inc/tft_gui.h(299): warning:  #223-D: function "sprintf" declared implicitly
+  			sprintf((char*)STR_BUFF, "REVERB ");	
+../Inc/tft_gui.h(303): warning:  #223-D: function "sprintf" declared implicitly
+  			sprintf((char*)STR_BUFF, "TRANS  ");	
+../Inc/tft_gui.h(307): warning:  #223-D: function "sprintf" declared implicitly
+  			sprintf((char*)STR_BUFF, "FLANGER");	
+../Inc/tft_gui.h(311): warning:  #223-D: function "sprintf" declared implicitly
+  			sprintf((char*)STR_BUFF, "SLPROLL");	
+../Inc/tft_gui.h(315): warning:  #223-D: function "sprintf" declared implicitly
+  			sprintf((char*)STR_BUFF, "ROLL   ");	
+../Inc/tft_gui.h(319): warning:  #223-D: function "sprintf" declared implicitly
+  			sprintf((char*)STR_BUFF, "VINYL  ");	
+../Inc/tft_gui.h(323): warning:  #167-D: argument of type "uint8_t *" is incompatible with parameter of type "char *"
+  		TFT_String(0, 1, STR_BUFF);		
+../Inc/tft_gui.h(355): warning:  #1-D: last line of file ends without a newline
+  																																									
+../Inc/MAX7219.h(194): warning:  #1-D: last line of file ends without a newline
+  																																									
+../Src/main.c(266): warning:  #167-D: argument of type "int16_t *" is incompatible with parameter of type "uint8_t *"
+  	HAL_SAI_Transmit_IT(&hsai_BlockA1, MASTER_BUS, 2);	
+../Src/main.c(267): warning:  #167-D: argument of type "int16_t *" is incompatible with parameter of type "uint8_t *"
+  	HAL_SAI_Transmit_IT(&hsai_BlockA2, HP_BUS, 2);
+../Src/main.c(268): warning:  #167-D: argument of type "int16_t *" is incompatible with parameter of type "uint8_t *"
+  	HAL_SAI_Receive_IT(&hsai_BlockA3, CH2IN, 2);
+../Src/main.c(269): warning:  #167-D: argument of type "int16_t *" is incompatible with parameter of type "uint8_t *"
+  	HAL_SAI_Receive_IT(&hsai_BlockB3, CH1IN, 2);
+../Src/main.c(322): warning:  #223-D: function "sprintf" declared implicitly
+  		sprintf((char*)STR_BUFF, "123");	
+../Src/main.c(324): warning:  #167-D: argument of type "uint8_t *" is incompatible with parameter of type "char *"
+  		TFT_String(38, 77, STR_BUFF);		
+../Src/main.c(388): warning:  #167-D: argument of type "uint8_t *" is incompatible with parameter of type "char *"
+  		TFT_String(1, 105, STR_BUFF);		
+../Src/main.c(396): warning:  #167-D: argument of type "uint8_t *" is incompatible with parameter of type "char *"
+  		TFT_String(1, 122, &STR_BUFF[48]);
+../Src/main.c(425): warning:  #223-D: function "sprintf" declared implicitly
+  		sprintf((char*)&STR_BUFF[32], "%04lu", CRSF_midi);
+../Src/main.c(428): warning:  #167-D: argument of type "uint8_t *" is incompatible with parameter of type "char *"
+  		TFT_String(1, 113, &STR_BUFF[32]);
+../Src/main.c: 34 warnings, 0 errors
+linking...
+Program Size: Code=37150 RO-data=6550 RW-data=252 ZI-data=3668  
+FromELF: creating hex file...
+"ROTARY_MIXER\XDJ-X MIXER ASSY.axf" - 0 Error(s), 34 Warning(s).
+
+<h2>Software Packages used:</h2>
+
+Package Vendor: ARM
+                http://www.keil.com/pack/ARM.CMSIS.5.7.0.pack
+                ARM.CMSIS.5.7.0
+                CMSIS (Cortex Microcontroller Software Interface Standard)
+   * Component: CORE Version: 5.4.0
+
+Package Vendor: Keil
+                https://www.keil.com/pack/Keil.STM32H7xx_DFP.3.1.1.pack
+                Keil.STM32H7xx_DFP.3.1.1
+                STMicroelectronics STM32H7 Series Device Support and Examples
+
+<h2>Collection of Component include folders:</h2>
+  .\RTE\_ROTARY_MIXER
+  C:\Users\Greeb\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include
+  C:\Users\Greeb\AppData\Local\Arm\Packs\Keil\STM32H7xx_DFP\3.1.1\Drivers\CMSIS\Device\ST\STM32H7xx\Include
+
+<h2>Collection of Component Files used:</h2>
+
+   * Component: ARM::CMSIS:CORE:5.4.0
+      Include file:  CMSIS\Core\Include\tz_context.h
+Build Time Elapsed:  00:00:05
+</pre>
+</body>
+</html>
