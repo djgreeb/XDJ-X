@@ -1,0 +1,80 @@
+Configuration	Power_manager
+STM32CubeMX 	6.10.0
+Date	03/17/2025
+MCU	STM32G431CBUx
+
+
+
+PERIPHERALS	MODES	FUNCTIONS	PINS
+ADC1	IN1 Single-ended	ADC1_IN1	PA0
+RCC	Crystal/Ceramic Resonator	RCC_OSC_IN	PF0-OSC_IN
+RCC	Crystal/Ceramic Resonator	RCC_OSC_OUT	PF1-OSC_OUT
+SYS	SysTick	SYS_VS_Systick	VP_SYS_VS_Systick
+SYS	Dead Battery Signals disabled	SYS_VS_DBSignals	VP_SYS_VS_DBSignals
+USART1	Asynchronous	USART1_RX	PA10
+USART1	Asynchronous	USART1_TX	PC4
+
+
+
+Pin Nb	PINs	FUNCTIONs	LABELs
+5	PF0-OSC_IN	RCC_OSC_IN	
+6	PF1-OSC_OUT	RCC_OSC_OUT	
+8	PA0	ADC1_IN1	
+11	PA3	GPIO_Input	BUTTON_IN
+13	PA5	GPIO_Output	PON
+16	PC4	USART1_TX	
+26	PB13	GPIO_Input	ACIN_EN
+28	PB15	GPIO_Input	CHARGE_EN
+32	PA10	USART1_RX	
+41	PB3	GPIO_Output	LED_WHITE
+43	PB5	GPIO_Output	LED_GREEN
+PERIPHERALS	MODES	FUNCTIONS	PINS
+ADC1	IN1 Single-ended	ADC1_IN1	PA0
+RCC	Crystal/Ceramic Resonator	RCC_OSC_IN	PF0-OSC_IN
+RCC	Crystal/Ceramic Resonator	RCC_OSC_OUT	PF1-OSC_OUT
+SYS	SysTick	SYS_VS_Systick	VP_SYS_VS_Systick
+SYS	Dead Battery Signals disabled	SYS_VS_DBSignals	VP_SYS_VS_DBSignals
+USART1	Asynchronous	USART1_RX	PA10
+USART1	Asynchronous	USART1_TX	PC4
+
+
+
+Pin Nb	PINs	FUNCTIONs	LABELs
+5	PF0-OSC_IN	RCC_OSC_IN	
+6	PF1-OSC_OUT	RCC_OSC_OUT	
+8	PA0	ADC1_IN1	
+11	PA3	GPIO_Input	BUTTON_IN
+13	PA5	GPIO_Output	PON
+16	PC4	USART1_TX	
+26	PB13	GPIO_Input	ACIN_EN
+28	PB15	GPIO_Input	CHARGE_EN
+32	PA10	USART1_RX	
+41	PB3	GPIO_Output	LED_WHITE
+43	PB5	GPIO_Output	LED_GREEN
+
+
+
+SOFTWARE PROJECT
+
+Project Settings : 
+Project Name : Power_manager
+Project Folder : C:\Keil_v5\Projects\Power_manager
+Toolchain / IDE : MDK-ARM V5.32
+Firmware Package Name and Version : STM32Cube FW_G4 V1.5.1
+
+
+Code Generation Settings : 
+STM32Cube MCU packages and embedded software packs : Copy all used libraries into the project folder
+Generate peripheral initialization as a pair of '.c/.h' files per peripheral : Yes
+Backup previously generated files when re-generating : No
+Delete previously generated files when not re-generated : Yes
+Set all free pins as analog (to optimize the power consumption) : No
+
+
+Toolchains Settings : 
+Compiler Optimizations : 
+
+
+
+
+
