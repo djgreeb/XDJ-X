@@ -17,5 +17,5 @@ OVERALL BLOCK DIAGRAM
 
 ![OVERALL BLOCK DIAGRAM](https://github.com/user-attachments/assets/cbc446ae-c7ef-409f-bf2b-90ac37aeba47)
 
-
+XDJ-X is based on 2 STM32H7 series ARMs, which handle the mixer and deck audio parts. Two STM32F4 microcontrollers handle the buttons and jog wheels in the decks. 1 STM32G4 microcontroller handles power, battery charge and standby.
 
