@@ -7,7 +7,7 @@ The main goal was to create a 2-channel dj setup, compact, without major comprom
 
 Displays in jogs are specially selected classic VFD, not TFT. These displays have a higher response speed, requiring fewer resources. And this is their main task, when scratching.
 
-The XDJ-X has such advantages as an optical crossfader, a Bluetooth transmitter capable of transmitting a master bus signal or a CUE bus. A built-in battery, the ability to charge the device from a socket or in a car. Built-in speakers (from a MacBook Pro). Support for Rekordbox playlists.
+The XDJ-X has such advantages as an optical crossfader, a Bluetooth transmitter capable of transmitting a master bus signal or a CUE bus. A built-in battery, the ability to charge the device from a socket or in a car. Built-in speakers (from a MacBook Pro). Support for Rekordbox playlists, wav 16 bits, 44.1 kHz audio files on SD card.
 
 And the most important advantage for me: my source code, scheme, printed circuit board. This will allow adding and testing ideas, algorithms of effects, gui, which in the future will be presented in new models of dj equipment from large companies.
 
@@ -17,7 +17,7 @@ OVERALL BLOCK DIAGRAM
 
 ![OVERALL BLOCK DIAGRAM](https://github.com/user-attachments/assets/cbc446ae-c7ef-409f-bf2b-90ac37aeba47)
 
-XDJ-X is based on 2 STM32H7 series ARMs, which handle the mixer and deck audio parts. Two STM32F4 microcontrollers handle the buttons and jog wheels in the decks. 1 STM32G4 microcontroller handles power, battery charge and standby.
+XDJ-X is based on 2 STM32H7 series ARMs, which handle the mixer and deck audio parts. Two STM32F446RET6 microcontrollers handle the buttons and jog wheels in the decks. 1 STM32G431CBU6 microcontroller handles power, battery charge and standby.
 
 
 Some videos:
