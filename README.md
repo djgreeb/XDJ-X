@@ -1,7 +1,7 @@
 # XDJ-X
  All-in-one Dj System
 
-The XDJ-X is an all-in-one DJ system built on the body parts of the CDJ-1000mk3, such as the jog wheel, buttons, and pitch.
+The XDJ-X is an standalone all-in-one DJ system built on the body parts of the CDJ-1000mk3, such as the jog wheel, buttons, and pitch.
 
 The main goal was to create a 2-channel dj setup, compact, without major compromises. Have full-fledged jog wheels, pads, a mixer layer the same as the DJM-900nxs, with an effects display imitating the vacuum display of the classic DJM.
 
