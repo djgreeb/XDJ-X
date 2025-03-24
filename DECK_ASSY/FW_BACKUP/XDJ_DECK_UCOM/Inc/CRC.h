@@ -1,0 +1,86 @@
+/////////////////////////////////////////////////////////////////////////////////////////////////
+// 	CRCs funtions
+//	product: XDJ-X deck ucom
+//
+//
+//
+//
+//	Author: Anatska Andrei
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+uint8_t n;
+uint8_t sm;
+
+void CalcTXCRC(void);
+uint8_t CheckRXCRC(void);
+
+////////////////////////////////////////////////////////
+//
+//
+//
+void CalcTXCRC(void)
+	{
+	#ifdef DECK_1	
+	deckTbuf[8] = 0;	
+	for(n=0;n<8;n++)
+		{
+		deckTbuf[8]+=deckTbuf[n];	
+		}
+	#endif
+
+	#ifndef DECK_1
+	deckTbuf[17] = 0;	
+	for(n=9;n<17;n++)
+		{
+		deckTbuf[17]+=deckTbuf[n];	
+		}
+	#endif
+	};
+
+
+////////////////////////////////////////////////////////
+//
+//
+//
+uint8_t CheckRXCRC(void)
+	{
+	#ifdef DECK_1	
+	sm = 0;	
+	for(n=0;n<8;n++)
+		{
+		sm+=deckRbuf[n];	
+		}
+//	if(sm==deckRbuf[8])
+//		{
+		return 1;	
+//		}		
+//	else
+//		{
+//		return 0;	
+//		}
+	#endif
+
+	#ifndef DECK_1
+	sm = 0;		
+	for(n=9;n<17;n++)
+		{
+		sm+=deckRbuf[n];	
+		}
+//	if(sm==deckRbuf[17])
+//		{
+		return 1;	
+//		}		
+//	else
+//		{
+//		return 0;	
+//		}	
+	#endif
+	}
+
+
+	
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	
+	
