@@ -52,7 +52,7 @@
           <OutputName>XDJX</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
-          <CreateHexFile>0</CreateHexFile>
+          <CreateHexFile>1</CreateHexFile>
           <DebugInformation>1</DebugInformation>
           <BrowseInformation>1</BrowseInformation>
           <ListingPath></ListingPath>
@@ -339,7 +339,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32H750xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;../Drivers/STM32H7xx_HAL_Driver/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32H7xx/Include;../Drivers/CMSIS/Include;../Drivers/LCD/STM32746G-Discovery;../Drivers/LCD/Components/Common;../Utilities/Fonts;../Middlewares/Third_Party/FatFs/src</IncludePath>
+              <IncludePath>../Inc;../Drivers/STM32H7xx_HAL_Driver/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32H7xx/Include;../Drivers/CMSIS/Include;../Drivers/LCD/STM32746G-Discovery;../Drivers/LCD/Components/Common;../Utilities/Fonts;../Middlewares/Third_Party/FatFs/src;..\Drivers\QSPI</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -361,14 +361,14 @@
             </VariousControls>
           </Aads>
           <LDads>
-            <umfTarg>1</umfTarg>
+            <umfTarg>0</umfTarg>
             <Ropi>0</Ropi>
             <Rwpi>0</Rwpi>
             <noStLib>0</noStLib>
             <RepFail>1</RepFail>
             <useFile>0</useFile>
-            <TextAddressRange></TextAddressRange>
-            <DataAddressRange></DataAddressRange>
+            <TextAddressRange>0x08000000</TextAddressRange>
+            <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
             <ScatterFile>XDJX\XDJX.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
@@ -1032,6 +1032,16 @@
               <FileName>stm32h7xx_hal_msp.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Src/stm32h7xx_hal_msp.c</FilePath>
+            </File>
+            <File>
+              <FileName>w25qxx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Drivers\QSPI\w25qxx.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32746g_discovery_qspi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Drivers\BSP\STM32746G-Discovery\stm32746g_discovery_qspi.c</FilePath>
             </File>
           </Files>
         </Group>

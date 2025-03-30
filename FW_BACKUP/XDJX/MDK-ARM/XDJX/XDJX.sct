@@ -17,3 +17,8 @@ LR_IROM1 0x08000000 0x00020000  {    ; load region size_region
   }
 }
 
+LR_QSPI 0x90000000 0x00800000 {
+ER_QSPI 0x90000000 0x00800000 {
+*(.qspi_data)
+}
+}

@@ -18,6 +18,8 @@
 "xdjx\usart.o"
 "xdjx\stm32h7xx_it.o"
 "xdjx\stm32h7xx_hal_msp.o"
+"xdjx\w25qxx.o"
+"xdjx\stm32746g_discovery_qspi.o"
 "xdjx\stm32h7xx_hal_cortex.o"
 "xdjx\stm32h7xx_hal_dma2d.o"
 "xdjx\stm32h7xx_hal_rcc.o"

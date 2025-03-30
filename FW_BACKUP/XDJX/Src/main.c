@@ -116,8 +116,9 @@
 //		-	debugged SAI exchange 128 bits per sample (32 bits per channel)
 //	ver. 0.54
 //		- added test sine 882Hz
-//
-//
+//	ver. 0.55
+//		- added shor audio
+//		- added double libruary QSPI MemMap need debug QSPI: HardFault in stm32h7xx_it.c
 //
 //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////	
@@ -249,6 +250,18 @@ int main(void)
   MX_UART7_Init();
   /* USER CODE BEGIN 2 */
 	
+	//// need debug QSPI: HardFault in stm32h7xx_it.c
+	//	double libruary QSPI MemMap
+	//i = BSP_QSPI_Init();
+  //BSP_QSPI_EnableMemoryMappedMode();
+	//WRITE_REG(QUADSPI->LPTR, 0xFFF);
+	//W25QXX_Init();
+	//W25Q_Memory_Mapped_Enable();
+	//sprintf((char*)U_TX_DATA, "rslt %01lu\n\r", i);	
+	//HAL_UART_Transmit(&huart4, U_TX_DATA, 8, 5);
+
+
+
 	BSP_SD_Init();
 	USART1->CR1 |= USART_CR1_RXNEIE_RXFNEIE; //interrupt ON for a RX enable	
 	USART1->CR1 |= USART_CR1_PEIE;
@@ -292,7 +305,7 @@ int main(void)
 		deckTbuf[j][1] = 0x20;
 		deckTbuf[j][2] = 0x30;
 		deckTbuf[j][3] = 0x40;
-		deckTbuf[j][4] = 0xE0;	
+		deckTbuf[j][4] = 0xE3;	
 		deckTbuf[j][5] = 85;	
 		deckTbuf[j][6] = 27;
 		deckTbuf[j][7] = 135;	//play pos
@@ -301,7 +314,7 @@ int main(void)
 		deckTbuf[j][10] = 0x20;
 		deckTbuf[j][11] = 0x30;
 		deckTbuf[j][12] = 0x40;
-		deckTbuf[j][13] = 0xE0;	
+		deckTbuf[j][13] = 0xE3;	
 		deckTbuf[j][14] = 85;	
 		deckTbuf[j][15] = 15;
 		deckTbuf[j][16] = 135;	//play pos
@@ -362,8 +375,9 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	RedrawWaveforms(play_adr/294);	
-
+	RedrawWaveforms(play_adr/294);		
+		
+	//SINED[3] = REKBX[play_adr%11264][1]; 	
 		
 		
 //	if(i<479)
@@ -907,7 +921,25 @@ void MPU_Config(void)
 
   HAL_MPU_ConfigRegion(&MPU_InitStruct);
   /* Enables the MPU */
+ // HAL_MPU_Enable(MPU_HFNMI_PRIVDEF);
+
+
+  MPU_InitStruct.Enable = MPU_REGION_ENABLE;
+  MPU_InitStruct.Number = MPU_REGION_NUMBER1;
+  MPU_InitStruct.BaseAddress = 0x90000000;
+  MPU_InitStruct.Size = MPU_REGION_SIZE_8MB;
+  MPU_InitStruct.SubRegionDisable = 0x0;
+  MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL0;
+  MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
+  MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_ENABLE;
+  MPU_InitStruct.IsShareable = MPU_ACCESS_SHAREABLE;
+  MPU_InitStruct.IsCacheable = MPU_ACCESS_NOT_CACHEABLE;
+  MPU_InitStruct.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
+
+  HAL_MPU_ConfigRegion(&MPU_InitStruct);
+  /* Enables the MPU */
   HAL_MPU_Enable(MPU_HFNMI_PRIVDEF);
+
 
 }
 

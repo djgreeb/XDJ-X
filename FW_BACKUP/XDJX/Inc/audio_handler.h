@@ -39,9 +39,25 @@ void SAI1_IRQHandler(void)
 		{
 		rs1 = 0;	
 		}			
+
+		
+	if(s<11000)
+		{
+		s++;	
+		}	
+	else
+		{
+		s = 0;	
+		}		
+		
+		
+	//SINED882[4*rs1+2] = REKBX[s][s%3]; 
+
+	SINED[2] = audio[4*(play_adr%7945)] + 0x100*audio[4*(play_adr%7945)+1];
+	SINED[3] = audio[4*(play_adr%7945)+2] + 0x100*audio[4*(play_adr%7945)+3];	
 		
 	HAL_SAI_Transmit_IT(&hsai_BlockA1, (uint8_t*)&SINED882[4*rs1], 2);
-	HAL_SAI_Transmit_IT(&hsai_BlockB1, (uint8_t*)&SINED[4*rs], 2);	
+	HAL_SAI_Transmit_IT(&hsai_BlockB1, (uint8_t*)&SINED[0], 2);	
 	play_adr++;	
 	if(play_adr>6000000)
 		{

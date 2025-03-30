@@ -26,8 +26,10 @@ void TIM2_IRQHandler(void)
 		TXpage = 0;	
 		}
 		
+	deckTbuf[TXpage][7] = ((play_adr/588)+65)%135; 		
+	deckTbuf[TXpage][16] = (play_adr/588)%135; 
+				
 	rslt = Decks_DMA(&hspi2, &deckTbuf[TXpage][0], deckRbuf, 18);
-		
 	
 	HAL_TIM_IRQHandler(&htim2);	
 	}
