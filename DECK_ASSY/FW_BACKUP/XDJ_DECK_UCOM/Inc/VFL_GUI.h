@@ -11,7 +11,7 @@
 
 void draw_playing_sector(uint8_t sc);
 void draw_cue_sector(uint8_t sc);
-void draw_slip_sector(uint8_t sc);
+void draw_slip_sector(uint8_t sc, uint8_t cue);
 
 
 
@@ -134,28 +134,70 @@ void draw_playing_sector(uint8_t sc)
 /////////////////////////////////////////////////////
 //
 //	0...84
+//	85 - clear	
 //	
 void draw_cue_sector(uint8_t sc)
 	{
 	uint8_t i;	
-	for(i=0;i<85;i++)
-		{	
-		
+	if(sc<85)
+		{
+		for(i=0;i<85;i++)
+			{	
+			if(i>=sc && i<(sc+2) || (sc>82 && i<((sc+87)%85)))
+				{						//red
+				VFL_DATA[CSEGM[i]>>3]|=BITON[CSEGM[i]%8];		
+				}
+			else					//black
+				{
+				VFL_DATA[CSEGM[i]>>3]&=BITOFF[CSEGM[i]%8];
+				}
+			}			
 		}
+	else if(sc==85)			//CUE without cue on jog display 
+		{
+		for(i=0;i<85;i++)
+			{				//black
+			VFL_DATA[CSEGM[i]>>3]&=BITOFF[CSEGM[i]%8];	
+			}				
+		}
+	return;	
 	};
 	
-
 /////////////////////////////////////////////////////
 //
 //	0...84
+//	85 - clear
 //	
-void draw_slip_sector(uint8_t sc)
+void draw_slip_sector(uint8_t sc, uint8_t cue)
 	{
-	uint8_t i;	
-	for(i=0;i<85;i++)
-		{	
-		
-		}	
+	uint8_t i;
+	if(sc<85)
+		{
+		for(i=0;i<85;i++)
+			{	
+			if((i>=sc && i<(sc+3)) || (sc>81 && i<((sc+88)%85)))
+				{						//black	
+				VFL_DATA[CSEGM[i]>>3]&=BITOFF[CSEGM[i]%8];
+				}
+			else if(cue<85 && (i==((cue+84)%85) || i==((cue+2)%85)))	
+				{
+				VFL_DATA[CSEGM[i]>>3]&=BITOFF[CSEGM[i]%8];	
+				}
+			else					//red
+				{
+				VFL_DATA[CSEGM[i]>>3]|=BITON[CSEGM[i]%8];		
+				}	
+			}
+		}
+	else if(sc==85)
+		{
+		for(i=0;i<85;i++)
+			{	//black
+			VFL_DATA[CSEGM[i]>>3]&=BITOFF[CSEGM[i]%8];
+			}
+		prev_cue_sect = 0xFF;		//forcebly redraw cue	
+		}		
+	return;	
 	}
 	
 	

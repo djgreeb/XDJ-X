@@ -1,6 +1,6 @@
 Configuration	XDJ_DECK_UCOM
 STM32CubeMX 	4.25.1
-Date	03/17/2025
+Date	05/10/2025
 MCU	STM32F446RETx
 
 
@@ -24,6 +24,7 @@ TIM1	Internal Clock	TIM1_VS_ClockSourceINT	VP_TIM1_VS_ClockSourceINT
 TIM1	PWM Generation CH1	TIM1_CH1	PA8
 TIM1	PWM Generation CH2	TIM1_CH2	PA9
 TIM1	PWM Generation CH3	TIM1_CH3	PA10
+TIM2	Internal Clock	TIM2_VS_ClockSourceINT	VP_TIM2_VS_ClockSourceINT
 TIM3	Internal Clock	TIM3_VS_ClockSourceINT	VP_TIM3_VS_ClockSourceINT
 TIM3	PWM Generation CH1	TIM3_CH1	PC6
 TIM4	Encoder Mode	TIM4_CH1	PB6

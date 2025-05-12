@@ -22,18 +22,18 @@ uint8_t CheckRXCRC(void);
 void CalcTXCRC(void)
 	{
 	#ifdef DECK_1	
-	deckTbuf[8] = 0;	
-	for(n=0;n<8;n++)
+	deckTbuf[7] = 0;	
+	for(n=0;n<7;n++)
 		{
-		deckTbuf[8]+=deckTbuf[n];	
+		deckTbuf[7]+=deckTbuf[n];	
 		}
 	#endif
 
 	#ifndef DECK_1
-	deckTbuf[17] = 0;	
-	for(n=9;n<17;n++)
+	deckTbuf[15] = 0;	
+	for(n=8;n<15;n++)
 		{
-		deckTbuf[17]+=deckTbuf[n];	
+		deckTbuf[15]+=deckTbuf[n];	
 		}
 	#endif
 	};
@@ -47,11 +47,11 @@ uint8_t CheckRXCRC(void)
 	{
 	#ifdef DECK_1	
 	sm = 0;	
-	for(n=0;n<8;n++)
+	for(n=0;n<7;n++)
 		{
 		sm+=deckRbuf[n];	
 		}
-//	if(sm==deckRbuf[8])
+//	if(sm==deckRbuf[7])
 //		{
 		return 1;	
 //		}		
@@ -63,11 +63,11 @@ uint8_t CheckRXCRC(void)
 
 	#ifndef DECK_1
 	sm = 0;		
-	for(n=9;n<17;n++)
+	for(n=8;n<15;n++)
 		{
 		sm+=deckRbuf[n];	
 		}
-//	if(sm==deckRbuf[17])
+//	if(sm==deckRbuf[15])
 //		{
 		return 1;	
 //		}		

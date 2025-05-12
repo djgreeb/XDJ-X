@@ -96,31 +96,55 @@ uint8_t PAD_BUF[100] =  {0x88, 0x88, 0x88, 0x88,
 												0x88, 0x88, 0x88, 0x88,
 												0x88, 0x88, 0x88, 0x88, 
 												0x00, 0x00, 0x00, 0x00};			
-
-											
+			
 
 /* JOG RING ---------------------------------------------------------*/																				 
 uint8_t R_rx, G_rx, B_rx;						
 
-																			 
+/* JOG timer ---------------------------------------------------------*/													
+uint8_t new_measure_spd = 0;						
+uint32_t cnts = 0;												
+uint32_t tims = 0;
+uint32_t _tims = 0;												
+uint32_t JOGSPD = 0;												
 
 /* SPI DMA TRANSFER ---------------------------------------------------------*/																			 
-		
-uint8_t deckRbuf[20];
-																			 
+uint8_t	dma_div = 0;
+uint8_t	adc_div = 0;													
+uint8_t deckRbuf[16];		
+												
 #ifdef DECK_1
-uint8_t deckTbuf[18] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-												0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+uint8_t deckTbuf[16] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+												0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 #endif
 
 #ifndef DECK_1
-uint8_t deckTbuf[18] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 
-												0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+uint8_t deckTbuf[16] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 
+												0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 #endif			
 
-																			 
+/* ADCs ---------------------------------------------------------*/																				 
+uint16_t pot_ADC[16] = {0};
+uint32_t pot_SUM = 0;
+uint16_t pot_out;					//potenciometer value after gysteresis 0..4095 approx
+uint16_t  pot_10b = 0;		//potenciometer value (after vonversion 4095 to 255) 0..255 approx
+uint32_t ADC_TMP;												
+uint8_t cnt_ad = 0;												
+#define adc_hysteresis	8			//7 stable for mediannyj filter; 7.5 for slip aver;
+#define adc_hysteresis2	15	
 
-												
+#define POTL	20						//for conversion 4095 to 255
+#define POTCL	2021					//		2091 - center
+#define POTCH	2161					//
+#define POTH	4075					//	
+
+
+#define POTxCD1	1047					//				
+#define POTxCD2	1094					//
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				
 																																									

@@ -71,6 +71,7 @@
 //
 //
 //	TIM1 LEDS PWM
+//	TIM2 time counter for jog encoder
 //	TIM3 transformer PWM
 //	TIM4 JOG ENCODER TIMER
 //	TIM5 1315*4Hz for VFD
@@ -105,7 +106,23 @@
 //		-	improved SPI transfer
 //	ver. 0.20
 //		-	SPI transfer fixed
-//
+//	ver. 0.21
+//		- changed packet length to 8 bytes (7+CRC)
+//	ver. 0.23
+//		- added cue on vfd
+//		- added slip mode on vfd
+//	ver. 0.25
+//		-	regenerated code
+//		-	added TIM2
+//	ver. 0.26
+//		-	improved jog cnt
+//	ver. 0.27
+//		- fixed bug, data offsets on 2 deck due to packet reduction by 16 bytes
+//	ver. 0.29
+//		- slip mode round clear fixed
+//		- adc pitch gysteresis added 
+//	ver. 0.31
+//		- PWM ring is changed
 //
 //
 //
@@ -129,6 +146,8 @@
 #include "global_variables.h"
 #include "CRC.h"
 extern DMA_HandleTypeDef hdma_spi1_tx;
+
+uint8_t FIRMWARE_VERSION = 31;			//127 max!
 
 /* USER CODE END PV */
 
@@ -187,7 +206,20 @@ int main(void)
   MX_TIM3_Init();
   MX_TIM4_Init();
   MX_TIM5_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
+	HAL_TIM_Base_Start_IT(&htim2);				//ENCODER TIME
+	HAL_TIM_Encoder_Start_IT(&htim4, TIM_CHANNEL_ALL);				//ENCODER
+	
+	
+	#ifdef DECK_1
+	deckTbuf[4] = FIRMWARE_VERSION;
+	#endif
+
+	#ifndef DECK_1
+	deckTbuf[12] = FIRMWARE_VERSION;
+	#endif
+	
 	
 	HAL_TIM_Base_Start_IT(&htim5);
 	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);			//transformer pwm
@@ -205,13 +237,10 @@ int main(void)
 		HAL_Delay(25);	
 		}
 	TIM3->CCR1 = transformer_pwm;
-	HAL_Delay(1500);
-	
-	HAL_SPI_TransmitReceive_DMA(&hspi1, deckTbuf, deckRbuf, 18);
-	
-
-
+	HAL_Delay(1000);
 		
+	HAL_SPI_TransmitReceive_DMA(&hspi1, deckTbuf, deckRbuf, 16);
+
 	HAL_Delay(300);		
 	COLOR_SET(PAD[0], 0);
 	COLOR_SET(PAD[1], 1);
@@ -231,6 +260,9 @@ int main(void)
 	VFL_DATA[0]|=BITON[4];				//vinyl label ON
 	VFL_DATA[0]|=BITON[6];				//S ring
 		
+	TIM1->CCR1 = 255;
+	TIM1->CCR2 = 255;
+	TIM1->CCR3 = 255;	
 		
 		
   /* USER CODE END 2 */
@@ -315,6 +347,27 @@ void SystemClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 
+///////////////////////////////////////////////////////////////
+//
+//		Jog encoder timer
+//
+void TIM4_IRQHandler(void)
+	{
+	if(new_measure_spd==1)
+		{
+		TIM4->CNT = 32768;
+		tims = 0;	
+		TIM2->CNT = 0;
+		new_measure_spd = 0;	
+		}
+	else
+		{
+		tims = TIM2->CNT;
+		}
+  HAL_TIM_IRQHandler(&htim4);	
+	}
+
+		
 #include "spi_transfer.h"
 	
 	
