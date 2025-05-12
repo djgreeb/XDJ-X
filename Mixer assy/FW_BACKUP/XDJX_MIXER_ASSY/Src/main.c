@@ -147,6 +147,22 @@
 //	-	added firs audio processing with pot control
 //	ver. 0.33
 //	-	added TRIM, CRSF, FDR, MIXN processes
+//	ver. 0.35
+//	-	SAI reception has been switched to floating point data
+//	-	added a new arrays for audio processing
+//	ver. 0.37
+//	-	added EQ processeng
+//	-	added level meters connecting to audio
+//	ver. 0.38
+//	-	added LVLtoDB func.
+//	- optimized LEVEL_METER func.
+//	ver. 0.39
+//	- leveler integrator code changed
+//	ver. 0.40
+//	- improved leveler integrator coeff
+//	-	LEVEL_METER func bug fix
+//
+//
 //
 //
 //
@@ -255,7 +271,13 @@ int main(void)
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
 	MAX7219_INIT();
-	HAL_Delay(3100);
+	HAL_Delay(2900);
+	
+	init_3band_state(&eql0, 880, 4000, 44100);
+	init_3band_state(&eqr0, 880, 4000, 44100);
+	init_3band_state(&eql1, 880, 4000, 44100);
+	init_3band_state(&eqr1, 880, 4000, 44100);
+	
 	
 	HAL_GPIO_WritePin(TFT_RST_GPIO_Port, TFT_RST_Pin, GPIO_PIN_SET);
 	HAL_Delay(100);
@@ -326,7 +348,7 @@ int main(void)
 			TFT_SetTextColor(TFT_BLACK);	
 			lay = 0;		
 			}
-		sprintf((char*)STR_BUFF, "123");	
+		sprintf((char*)STR_BUFF, "126");	
 		TFT_SetFont(&FontVFD);					
 		TFT_String(38, 77, STR_BUFF);		
 			
@@ -404,23 +426,23 @@ int main(void)
 		temp_time = HAL_GetTick();	
 		}
 
-	if(ADC_prev[1]!=pot_out[FDR0])
-		{			
-		LEVEL_METER(0, pot_out[FDR0]/329, 0);
-		ADC_prev[1] = pot_out[FDR0];	
-		}	
+//	if(ADC_prev[1]!=pot_out[FDR0])
+//		{			
+//		LEVEL_METER(0, pot_out[FDR0]/329, 0);
+//		ADC_prev[1] = pot_out[FDR0];	
+//		}	
 
-	if(ADC_prev[0]!=pot_out[FDR1])
-		{			
-		LEVEL_METER(1, pot_out[FDR1]/329, 0);
-		ADC_prev[0] = pot_out[FDR1];	
-		}		
-		
-	if(ADC_prev[2]!=pot_out[HPHN])
-		{			
-		LEVEL_METER(2, pot_out[HPHN]/329, 0);
-		ADC_prev[2] = pot_out[HPHN];	
-		}	
+//	if(ADC_prev[0]!=pot_out[FDR1])
+//		{			
+//		LEVEL_METER(1, pot_out[FDR1]/329, 0);
+//		ADC_prev[0] = pot_out[FDR1];	
+//		}		
+//		
+//	if(ADC_prev[2]!=pot_out[HPHN])
+//		{			
+//		LEVEL_METER(2, pot_out[HPHN]/329, 0);
+//		ADC_prev[2] = pot_out[HPHN];	
+//		}	
 		
 		
 		
@@ -430,7 +452,7 @@ int main(void)
 		TFT_SetTextColor(TFT_WHITE);
 		TFT_SetFont(&Font8);	
 		TFT_String(1, 113, &STR_BUFF[32]);
-		LEVEL_METER(3, pot_8b[B]/21, 0);
+		//LEVEL_METER(3, pot_8b[B]/21, 0);
 		ADC_prev[3] = pot_8b[B];	
 		}			
 

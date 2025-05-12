@@ -10,13 +10,6 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 					
-int16_t MASTER_BUS[2];
-int16_t HP_BUS[2];
-int16_t CH0IN[4];
-int16_t CH1IN[4];
-float POSTEQCH0[2];
-float POSTEQCH1[2];
-float CUESUM[2];
 
 /* BLUETOOTH ---------------------------------------------------------*/
 #define BT_POW_ON			GPIOE->BSRR = 0x00001000		//HAL_GPIO_WritePin(GPIOE, BT_PON_Pin, GPIO_PIN_SET)
@@ -35,6 +28,24 @@ uint8_t need_draw_fxsel = 0;
 /* MAX7219 ---------------------------------------------------------*/
 uint8_t MAX7219_DATA[8] = {0};
 uint8_t MAX7219_need_update = 0;
+uint8_t prev_lvl[4] = {0xFF, 0xFF, 0xFF, 0xFF};
+uint8_t prev_pklvl[4] = {0xFF, 0xFF, 0xFF, 0xFF};
+
+const static uint16_t dBConv[12]={
+32766,		//over(+12)		0				100.00%				
+23195,		//+9					-3			70.79%
+16422,		//+6					-6			50.12%
+11625,		//+3					-9			35.48%
+8230,			//0						-12			25.12%
+5826,			//-3					-15			17.78%
+4125,			//-6					-18			12.59%	
+2919,			//-9					-21			8.91%
+2067,			//-12					-24			6.31%
+1464,			//-15					-27			4.47%
+1035,			//-18					-30			3.16%
+518				//-24					-36			1.58%
+};
+
 
 /* TFT ---------------------------------------------------------*/
 uint8_t previous_ch = 0xFF;
@@ -129,6 +140,9 @@ uint8_t link_usart_data_cnt = 0;
 uint8_t link_new_data = 0;
 uint8_t link_urx_buf[16];
 uint8_t linkURX;
+
+
+
 
 
 /* TEMPORARY ---------------------------------------------------------*/

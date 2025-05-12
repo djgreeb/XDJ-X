@@ -27,7 +27,76 @@ Project File Date:  03/12/2025
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 7 (build 960)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'ROTARY_MIXER'
-"ROTARY_MIXER\XDJ-X MIXER ASSY.axf" - 0 Error(s), 0 Warning(s).
+compiling main.c...
+../Drivers/CMSIS/Include/arm_math.h(295): warning:  #2803-D: unrecognized GCC pragma
+  #pragma GCC diagnostic push
+../Drivers/CMSIS/Include/arm_math.h(296): warning:  #2803-D: unrecognized GCC pragma
+  #pragma GCC diagnostic ignored "-Wsign-conversion"
+../Drivers/CMSIS/Include/arm_math.h(297): warning:  #2803-D: unrecognized GCC pragma
+  #pragma GCC diagnostic ignored "-Wconversion"
+../Drivers/CMSIS/Include/arm_math.h(298): warning:  #2803-D: unrecognized GCC pragma
+  #pragma GCC diagnostic ignored "-Wunused-parameter"
+../Drivers/CMSIS/Include/arm_math.h(7148): warning:  #2803-D: unrecognized GCC pragma
+  #pragma GCC diagnostic pop
+../Inc/global_variables.h(158): warning:  #1-D: last line of file ends without a newline
+  																																									
+../Inc/audio_handler.h(252): warning:  #167-D: argument of type "int16_t *" is incompatible with parameter of type "uint8_t *"
+  	HAL_SAI_Transmit_IT(&hsai_BlockA1, HP_BUS, 2);
+../Inc/audio_handler.h(267): warning:  #167-D: argument of type "int16_t *" is incompatible with parameter of type "uint8_t *"
+  	HAL_SAI_Transmit_IT(&hsai_BlockA2, MASTER_BUS, 2);	
+../Inc/audio_handler.h(293): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  	if(dt>32767.0)
+../Inc/tft_gui.h(188): warning:  #223-D: function "sprintf" declared implicitly
+  	sprintf((char*)STR_BUFF, "123");	
+../Inc/tft_gui.h(191): warning:  #167-D: argument of type "uint8_t *" is incompatible with parameter of type "char *"
+  	TFT_String(38, 77, STR_BUFF);	
+../Inc/tft_gui.h(193): warning:  #167-D: argument of type "uint8_t *" is incompatible with parameter of type "char *"
+  	TFT_String(38, 106, STR_BUFF);			
+../Inc/tft_gui.h(291): warning:  #223-D: function "sprintf" declared implicitly
+  			sprintf((char*)STR_BUFF, "DELAY  ");	
+../Inc/tft_gui.h(295): warning:  #223-D: function "sprintf" declared implicitly
+  			sprintf((char*)STR_BUFF, "ECHO   ");	
+../Inc/tft_gui.h(299): warning:  #223-D: function "sprintf" declared implicitly
+  			sprintf((char*)STR_BUFF, "REVERB ");	
+../Inc/tft_gui.h(303): warning:  #223-D: function "sprintf" declared implicitly
+  			sprintf((char*)STR_BUFF, "TRANS  ");	
+../Inc/tft_gui.h(307): warning:  #223-D: function "sprintf" declared implicitly
+  			sprintf((char*)STR_BUFF, "FLANGER");	
+../Inc/tft_gui.h(311): warning:  #223-D: function "sprintf" declared implicitly
+  			sprintf((char*)STR_BUFF, "SLPROLL");	
+../Inc/tft_gui.h(315): warning:  #223-D: function "sprintf" declared implicitly
+  			sprintf((char*)STR_BUFF, "ROLL   ");	
+../Inc/tft_gui.h(319): warning:  #223-D: function "sprintf" declared implicitly
+  			sprintf((char*)STR_BUFF, "VINYL  ");	
+../Inc/tft_gui.h(323): warning:  #167-D: argument of type "uint8_t *" is incompatible with parameter of type "char *"
+  		TFT_String(0, 1, STR_BUFF);		
+../Inc/tft_gui.h(355): warning:  #1-D: last line of file ends without a newline
+  																																									
+../Inc/MAX7219.h(199): warning:  #1-D: last line of file ends without a newline
+  																																									
+../Src/main.c(295): warning:  #167-D: argument of type "int16_t *" is incompatible with parameter of type "uint8_t *"
+  	HAL_SAI_Transmit_IT(&hsai_BlockA1, MASTER_BUS, 2);	
+../Src/main.c(296): warning:  #167-D: argument of type "int16_t *" is incompatible with parameter of type "uint8_t *"
+  	HAL_SAI_Transmit_IT(&hsai_BlockA2, HP_BUS, 2);
+../Src/main.c(297): warning:  #167-D: argument of type "float *" is incompatible with parameter of type "uint8_t *"
+  	HAL_SAI_Receive_IT(&hsai_BlockA3, CH0IN, 2);
+../Src/main.c(298): warning:  #167-D: argument of type "float *" is incompatible with parameter of type "uint8_t *"
+  	HAL_SAI_Receive_IT(&hsai_BlockB3, CH1IN, 2);
+../Src/main.c(351): warning:  #223-D: function "sprintf" declared implicitly
+  		sprintf((char*)STR_BUFF, "126");	
+../Src/main.c(353): warning:  #167-D: argument of type "uint8_t *" is incompatible with parameter of type "char *"
+  		TFT_String(38, 77, STR_BUFF);		
+../Src/main.c(422): warning:  #167-D: argument of type "uint8_t *" is incompatible with parameter of type "char *"
+  		TFT_String(1, 122, &STR_BUFF[48]);
+../Src/main.c(451): warning:  #223-D: function "sprintf" declared implicitly
+  		sprintf((char*)&STR_BUFF[32], "%03lu", pot_8b[B]);
+../Src/main.c(454): warning:  #167-D: argument of type "uint8_t *" is incompatible with parameter of type "char *"
+  		TFT_String(1, 113, &STR_BUFF[32]);
+../Src/main.c: 32 warnings, 0 errors
+linking...
+Program Size: Code=41372 RO-data=11452 RW-data=300 ZI-data=4204  
+FromELF: creating hex file...
+"ROTARY_MIXER\XDJ-X MIXER ASSY.axf" - 0 Error(s), 32 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -51,7 +120,7 @@ Package Vendor: Keil
 
    * Component: ARM::CMSIS:CORE:5.4.0
       Include file:  CMSIS\Core\Include\tz_context.h
-Build Time Elapsed:  00:00:01
+Build Time Elapsed:  00:00:05
 </pre>
 </body>
 </html>

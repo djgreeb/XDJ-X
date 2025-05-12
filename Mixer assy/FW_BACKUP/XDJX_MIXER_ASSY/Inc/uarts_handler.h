@@ -49,9 +49,8 @@ void USART1_IRQHandler(void)
 	if(USART1->ISR & USART_ISR_RXNE_RXFNE)		//have a new data
 		{		
 		CRSF_midi = (USART1->RDR);		//0..127			
-
-		CRSF0_ATT = CRSF_POS[CRSF_midi];
-		CRSF1_ATT = CRSF_POS[127-CRSF_midi];	
+		CRSF0_ATT = CRSF_POS[127-CRSF_midi];
+		CRSF1_ATT = CRSF_POS[CRSF_midi];	
 		}				
   HAL_UART_IRQHandler(&huart1);
 	};

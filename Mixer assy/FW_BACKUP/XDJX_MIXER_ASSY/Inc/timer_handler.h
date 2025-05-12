@@ -13,7 +13,8 @@
 
 uint8_t pot_convln(uint16_t dt);					//conversion without center detent
 uint8_t pot_convcd(uint16_t dt);					//conversion with center detent
-
+uint8_t LVLtoDB(uint16_t lvl);						//convert PCM level to DB scale
+	
 	
 ///////////////////////////////////////////////
 //
@@ -196,6 +197,8 @@ void TIM2_IRQHandler(void)
 					pot_out[tim_dv] = (pot_out[tim_dv]+ADC_TMP+1)>>1;	
 					}
 				pot_8b[tim_dv] = pot_convcd(pot_out[tim_dv]);	
+				eql0.hg	= VR_LIN[pot_8b[tim_dv]];	
+				eqr0.hg	= VR_LIN[pot_8b[tim_dv]];	
 				}				
 			ADC_TMP = (pot_SUM[tim_dv-1]+4)>>3;	
 			if((ADC_TMP>(pot_out[tim_dv-1]+adc_hysteresis))||((ADC_TMP+adc_hysteresis)<pot_out[tim_dv-1]))	////////// HI1	
@@ -209,7 +212,9 @@ void TIM2_IRQHandler(void)
 					pot_out[tim_dv-1] = (pot_out[tim_dv-1]+ADC_TMP+1)>>1;	
 					}
 				pot_8b[tim_dv-1] = pot_convcd(pot_out[tim_dv-1]);	
-				}	
+				eql1.hg	= VR_LIN[pot_8b[tim_dv-1]];	
+				eqr1.hg	= VR_LIN[pot_8b[tim_dv-1]];					
+				}
 			}	
 		else if(tim_dv==4)		//////////////////////////////////////////			4			//////////////////////////////////////////
 			{	
@@ -384,6 +389,90 @@ void TIM2_IRQHandler(void)
 					}
 				tim_dv2 = 0;	
 				}
+			////////added calc code (level meter)	
+			if(tim_dv2%2==0)		// 75hz refresh rate
+				{		
+				lvlc = LVLtoDB((uint16_t)lvl_ch0);		/////// CH0
+				lvl_ch0 = 0;
+				if(lvlc>=prev_lvl_ch0)
+					{
+					prev_lvl_ch0 = lvlc;
+					tim_ch0 = 0;	
+					}					
+				else if(tim_ch0>dwnlvl)
+					{
+					prev_lvl_ch0-=1;
+					tim_ch0 = 0;
+					}
+				if((prev_lvl_ch0>=prev_pk_ch0) || (timpk_ch0>dwnpk))
+					{
+					prev_pk_ch0 = prev_lvl_ch0;	
+					timpk_ch0 = 0;	
+					}									
+				LEVEL_METER(0, prev_lvl_ch0, prev_pk_ch0);
+				lvlc = LVLtoDB((uint16_t)lvl_ch1);		/////// CH1
+				lvl_ch1 = 0;
+				if(lvlc>=prev_lvl_ch1)
+					{
+					prev_lvl_ch1 = lvlc;
+					tim_ch1 = 0;	
+					}					
+				else if(tim_ch1>dwnlvl)
+					{
+					prev_lvl_ch1-=1;
+					tim_ch1 = 0;
+					}
+				if((prev_lvl_ch1>=prev_pk_ch1) || (timpk_ch1>dwnpk))
+					{
+					prev_pk_ch1 = prev_lvl_ch1;	
+					timpk_ch1 = 0;	
+					}		
+				LEVEL_METER(1, prev_lvl_ch1, prev_pk_ch1);				
+				lvlc = LVLtoDB((uint16_t)lvl_ml);		/////// MASTER L
+				lvl_ml = 0;
+				if(lvlc>=prev_lvl_ml)
+					{
+					prev_lvl_ml = lvlc;
+					tim_ml = 0;	
+					}					
+				else if(tim_ml>dwnlvl)
+					{
+					prev_lvl_ml-=1;
+					tim_ml = 0;
+					}
+				if((prev_lvl_ml>=prev_pk_ml) || (timpk_ml>dwnpk))
+					{
+					prev_pk_ml = prev_lvl_ml;	
+					timpk_ml = 0;	
+					}		
+				LEVEL_METER(2, prev_lvl_ml, prev_pk_ml);			
+				lvlc = LVLtoDB((uint16_t)lvl_mr);		/////// MASTER R
+				lvl_mr = 0;
+				if(lvlc>=prev_lvl_mr)
+					{
+					prev_lvl_mr = lvlc;
+					tim_mr = 0;	
+					}					
+				else if(tim_mr>dwnlvl)
+					{
+					prev_lvl_mr-=1;
+					tim_mr = 0;
+					}
+				if((prev_lvl_mr>=prev_pk_mr) || (timpk_mr>dwnpk))
+					{
+					prev_pk_mr = prev_lvl_mr;	
+					timpk_mr = 0;	
+					}					
+				LEVEL_METER(3, prev_lvl_mr, prev_pk_mr);
+				tim_ch0++;	
+				tim_ch1++;	
+				tim_ml++;	
+				tim_mr++;	
+				timpk_ch0++;	
+				timpk_ch1++;	
+				timpk_ml++;	
+				timpk_mr++;
+				}
 			}	
 		else if(tim_dv==6)		//////////////////////////////////////////			6			//////////////////////////////////////////
 			{
@@ -454,6 +543,8 @@ void TIM2_IRQHandler(void)
 					pot_out[tim_dv] = (pot_out[tim_dv]+ADC_TMP+1)>>1;	
 					}
 				pot_8b[tim_dv] = pot_convcd(pot_out[tim_dv]);	
+				eql0.lg	= VR_LIN[pot_8b[tim_dv]];	
+				eqr0.lg	= VR_LIN[pot_8b[tim_dv]];			
 				}				
 			ADC_TMP = (pot_SUM[tim_dv-1]+4)>>3;	
 			if((ADC_TMP>(pot_out[tim_dv-1]+adc_hysteresis))||((ADC_TMP+adc_hysteresis)<pot_out[tim_dv-1]))	////////// LOW1		
@@ -467,6 +558,8 @@ void TIM2_IRQHandler(void)
 					pot_out[tim_dv-1] = (pot_out[tim_dv-1]+ADC_TMP+1)>>1;	
 					}
 				pot_8b[tim_dv-1] = pot_convcd(pot_out[tim_dv-1]);	
+				eql1.lg	= VR_LIN[pot_8b[tim_dv-1]];	
+				eqr1.lg	= VR_LIN[pot_8b[tim_dv-1]];			
 				}	
 			////////added calc code				
 			if((GPIOB->IDR & 0x00000004)==0x00U)			//Bluetooth button
@@ -612,8 +705,8 @@ void TIM2_IRQHandler(void)
 					pot_out[tim_dv] = (pot_out[tim_dv]+ADC_TMP+1)>>1;	
 					}
 				pot_8b[tim_dv] = pot_convcd(pot_out[tim_dv]);	
-				MIXN0_ATT = VR_LIN[pot_8b[tim_dv]];		
-				MIXN1_ATT = VR_LIN[255-pot_8b[tim_dv]];		
+				MIXN0_ATT = MXNG[255-pot_8b[tim_dv]];		
+				MIXN1_ATT = MXNG[pot_8b[tim_dv]];		
 				}				
 			ADC_TMP = (pot_SUM[tim_dv-1]+4)>>3;	
 			if((ADC_TMP>(pot_out[tim_dv-1]+adc_hysteresis))||((ADC_TMP+adc_hysteresis)<pot_out[tim_dv-1]))	////////// DEPT	
@@ -697,6 +790,8 @@ void TIM2_IRQHandler(void)
 					pot_out[tim_dv] = (pot_out[tim_dv]+ADC_TMP+1)>>1;	
 					}
 				pot_8b[tim_dv] = pot_convcd(pot_out[tim_dv]);	
+				eql0.mg	= VR_LIN[pot_8b[tim_dv]];	
+				eqr0.mg	= VR_LIN[pot_8b[tim_dv]];
 				}				
 			ADC_TMP = (pot_SUM[tim_dv-1]+4)>>3;	
 			if((ADC_TMP>(pot_out[tim_dv-1]+adc_hysteresis))||((ADC_TMP+adc_hysteresis)<pot_out[tim_dv-1]))	////////// MID1	
@@ -710,6 +805,8 @@ void TIM2_IRQHandler(void)
 					pot_out[tim_dv-1] = (pot_out[tim_dv-1]+ADC_TMP+1)>>1;	
 					}
 				pot_8b[tim_dv-1] = pot_convcd(pot_out[tim_dv-1]);	
+				eql1.mg	= VR_LIN[pot_8b[tim_dv-1]];	
+				eqr1.mg	= VR_LIN[pot_8b[tim_dv-1]];		
 				}	
 			}	
 		else if(tim_dv==12)		//////////////////////////////////////////			12			//////////////////////////////////////////
@@ -909,7 +1006,7 @@ void TIM2_IRQHandler(void)
 				pot_out[tim_dv] = (pot_out[tim_dv]+ADC_TMP+1)>>1;	
 				}
 			pot_8b[tim_dv] = pot_convln(pot_out[tim_dv]);	
-			TRM0_ATT = VR_LIN[pot_8b[tim_dv]];	
+			TRM0_ATT = TRM[pot_8b[tim_dv]];	
 			}				
 		ADC_TMP = (pot_SUM[tim_dv-1]+4)>>3;	
 		if((ADC_TMP>(pot_out[tim_dv-1]+adc_hysteresis))||((ADC_TMP+adc_hysteresis)<pot_out[tim_dv-1]))	////////// TRM1	
@@ -923,7 +1020,7 @@ void TIM2_IRQHandler(void)
 				pot_out[tim_dv-1] = (pot_out[tim_dv-1]+ADC_TMP+1)>>1;	
 				}
 			pot_8b[tim_dv-1] = pot_convln(pot_out[tim_dv-1]);	
-			TRM1_ATT = VR_LIN[pot_8b[tim_dv-1]];	
+			TRM1_ATT = TRM[pot_8b[tim_dv-1]];	
 			}	
 		////////added calc code	
 		if(CRSFCURVE_scan==0)
@@ -1019,6 +1116,96 @@ uint8_t pot_convcd(uint16_t dt)
 	};	
 
 
+/////////////////////////////////////////
+//convert PCM level to DB scale
+//
+//	input: PCM level 0...32767
+//
+//	output DB scale level 0...12
+//	
+uint8_t LVLtoDB(uint16_t lvl)
+	{	
+	if(lvl>dBConv[6])
+		{
+		if(lvl>dBConv[3])
+			{
+			if(lvl>dBConv[1])
+				{
+				if(lvl>dBConv[0])
+					{
+					return 12;
+					}
+				else
+					{
+					return 11;	
+					}					
+				}
+			else
+				{
+				if(lvl>dBConv[2])
+					{
+					return 10;
+					}
+				else
+					{
+					return 9;	
+					}
+				}				
+			}				
+		else
+			{
+			if(lvl>dBConv[4])
+				{
+				return 8;
+				}
+			else if(lvl>dBConv[5])
+				{
+				return 7;	
+				}
+			else
+				{
+				return 6;	
+				}
+			}	
+		}
+	else
+		{
+		if(lvl>dBConv[9])
+			{	
+			if(lvl>dBConv[7])
+				{				
+				return 5;
+				}
+			else if(lvl>dBConv[8])
+				{
+				return 4;	
+				}
+			else
+				{
+				return 3;	
+				}				
+			}
+		else
+			{
+			if(lvl>dBConv[10])
+				{				
+				return 2;
+				}
+			else if(lvl>dBConv[11])
+				{
+				return 1;	
+				}			
+			else
+				{
+				return 0;	
+				}	
+			}
+		}
+	};
+	
+
+	
+	
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
