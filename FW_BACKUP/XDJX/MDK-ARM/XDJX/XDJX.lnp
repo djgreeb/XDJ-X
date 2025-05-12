@@ -18,8 +18,6 @@
 "xdjx\usart.o"
 "xdjx\stm32h7xx_it.o"
 "xdjx\stm32h7xx_hal_msp.o"
-"xdjx\w25qxx.o"
-"xdjx\stm32746g_discovery_qspi.o"
 "xdjx\stm32h7xx_hal_cortex.o"
 "xdjx\stm32h7xx_hal_dma2d.o"
 "xdjx\stm32h7xx_hal_rcc.o"
@@ -55,14 +53,13 @@
 "xdjx\stm32h7xx_hal_uart.o"
 "xdjx\stm32h7xx_hal_uart_ex.o"
 "xdjx\system_stm32h7xx.o"
-"xdjx\stm32746g_discovery_lcd.o"
-"xdjx\stm32746g_discovery_sdram.o"
+"xdjx\cwx3970.o"
 "xdjx\diskio.o"
 "xdjx\ff.o"
 "xdjx\ff_gen_drv.o"
 "xdjx\syscall.o"
 "xdjx\ccsbcs.o"
 --library_type=microlib --strict --scatter "XDJX\XDJX.sct"
---summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
+--diag_suppress=L6329 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers
 --list "XDJX.map" -o XDJX\XDJX.axf

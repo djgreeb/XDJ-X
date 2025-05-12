@@ -328,18 +328,18 @@
             <uC99>1</uC99>
             <uGnu>0</uGnu>
             <useXO>0</useXO>
-            <v6Lang>3</v6Lang>
-            <v6LangP>3</v6LangP>
+            <v6Lang>0</v6Lang>
+            <v6LangP>6</v6LangP>
             <vShortEn>1</vShortEn>
             <vShortWch>1</vShortWch>
-            <v6Lto>0</v6Lto>
+            <v6Lto>1</v6Lto>
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls></MiscControls>
+              <MiscControls>--C99</MiscControls>
               <Define>USE_HAL_DRIVER,STM32H750xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;../Drivers/STM32H7xx_HAL_Driver/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32H7xx/Include;../Drivers/CMSIS/Include;../Drivers/LCD/STM32746G-Discovery;../Drivers/LCD/Components/Common;../Utilities/Fonts;../Middlewares/Third_Party/FatFs/src;..\Drivers\QSPI</IncludePath>
+              <IncludePath>../Inc;../Drivers/STM32H7xx_HAL_Driver/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32H7xx/Include;../Drivers/CMSIS/Include;../Drivers/LCD/Components/Common;../Utilities/Fonts;../Middlewares/Third_Party/FatFs/src;..\Drivers\QSPI;..\Drivers\LCD</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -373,7 +373,7 @@
             <ScatterFile>XDJX\XDJX.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
-            <Misc></Misc>
+            <Misc>--diag_suppress=L6329</Misc>
             <LinkerInputFile></LinkerInputFile>
             <DisabledWarnings></DisabledWarnings>
           </LDads>
@@ -397,16 +397,6 @@
               <FileName>global_variables.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Inc\global_variables.h</FilePath>
-            </File>
-            <File>
-              <FileName>audio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Inc\audio.h</FilePath>
-            </File>
-            <File>
-              <FileName>audio_handler.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Inc\audio_handler.h</FilePath>
             </File>
             <File>
               <FileName>deck_transfer.h</FileName>
@@ -1034,14 +1024,14 @@
               <FilePath>../Src/stm32h7xx_hal_msp.c</FilePath>
             </File>
             <File>
-              <FileName>w25qxx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Drivers\QSPI\w25qxx.c</FilePath>
+              <FileName>qspi_const.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\qspi_const.h</FilePath>
             </File>
             <File>
-              <FileName>stm32746g_discovery_qspi.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Drivers\BSP\STM32746G-Discovery\stm32746g_discovery_qspi.c</FilePath>
+              <FileName>rekordbox.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\rekordbox.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1690,17 +1680,17 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>LCD</GroupName>
+          <GroupName>LCD_UI</GroupName>
           <Files>
             <File>
-              <FileName>stm32746g_discovery_lcd.c</FileName>
+              <FileName>CWX3970.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Drivers\LCD\STM32746G-Discovery\stm32746g_discovery_lcd.c</FilePath>
+              <FilePath>..\Drivers\LCD\CWX3970.c</FilePath>
             </File>
             <File>
-              <FileName>stm32746g_discovery_sdram.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Drivers\LCD\STM32746G-Discovery\stm32746g_discovery_sdram.c</FilePath>
+              <FileName>gui.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\gui.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -2055,6 +2045,21 @@
                   </Cads>
                 </FileArmAds>
               </FileOption>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Audio</GroupName>
+          <Files>
+            <File>
+              <FileName>audio_handler.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\audio_handler.h</FilePath>
+            </File>
+            <File>
+              <FileName>audio.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\audio.h</FilePath>
             </File>
           </Files>
         </Group>

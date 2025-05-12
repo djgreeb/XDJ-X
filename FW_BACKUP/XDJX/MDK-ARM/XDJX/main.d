@@ -73,11 +73,13 @@ xdjx\main.o: ../Inc/gpio.h
 xdjx\main.o: ../Inc/fmc.h
 xdjx\main.o: ../Inc/global_variables.h
 xdjx\main.o: ../Inc/audio.h
+xdjx\main.o: ..\Drivers\LCD\CWX3970.h
+xdjx\main.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/../../../Utilities/Fonts/fonts.h
+xdjx\main.o: ../Inc/qspi_const.h
+xdjx\main.o: ../Inc/gui.h
 xdjx\main.o: ../Inc/audio_handler.h
 xdjx\main.o: ../Inc/deck_transfer.h
-xdjx\main.o: ../Drivers/LCD/STM32746G-Discovery/stm32746g_discovery_lcd.h
-xdjx\main.o: ../Drivers/LCD/STM32746G-Discovery/stm32746g_discovery_sdram.h
-xdjx\main.o: ../Drivers/LCD/STM32746G-Discovery/../../../Utilities/Fonts/fonts.h
+xdjx\main.o: ../Inc/rekordbox.h
 xdjx\main.o: ../Inc/pm_uart_handler.h
 xdjx\main.o: ../Inc/mixer_uart_handler.h
 xdjx\main.o: ../Inc/debug_uart_handler.h

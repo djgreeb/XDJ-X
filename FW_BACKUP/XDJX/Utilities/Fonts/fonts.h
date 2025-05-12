@@ -1,7 +1,5 @@
 /**
   ******************************************************************************
-  * @file    fonts.h
-  * @author  
   *
   ******************************************************************************
   */
@@ -24,11 +22,10 @@
 typedef struct _tFont
 {    
   const uint8_t *table;
-  uint16_t Width;
-  uint16_t Height;
+  uint8_t Width;
+  uint8_t Height;
   
 } sFONT;
-extern sFONT Font8;
 extern sFONT Font11D;
 extern sFONT Font13D;
 extern sFONT Font15P;
@@ -41,10 +38,6 @@ extern sFONT FontBMP;
 
 
 
-
-/** @defgroup FONTS_Exported_Constants
-  * @{
-  */ 
 #define LINE(x) ((x) * (((sFONT *)BSP_LCD_GetFont())->Height))
 
 
@@ -56,4 +49,4 @@ extern sFONT FontBMP;
 #endif /* __FONTS_H */
 
 
-/************************/
+/*********************************************************************************/

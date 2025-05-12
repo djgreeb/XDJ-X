@@ -32,6 +32,30 @@
 //		replace file \Drivers\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_dma.c  !!!modify file
 //		replace file \Src\ltdc.c
 //
+//		file main.c:
+//				//  /* Enables the MPU */
+//					//HAL_MPU_Enable(MPU_HFNMI_PRIVDEF);
+//
+//
+//					MPU_InitStruct.Enable = MPU_REGION_ENABLE;
+//					MPU_InitStruct.Number = MPU_REGION_NUMBER1;
+//					MPU_InitStruct.BaseAddress = 0x90000000;
+//					MPU_InitStruct.Size = MPU_REGION_SIZE_8MB;
+//					MPU_InitStruct.SubRegionDisable = 0x0;
+//					MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL0;
+//					MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
+//					MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_ENABLE;
+//					MPU_InitStruct.IsShareable = MPU_ACCESS_SHAREABLE;
+//					MPU_InitStruct.IsCacheable = MPU_ACCESS_CACHEABLE;
+//					MPU_InitStruct.IsBufferable = MPU_ACCESS_BUFFERABLE;
+//
+//					HAL_MPU_ConfigRegion(&MPU_InitStruct);
+//
+//					/** Initializes and configures the Region and the memory to be protected
+//					*/
+//					HAL_MPU_ConfigRegion(&MPU_InitStruct);
+//					/* Enables the MPU */
+//					HAL_MPU_Enable(MPU_HFNMI_PRIVDEF);
 //
 //
 //
@@ -119,6 +143,52 @@
 //	ver. 0.55
 //		- added shor audio
 //		- added double libruary QSPI MemMap need debug QSPI: HardFault in stm32h7xx_it.c
+//	ver. 0.61
+//		-	debugged QSPI MemMap
+//		- added 2 audio tracks to QSPI and routed to SAI outputs
+//	ver. 0.62
+//		-	optimized libs
+//	ver. 0.63
+//		-	added text
+//	ver. 0.67
+//		- fixed QSPI reading bug where data was shifted by 2 bytes. sCommand.DummyCycles = 6;
+//		- added rekordbox.h
+//	ver. 0.69
+//		-	bug fixed: path_ANLZ expanded to 46 bytes, for final 0 
+//	ver. 0.70
+//		-	added static wf and hcue, memory markers
+//	ver. 0.72
+//		- added hcue icons
+//		-	added hcue icons and mem markers on dyn.wf
+//	ver. 0.73
+//		- gui optimization
+//	ver. 0.74
+//		- added audio playback in deck A
+//	ver. 0.75
+//		- changed packet length to 8 bytes (7+CRC)
+//	ver. 0.76
+//		-	added debug jog cnt
+//	ver. 0.77
+//		-	added FIR in audio handler
+//		-	SAI transmission has been switched to floating point data
+//	ver. 0.78
+//		-	added PLAY, CUE, JOG code
+//	ver. 0.79
+//		- bug fixed in debug mode
+//	ver. 0.81
+//		-	added SLIP, TEMPO, jog display code
+//	ver. 0.82
+//		-	minor fixes
+//	ver. 0.83
+//	-	added rev butt code
+//	ver. 0.85
+//	-	added pitch pot control deck A
+//	ver. 0.87
+//	- added jog ring
+//
+//
+//
+//
 //
 //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////	
@@ -143,16 +213,26 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+char FIRMWARE_VERSION[] = "0.87";	
+#define DEBUG_UART_EN				//sending work status to uart
 #include "global_variables.h"
 #include "audio.h"
+#include "CWX3970.h"
+#include "qspi_const.h"
+#include "gui.h"
 #include "audio_handler.h"
 #include "deck_transfer.h"
+#include "rekordbox.h"
+
 
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-#include "stm32746g_discovery_lcd.h"
+
+
+
+
 
 /* USER CODE END PTD */
 
@@ -177,8 +257,6 @@ void SystemClock_Config(void);
 void PeriphCommonClock_Config(void);
 static void MPU_Config(void);
 /* USER CODE BEGIN PFP */
-void RedrawWaveforms(uint32_t position);
-void intDRAW_WAVEFORM_FRAME(uint32_t position);						//internal function for redraw waveform
 
 
 
@@ -249,17 +327,9 @@ int main(void)
   MX_SPI2_Init();
   MX_UART7_Init();
   /* USER CODE BEGIN 2 */
-	
-	//// need debug QSPI: HardFault in stm32h7xx_it.c
-	//	double libruary QSPI MemMap
-	//i = BSP_QSPI_Init();
-  //BSP_QSPI_EnableMemoryMappedMode();
-	//WRITE_REG(QUADSPI->LPTR, 0xFFF);
-	//W25QXX_Init();
-	//W25Q_Memory_Mapped_Enable();
-	//sprintf((char*)U_TX_DATA, "rslt %01lu\n\r", i);	
-	//HAL_UART_Transmit(&huart4, U_TX_DATA, 8, 5);
 
+	CSP_QUADSPI_Init();
+	CSP_QSPI_EnableMemoryMappedMode();
 
 
 	BSP_SD_Init();
@@ -272,19 +342,24 @@ int main(void)
 	
 	HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_1);	
 
-	HAL_SAI_Transmit_IT(&hsai_BlockA1, SAMPLE_0, 2);
-	HAL_SAI_Transmit_IT(&hsai_BlockB1, SAMPLE_1, 2);
+	HAL_SAI_Transmit_IT(&hsai_BlockA1, (uint8_t*)&deckAout[0], 2);
+	HAL_SAI_Transmit_IT(&hsai_BlockB1, (uint8_t*)&deckAout[0], 2);
 
 	BSP_LCD_Init();
 	BSP_LCD_LayerDefaultInit(0, LCD_FRAME_BUFFER);
 	BSP_LCD_LayerDefaultInit(1, LCD_FRAME_BUFFER_2);
-
+	
+	#if defined(DEBUG_UART_EN)	
 	sprintf((char*)U_TX_DATA, "%01lu error\n\r", i);	
 	HAL_UART_Transmit(&huart4, U_TX_DATA, 9, 5);	
-
+	#endif
+	
 	i = 0;
+	
+	#if defined(DEBUG_UART_EN)	
 	sprintf((char*)U_TX_DATA, "All init\n\r");	
-	HAL_UART_Transmit(&huart4, U_TX_DATA, 10, 5);	
+	HAL_UART_Transmit(&huart4, U_TX_DATA, 10, 5);
+	#endif
 
 	BSP_LCD_SetTransparency(0, 255);
 	BSP_LCD_SetTransparency(1, 255);
@@ -294,266 +369,349 @@ int main(void)
 
 	BSP_LCD_SelectLayer(0);
 	BSP_LCD_Clear(LCD_COLOR_BLACK);
-	
-	HAL_Delay(3000);
-	TIM8->CCR1 = 450;
-	HAL_GPIO_WritePin(BACKLIGHT_EN_GPIO_Port, BACKLIGHT_EN_Pin, GPIO_PIN_SET);
-		
+			
 	for(j=0;j<8;j++)
 		{
-		deckTbuf[j][0] = 192+j;	
+		deckTbuf[j][0] = 24+j;	
 		deckTbuf[j][1] = 0x20;
 		deckTbuf[j][2] = 0x30;
 		deckTbuf[j][3] = 0x40;
-		deckTbuf[j][4] = 0xE3;	
+		deckTbuf[j][4] = 135;	//play pos
 		deckTbuf[j][5] = 85;	
-		deckTbuf[j][6] = 27;
-		deckTbuf[j][7] = 135;	//play pos
-		deckTbuf[j][8] = 0xFF;
-		deckTbuf[j][9] = 192+j;	
-		deckTbuf[j][10] = 0x20;
-		deckTbuf[j][11] = 0x30;
-		deckTbuf[j][12] = 0x40;
-		deckTbuf[j][13] = 0xE3;	
-		deckTbuf[j][14] = 85;	
-		deckTbuf[j][15] = 15;
-		deckTbuf[j][16] = 135;	//play pos
-		deckTbuf[j][17] = 0xFF;	
+		deckTbuf[j][6] = 85;
+		deckTbuf[j][7] = 0xFF;
+		deckTbuf[j][8] = 24+j;	
+		deckTbuf[j][9] = 0x20;
+		deckTbuf[j][10] = 0x30;
+		deckTbuf[j][11] = 0x40;
+		deckTbuf[j][12] = 135;	//play pos	
+		deckTbuf[j][13] = 85;	
+		deckTbuf[j][14] = 85;
+		deckTbuf[j][15] = 0xFF;	
 		}
-	HAL_TIM_Base_Start_IT(&htim2);									//start deck transfer timer
+	deckTbuf[3][0]&= 0xEF;	
+	deckTbuf[3][8]&= 0xEF;
+	deckTbuf[5][0]&= 0xEF;	
+	deckTbuf[5][8]&= 0xEF;
 
+	SET_JOG_COLOR(0, JOG_WHITE);	
+	SET_JOG_COLOR(1, JOG_WHITE);	
+		
+	HAL_TIM_Base_Start_IT(&htim2);									//start deck transfer timer
+		
+	HAL_Delay(2000);						//need decrees delay in deck assy. spi dma not starting?
+	TIM8->CCR1 = 450;
+	HAL_GPIO_WritePin(BACKLIGHT_EN_GPIO_Port, BACKLIGHT_EN_Pin, GPIO_PIN_SET);	
+	DrawLOGO();	
+		
+	#if defined(DEBUG_UART_EN)	
+	sprintf((char*)U_TX_DATA, "Main assy: ");	
+	HAL_UART_Transmit(&huart4, U_TX_DATA, 11, 5);	
+	HAL_UART_Transmit(&huart4, FIRMWARE_VERSION, 4, 5);
+	sprintf((char*)U_TX_DATA, "\n\r");	
+	HAL_UART_Transmit(&huart4, U_TX_DATA, 2, 5);
+	sprintf((char*)U_TX_DATA, "Deck 1 UCOM: ");	
+	HAL_UART_Transmit(&huart4, U_TX_DATA, 13, 5);
+	sprintf((char*)U_TX_DATA, "%01lu.%02lu\n\r", (deckRbuf[4]&0x7F)/100, (deckRbuf[4]&0x7F)%100);
+	HAL_UART_Transmit(&huart4, U_TX_DATA, 6, 5);
+	sprintf((char*)U_TX_DATA, "Deck 2 UCOM: ");	
+	HAL_UART_Transmit(&huart4, U_TX_DATA, 13, 5);
+	sprintf((char*)U_TX_DATA, "%01lu.%02lu\n\r", (deckRbuf[12]&0x7F)/100, (deckRbuf[12]&0x7F)%100);
+	HAL_UART_Transmit(&huart4, U_TX_DATA, 6, 5);	
+	#endif	
+			
 	res = f_mount(&FAT, "0", 1);
 	if (res!=FR_OK)
 		{
+		#if defined(DEBUG_UART_EN)		
 		sprintf((char*)U_TX_DATA, "%01lu error\n\r", res);	
-		HAL_UART_Transmit(&huart4, U_TX_DATA, 9, 5);	
-			
+		HAL_UART_Transmit(&huart4, U_TX_DATA, 9, 5);		
 		sprintf((char*)U_TX_DATA, "SD not mounted\n\r");	
-		HAL_UART_Transmit(&huart4, U_TX_DATA, 16, 5);		
+		HAL_UART_Transmit(&huart4, U_TX_DATA, 16, 5);
+		#endif	
 		}
 	else
 		{
+		#if defined(DEBUG_UART_EN)		
+		sprintf((char*)U_TX_DATA, "Drive mounted\n\r");	
+		HAL_UART_Transmit(&huart4, U_TX_DATA, 15, 5);	
+		#endif		
 		res = f_open(&file, path_pic, FA_READ);
 		if (res != FR_OK)
 			{
+			#if defined(DEBUG_UART_EN)		
 			sprintf((char*)U_TX_DATA, "Picture not opened\n\r");	
-			HAL_UART_Transmit(&huart4, U_TX_DATA, 20, 5);		
+			HAL_UART_Transmit(&huart4, U_TX_DATA, 20, 5);	
+			#endif	
 			}		
 		else
 			{
+			#if defined(DEBUG_UART_EN)		
 			sprintf((char*)U_TX_DATA, "Picture file open\n\r", i);	
-			HAL_UART_Transmit(&huart4, U_TX_DATA, 17, 5);		
+			HAL_UART_Transmit(&huart4, U_TX_DATA, 19, 5);	
+			#endif		
 			HAL_Delay(500);
 			f_lseek(&file, 54);			
-			f_read(&file, parcser_adress, 223680, &nbytes);	
+			f_read(&file, fbuf, 223680, &nbytes);	
 							
 			for(i=0;i<111840;i++)	
 				{	
-				parcser_adress[i]|=0x8000;
+				fbuf[i]|=0x8000;
 				}		
 			f_close(&file);	
 			}	
 		}
+			
 		
-	for(i=0;i<24980;i++)			//31->18
-		{	
-		a = WFORMDYNAMIC[i]&0x1F;
-		a*= 153;
-		a>>=8;
-		WFORMDYNAMIC[i]&=0xE0;
-		WFORMDYNAMIC[i]|=a; 	
+	TOTAL_TRACKS = DATABASE_PARSER();
+	if(TOTAL_TRACKS==0xFFFE)
+		{
+		#if defined(DEBUG_UART_EN)		
+		sprintf((char*)U_TX_DATA, "Rekordbox database not found!\n\r");	
+		HAL_UART_Transmit(&huart4, U_TX_DATA, 31, 5);	
+		#endif		
+		SD_STATUS = SD_NEED_REPLACE;
 		}
-	
+	else if(TOTAL_TRACKS==0xFFFF)
+		{
+		#if defined(DEBUG_UART_EN)		
+		sprintf((char*)U_TX_DATA, "Rekordbox database has more than 512 tracks.\n\r");	
+		HAL_UART_Transmit(&huart4, U_TX_DATA, 46, 5);	
+		#endif	
+		SD_STATUS = SD_NEED_REPLACE;	
+		}
+	else if(TOTAL_TRACKS==0xFFF1)
+		{
+		#if defined(DEBUG_UART_EN)		
+		sprintf((char*)U_TX_DATA, "Playlists structure error.\n\r");	
+		HAL_UART_Transmit(&huart4, U_TX_DATA, 28, 5);	
+		#endif	
+		SD_STATUS = SD_NEED_REPLACE;	
+		}	
+	else if(TOTAL_TRACKS==0)
+		{
+		#if defined(DEBUG_UART_EN)		
+		sprintf((char*)U_TX_DATA, "Rekordbox database dont't have a tracks.\n\r");	
+		HAL_UART_Transmit(&huart4, U_TX_DATA, 42, 5);	
+		#endif	
+		SD_STATUS = SD_NEED_REPLACE;	
+		}	
+	else
+		{
+		#if defined(DEBUG_UART_EN)		
+		sprintf((char*)U_TX_DATA, "Rekordbox database have a %03lu tracks\n\r", TOTAL_TRACKS);	
+		HAL_UART_Transmit(&huart4, U_TX_DATA, 38, 5);	
+		#endif
+		SD_STATUS = SD_MOUNTED;	
+		}		
+
+
+		
 	BSP_LCD_SelectLayer(0);
 	
+	BSP_LCD_SetFont(&Font15P);
+	BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
+	sprintf((char*)Buf, "%s", "HUGEL, Topic, Arash");
+	BSP_LCD_DisplayStringAt(5, 124, Buf, TRANSPARENT_MODE);	
+	sprintf((char*)Buf, "%s", "I Adore You (Extended");	
+	BSP_LCD_DisplayStringAt(5, 141, Buf, TRANSPARENT_MODE);	
+	sprintf((char*)Buf, "%s", "Zerb x Sofiya Nzau");		
+	BSP_LCD_DisplayStringAt(245, 124, Buf, TRANSPARENT_MODE);
+	sprintf((char*)Buf, "%s", "Mwaki (Franky Wah)");	
+	BSP_LCD_DisplayStringAt(300, 141, Buf, TRANSPARENT_MODE);			
 	j = 0;
 			
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	RedrawWaveforms(play_adr/294);		
-		
-	//SINED[3] = REKBX[play_adr%11264][1]; 	
-		
-		
-//	if(i<479)
-//		{
-//		i++;	
-//		}			
-//	else
-//		{
-//		i = 0;	
-//		}			
-//	BSP_LCD_SetTextColor(LCD_COLOR_TRANSPARENT);
-//	BSP_LCD_DrawLine(i, 0, i, 232);		
-//	BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
-//	BSP_LCD_DrawLine((i+140)%480, 0, (i+140)%480, 232);		
-//	HAL_Delay(3);
-		
-		
-	if(HAL_GPIO_ReadPin(BUTTON_GPIO_Port, BUTTON_Pin)==0 && button_pressed==0)
+	RedrawWaveforms(play_adr/294);
+
+	if(end_adr_valid_data<128)
 		{
-		if(path_pic[6]<57)
+		f_read(&file, PCM[end_adr_valid_data][0], 32768, &nbytes);
+		//DrawCueMarker(((end_adr_valid_data*11145)/all_long));				////-----------------
+		end_adr_valid_data++;	
+		}
+	else if((end_adr_valid_data<((play_adr>>13)+42)) && (filling_step==0 || filling_step==6))									//filling the buffer forward
+		{
+		if(filling_step==6)
 			{
-			path_pic[6]++;	
+			f_lseek(&file, ((32768*end_adr_valid_data)+44));	
+			filling_step = 0;	
 			}
-		else
+		f_read(&file, PCM[end_adr_valid_data&0x7F][0], 32768, &nbytes);
+		//DrawCueMarker(((end_adr_valid_data*11145)/all_long));			////-----------------
+		end_adr_valid_data++;
+		if((end_adr_valid_data-start_adr_valid_data)>128)
 			{
-			path_pic[6] = 48;
-			}				
-		res = f_open(&file, path_pic, FA_READ);
-		if (res != FR_OK)
+			start_adr_valid_data = end_adr_valid_data-128;	
+			}
+		}
+	else if(((end_adr_valid_data>((play_adr>>13)+86) || ((end_adr_valid_data-start_adr_valid_data)<124)) && start_adr_valid_data>3) || (filling_step!=0 && filling_step!=6))					//filling the buffer back
+		{
+		if(filling_step==0 || filling_step==6)
 			{
-			sprintf((char*)U_TX_DATA, "Picture not opened\n\r");	
-			HAL_UART_Transmit(&huart4, U_TX_DATA, 20, 5);		
-			}		
-		else
+			if((end_adr_valid_data-start_adr_valid_data)>127)	
+				{
+				end_adr_valid_data = start_adr_valid_data+124;	
+				}	
+			start_adr_valid_data-= 4;	
+			f_lseek(&file, ((32768*(start_adr_valid_data))+44));
+			filling_step = 1;	
+			}
+		else if(filling_step==1)
 			{
-			sprintf((char*)U_TX_DATA, "Picture file open\n\r");	
-			HAL_UART_Transmit(&huart4, U_TX_DATA, 19, 5);		
-			f_lseek(&file, 54);			
-			f_read(&file, parcser_adress, 223680, &nbytes);	
-			for(i=0;i<111840;i++)	
-				{	
-				parcser_adress[i]|=0x8000;
+			f_read(&file, PCM[start_adr_valid_data&0x7F][0], 32768, &nbytes);
+			filling_step = 2;	
+			}
+		else if(filling_step==2)
+			{
+			f_read(&file, PCM[(start_adr_valid_data+1)&0x7F][0], 32768, &nbytes);
+			filling_step = 3;	
+			}
+		else if(filling_step==3)
+			{
+			f_read(&file, PCM[(start_adr_valid_data+2)&0x7F][0], 32768, &nbytes);
+			filling_step = 4;	
+			}
+		else if(filling_step==4)
+			{
+			f_read(&file, PCM[(start_adr_valid_data+3)&0x7F][0], 32768, &nbytes);
+			filling_step = 5;	
+			}
+		else if(filling_step==5)
+			{
+			//DrawCueMarker(((start_adr_valid_data*11145)/all_long));											////-----------------
+			filling_step = 6;		
+			}
+		}	
+		
+		
+		
+	if(track_need_load!=0)
+		{
+		if(track_need_load==1)				//load next track
+			{				
+			if(track_play_now==TOTAL_TRACKS)
+				{
+				track_play_now = 1;	
 				}
-			f_close(&file);		
-			}		
-			
-//			if(j<14)
+			else
+				{
+				track_play_now++;	
+				}	
+			}
+		PREPARE_LOAD_TRACK(track_play_now, track_play_now);	
+		track_need_load = 0;	
+		}	
+		
+	if(CUE_OPERATION==CUE_NEED_SET)
+		{
+//		if(QUANTIZE && dSHOW==WAVEFORM)				//add calculate bars in background process  /uncomment when bars calculated
+//			{
+//			if(((play_adr/294)>(BEATGRID[bars-1]+((BEATGRID[bars] - BEATGRID[bars-1])/2))) || bars==0)	
 //				{
-//				j++;	
+//				SET_CUE(BEATGRID[bars]);	
 //				}
 //			else
 //				{
-//				j = 0;	
-//				}
-//			for(i=0;i<111840;i++)	
-//				{	
-//				parcser_adress[i] = 0x0001<<j;
-//				}
-//			for(i=0;i<111840;i++)	
-//				{	
-//				parcser_adress[i]|=0x8000;
-//				}
-		button_pressed = 1;	
+//				SET_CUE(BEATGRID[bars-1]);		
+//				}				
+//			}
+//		else
+			{
+			SET_CUE(play_adr/294);	
+			}
+		CUE_OPERATION = 0;	
 		}
-	else if(HAL_GPIO_ReadPin(BUTTON_GPIO_Port, BUTTON_Pin)==1 && button_pressed==1)
+	else if(CUE_OPERATION==CUE_NEED_CALL)
 		{
-		button_pressed = 0;	
-		}		
+		CALL_CUE();
+		CUE_OPERATION = 0;			
+		}
+	else if(CUE_OPERATION==MEMORY_NEED_NEXT_SET)
+		{
+		if(number_of_memory_cue_points>0)
+			{
+			JJ=0;
+			while(MEMORY_adr[0][JJ]<=(play_adr/294) && (JJ<number_of_memory_cue_points-1))
+				{
+				JJ++;	
+				}
+			if((play_adr/294)<MEMORY_adr[0][JJ])
+				{
+				if(loop_active)				//deactivate loop
+					{
+					loop_active = 0;
+					LOOP_OUT = 0;			
+					}
+				SET_MEMORY_CUE_1(MEMORY_adr[0][JJ]);
+				CUE_OPERATION = MEMORY_NEED_SET_PART2;	
+				}
+			else
+				{
+				CUE_OPERATION = 0;	
+				}
+			}
+		else
+			{
+			CUE_OPERATION = 0;	
+			}
+		}	
+	else if(CUE_OPERATION==MEMORY_NEED_PREVIOUS_SET)
+		{
+		if(number_of_memory_cue_points>0)
+			{
+			JJ = number_of_memory_cue_points-1;
+			while(MEMORY_adr[0][JJ]>=(play_adr/294) && (JJ>0))
+				{
+				JJ--;	
+				}
+			if((play_adr/294)>MEMORY_adr[0][JJ])
+				{
+				if(loop_active)				//deactivate loop
+					{
+					loop_active = 0;
+					LOOP_OUT = 0;			
+					}	
+				SET_MEMORY_CUE_1(MEMORY_adr[0][JJ]);
+				CUE_OPERATION = MEMORY_NEED_SET_PART2;	
+				}
+			else
+				{
+				CUE_OPERATION = 0;	
+				}
+			}
+		else
+			{
+			CUE_OPERATION = 0;	
+			}			
+		}	
+	else if(CUE_OPERATION==MEMORY_NEED_SET_PART2 && ((end_adr_valid_data-start_adr_valid_data)>64))	
+		{
+		SET_MEMORY_CUE_2();
+		offset_adress = 0;		
+		CUE_OPERATION = 0;
+		}	
 		
 		
-
-//	sprintf((char*)U_TX_DATA, "Start fill 0xAAAA\n\r");	
-//	HAL_UART_Transmit(&huart4, U_TX_DATA, 19, 5);		
-//	for(i=0;i<0x1000000;i++)	
-//		{
-//		parcser_adress[i] = 0xAAAA;	
-//		}		
-//	sprintf((char*)U_TX_DATA, "Check fill 0xAAAA\n\r");	
-//	HAL_UART_Transmit(&huart4, U_TX_DATA, 19, 5);		
-//	for(i=0;i<0x1000000;i++)	
-//		{
-//		if(parcser_adress[i]!=0xAAAA)
+	///from (PART_CODE==1)
+	if(tempo_need_update>0)
+		{
+//		if(tempo_need_update==1)
 //			{
-//			sprintf((char*)U_TX_DATA, "Error data\n\r");	
-//			HAL_UART_Transmit(&huart4, U_TX_DATA, 12, 5);					
-//			i = 0xFFFFFFF0;	
-//			}			
-//		}		
-
-//	sprintf((char*)U_TX_DATA, "Start fill 0x5555\n\r");	
-//	HAL_UART_Transmit(&huart4, U_TX_DATA, 19, 5);		
-//	for(i=0;i<0x1000000;i++)	
-//		{
-//		parcser_adress[i] = 0x5555;	
-//		}		
-//	sprintf((char*)U_TX_DATA, "Check fill 0x5555\n\r");	
-//	HAL_UART_Transmit(&huart4, U_TX_DATA, 19, 5);		
-//	for(i=0;i<0x1000000;i++)	
-//		{
-//		if(parcser_adress[i]!=0x5555)
+//			ShowTempo(potenciometer_tempo);	
+//			}	
+//		if(originalBPM!=0xFFFF)
 //			{
-//			sprintf((char*)U_TX_DATA, "Error data\n\r");	
-//			HAL_UART_Transmit(&huart4, U_TX_DATA, 12, 5);					
-//			i = 0xFFFFFFF0;	
-//			}			
-//		}		
+//			ShowBPM(((originalBPM+5)*potenciometer_tempo)/100000);	
+//			}
+		tempo_need_update = 0;
+		}	
 		
-//	sprintf((char*)U_TX_DATA, "Start fill 0x0000\n\r");	
-//	HAL_UART_Transmit(&huart4, U_TX_DATA, 19, 5);		
-//	for(i=0;i<0x1000000;i++)	
-//		{
-//		parcser_adress[i] = 0x0000;	
-//		}		
-//	sprintf((char*)U_TX_DATA, "Check fill 0x0000\n\r");	
-//	HAL_UART_Transmit(&huart4, U_TX_DATA, 19, 5);		
-//	for(i=0;i<0x1000000;i++)	
-//		{
-//		if(parcser_adress[i]!=0x0000)
-//			{
-//			sprintf((char*)U_TX_DATA, "Error data\n\r");	
-//			HAL_UART_Transmit(&huart4, U_TX_DATA, 12, 5);					
-//			i = 0xFFFFFFF0;	
-//			}			
-//		}		
-//		
-//	sprintf((char*)U_TX_DATA, "Start fill 0xFFFF\n\r");	
-//	HAL_UART_Transmit(&huart4, U_TX_DATA, 19, 5);		
-//	for(i=0;i<0x1000000;i++)	
-//		{
-//		parcser_adress[i] = 0xFFFF;	
-//		}		
-//	sprintf((char*)U_TX_DATA, "Check fill 0xFFFF\n\r");	
-//	HAL_UART_Transmit(&huart4, U_TX_DATA, 19, 5);		
-//	for(i=0;i<0x1000000;i++)	
-//		{
-//		if(parcser_adress[i]!=0xFFFF)
-//			{
-//			sprintf((char*)U_TX_DATA, "Error data\n\r");	
-//			HAL_UART_Transmit(&huart4, U_TX_DATA, 12, 5);					
-//			i = 0xFFFFFFF0;	
-//			}			
-//		}	
-
-//	errs = 0;
-//	sprintf((char*)U_TX_DATA, "Start fill Addres\n\r");	
-//	HAL_UART_Transmit(&huart4, U_TX_DATA, 19, 5);		
-//	for(i=0;i<0x1000000;i++)	
-//		{
-//		parcser_adress[i] = (i%55000);	
-//		}		
-//	sprintf((char*)U_TX_DATA, "Check fill Addres\n\r");	
-//	HAL_UART_Transmit(&huart4, U_TX_DATA, 19, 5);		
-//	for(i=0;i<0x1000000;i++)	
-//		{
-//		if(parcser_adress[i]!=(i%55000))
-//			{
-//			errs++;	
-//			}			
-//		}	
-//	if(errs!=0)
-//		{
-//		sprintf((char*)U_TX_DATA, "Errors %08lu\n\r", errs);	
-//		HAL_UART_Transmit(&huart4, U_TX_DATA, 17, 5);
-//		}
-//	else
-//		{
-//		sprintf((char*)U_TX_DATA, "Test OK\n\r", errs);	
-//		HAL_UART_Transmit(&huart4, U_TX_DATA, 9, 5);	
-//		}
-//		
-//	while(1)
-//		{
-//			
-//		}		
-//		
-//	HAL_Delay(500);			
 		
 		
 	#include "pm_uart_handler.h"
@@ -661,241 +819,13 @@ void PeriphCommonClock_Config(void)
 /* USER CODE BEGIN 4 */
 #include "uarts_IRQs.h"
 
-////////////////////////////////////////////////////////////////////////
-//
-//Function redraw bar on static waveform and redraw dynamic waveform
-//position = 1/150 sec
-void RedrawWaveforms(uint32_t position)
-	{
-	if(position>all_long)
-		{
-		return;	
-		}
-	uint32_t clock_pos;	
 
-	if(REMAIN_ENABLE)
-		{
-		clock_pos = all_long - position;	
-		}	
-	else
-		{
-		clock_pos	= position;
-		}
-		
-	BSP_LCD_SetTextColor(LCD_COLOR_WHITE);	
-	BSP_LCD_SetFont(&Font18D);
-	BSP_LCD_SetBackColor(LCD_COLOR_BLACK);
-
-//	if(forcibly_redraw==1)
-//		{
-//		Prev10m = 0xFF;
-//		Prev1m = 0xFF;
-//		Prev10s = 0xFF;
-//		Prev1s = 0xFF;
-//		Prev10f = 0xFF;
-//		Prev1f = 0xFF;
-//		PrevHf = 0xFF;				
-//		}
-
-	if(Prev10m != (clock_pos/90000)%10)			
-		{
-		Prev10m = (clock_pos/90000)%10;	
-		sprintf((char *)Buf , "%0lu", Prev10m);				//10 Min	
-		BSP_LCD_DisplayStringAt(306, 168, Buf, LEFT_MODE);	
-		}
-	if(Prev1m != (clock_pos/9000)%10)			
-		{
-		Prev1m = (clock_pos/9000)%10;	
-		sprintf((char *)Buf , "%0lu", Prev1m);				//1 Min	
-		BSP_LCD_DisplayStringAt(322, 168, Buf, LEFT_MODE);				
-		}
-	if(Prev10s != (clock_pos/1500)%6)
-		{
-		Prev10s = (clock_pos/1500)%6;
-		sprintf((char *)Buf , "%0lu", Prev10s);				//10 Sec	
-		BSP_LCD_DisplayStringAt(352, 168, Buf, LEFT_MODE);		
-		}
-	if(Prev1s != (clock_pos/150)%10)
-		{
-		Prev1s = (clock_pos/150)%10;
-		sprintf((char *)Buf , "%0lu", Prev1s);				//1 Sec	
-		BSP_LCD_DisplayStringAt(368, 168, Buf, LEFT_MODE);
-		}		
-	if(Prev10f != ((clock_pos/2)%75)/10)
-		{
-		Prev10f = ((clock_pos/2)%75)/10;
-		BSP_LCD_SetFont(&Font14D);	
-		sprintf((char *)Buf , "%0lu", Prev10f);				//10 F	
-		BSP_LCD_DisplayStringAt(394, 172, Buf, LEFT_MODE);
-		}		
-	if(Prev1f != ((clock_pos/2)%75)%10)
-		{
-		Prev1f = ((clock_pos/2)%75)%10;
-		BSP_LCD_SetFont(&Font14D);	
-		sprintf((char *)Buf , "%0lu", Prev1f);				//1 F	
-		BSP_LCD_DisplayStringAt(407, 172, Buf, LEFT_MODE);	
-		}
-	if(PrevHf != clock_pos%2)
-		{
-		PrevHf = clock_pos%2;
-		BSP_LCD_SetFont(&Font14D);		
-		if(PrevHf%2==1)
-			{
-			sprintf((char*)Buf, "%s", "5");	
-			}
-		else
-			{
-			sprintf((char*)Buf, "%s", "0");	
-			}
-		BSP_LCD_DisplayStringAt(424, 172, Buf, LEFT_MODE);					
-		}		
-		
-	//DrawStaticWFM(position*399/all_long);	
-		
-	position = position/DynamicWaveformZOOM;					//zoom correction	
-		
-	if(position!=PreviousPositionDW)
-		{
-		PreviousPositionDW = position;
-		if(VisibleLayer==0)
-			{
-			BSP_LCD_SelectLayer(1);	
-			intDRAW_WAVEFORM_FRAME(position);		
-			//memcpy(&parcser_adress[114240], &parcser_adress[144960], 48960);							
-			HAL_DMA_GO(&hdma_memtomem_dma1_stream0, 0xC0049200, 0xC003D680, 8880);
-
-				
-			HAL_DMA_Poll(&hdma_memtomem_dma1_stream0, HAL_DMA_FULL_TRANSFER, 8);	
-			BSP_LCD_SetTransparency(1, 255);		//high layer disable
-			BSP_LCD_SelectLayer(0);
-			VisibleLayer = 1;
-			}
-		else
-			{
-			BSP_LCD_SelectLayer(0);
-			intDRAW_WAVEFORM_FRAME(position);	
-			//memcpy(&parcser_adress[2400], &parcser_adress[33120], 48960);
-			HAL_DMA_GO(&hdma_memtomem_dma1_stream0, 0xC0012840, 0xC0006CC0, 8880);	
-			HAL_DMA_Poll(&hdma_memtomem_dma1_stream0, HAL_DMA_FULL_TRANSFER, 8);
-			BSP_LCD_SetTransparency(1, 0);		//high layer disable
-			VisibleLayer = 0;	
-			}
-		}
-	return;	
-	}
-
-
-//////////////////////////////////////////////	
-//	
-//	internal function for redraw waveform	
-//	
-void intDRAW_WAVEFORM_FRAME(uint32_t position)
-	{
-	uint16_t i, adr, BG_COLOR;
-	uint16_t u, x; 	
-	uint8_t	j;
-	x = 0;
-	u = 0;	
-				
-//	if(position>=200)
-//		{
-//		while((BEATGRID[u]-(BEATGRID[u]%DynamicWaveformZOOM))<(DynamicWaveformZOOM*(position-200)))
-//			{
-//			u++;	
-//			}	
-//		}	
-	
-	BSP_LCD_SetTextColor(LCD_COLOR_BLACK);	
-//	BSP_LCD_FillRect(36, 49, 408, 5);
-//	BSP_LCD_FillRect(36, 136, 408, 5);				
-//	BSP_LCD_FillRect(40, 54, 400, 5);
-//	BSP_LCD_FillRect(40, 131, 400, 5);
-			
-	for(i=0;i<480;i++)
-		{	
-		adr = DynamicWaveformZOOM*(i+position-240);	
-		BG_COLOR = LCD_COLOR_BLACK;	
-
-//		if(adr<=all_long)
-//			{
-//			if((CUE_ADR-(CUE_ADR%DynamicWaveformZOOM))==adr) //Draw CUE triangle
-//				{
-//				BSP_LCD_SetTextColor(CUE_COLOR);
-//				FillTriangle(i+36, i+44, i+40, 170, 170, 166);
-//				}
-				
-//			if((BEATGRID[u+x]-(BEATGRID[u+x]%DynamicWaveformZOOM))==adr)	
-//				{
-//				if(((u+x)%4)==((1-GRID_OFFSET)&0x03))					//red grid
-//					{
-//					ForceDrawVLine(i+40, 84, 5, LCD_COLOR_RED);
-//					ForceDrawVLine(i+40, 161, 5, LCD_COLOR_RED);
-//					}
-//				else if(DynamicWaveformZOOM<8)			//white grid
-//					{	
-//					ForceDrawVLine(i+40, 84, 5, LCD_COLOR_WHITE);
-//					ForceDrawVLine(i+40, 161, 5, LCD_COLOR_WHITE);		
-//					}
-//				x++;	
-//				}	
-//			}
-
-		if(i==239)																		///you can optimize 1 raz draw red line
-			{
-			//bars = u+x;		
-			}
-		else if(i==240)
-			{
-			}
-		else
-			{
-			if(adr<=all_long)
-				{
-				if(DynamicWaveformZOOM==1)
-					{	
-					ForceDrawVLine(i, 97-(WFORMDYNAMIC[adr]&0x1F), 1+2*(WFORMDYNAMIC[adr]&0x1F), COLOR_MAP[0][WFORMDYNAMIC[adr]>>5]);		//124-125px center	
-					ForceDrawVLine(i, 79, 18-(WFORMDYNAMIC[adr]&0x1F), BG_COLOR);								
-					ForceDrawVLine(i, 98+(WFORMDYNAMIC[adr]&0x1F), 18-(WFORMDYNAMIC[adr]&0x1F), BG_COLOR);			
-					}
-				else 	
-					{
-					uint8_t amplitude = (WFORMDYNAMIC[adr]&0x1F);
-					if(amplitude>18)			//may delete check, when [adr] not owerflow value from massive WFORMDYNAMIC
-						{
-						amplitude = 18;	
-						}						
-					uint8_t color = (WFORMDYNAMIC[adr]>>5);
-					for(j=0;j<(DynamicWaveformZOOM-1);j++)
-						{
-						if((WFORMDYNAMIC[adr+j+1]&0x1F)>amplitude)
-							{
-							amplitude	= (WFORMDYNAMIC[adr+j+1]&0x1F);
-							if(amplitude>13)
-								{
-								color = (WFORMDYNAMIC[adr+j+1]>>5);
-								}
-							}
-						}		
-					ForceDrawVLine(i, 97-amplitude, 1+2*amplitude, COLOR_MAP[0][color]);		//124-125px center
-					ForceDrawVLine(i, 79, 18-amplitude, BG_COLOR);	
-					ForceDrawVLine(i, 98+amplitude, 18-amplitude, BG_COLOR);		
-					}
-				}
-			else
-				{
-				ForceDrawVLine(i, 79, 37, LCD_COLOR_BLACK);		
-				}	
-			}			
-		}
-	ForceDrawVLine(239, 17, 109, LCD_COLOR_WHITE);	
-	ForceDrawVLine(240, 17, 109, LCD_COLOR_WHITE);		
-	return;	
-	}	
-	
 	
 
 /* USER CODE END 4 */
+	
 
+	
 /* MPU Configuration */
 
 void MPU_Config(void)
@@ -921,7 +851,7 @@ void MPU_Config(void)
 
   HAL_MPU_ConfigRegion(&MPU_InitStruct);
   /* Enables the MPU */
- // HAL_MPU_Enable(MPU_HFNMI_PRIVDEF);
+  //HAL_MPU_Enable(MPU_HFNMI_PRIVDEF);
 
 
   MPU_InitStruct.Enable = MPU_REGION_ENABLE;
@@ -933,9 +863,13 @@ void MPU_Config(void)
   MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
   MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_ENABLE;
   MPU_InitStruct.IsShareable = MPU_ACCESS_SHAREABLE;
-  MPU_InitStruct.IsCacheable = MPU_ACCESS_NOT_CACHEABLE;
-  MPU_InitStruct.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
+  MPU_InitStruct.IsCacheable = MPU_ACCESS_CACHEABLE;
+  MPU_InitStruct.IsBufferable = MPU_ACCESS_BUFFERABLE;
 
+  HAL_MPU_ConfigRegion(&MPU_InitStruct);
+
+  /** Initializes and configures the Region and the memory to be protected
+  */
   HAL_MPU_ConfigRegion(&MPU_InitStruct);
   /* Enables the MPU */
   HAL_MPU_Enable(MPU_HFNMI_PRIVDEF);
