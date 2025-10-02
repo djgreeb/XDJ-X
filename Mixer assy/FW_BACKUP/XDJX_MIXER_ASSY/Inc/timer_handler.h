@@ -197,8 +197,8 @@ void TIM2_IRQHandler(void)
 					pot_out[tim_dv] = (pot_out[tim_dv]+ADC_TMP+1)>>1;	
 					}
 				pot_8b[tim_dv] = pot_convcd(pot_out[tim_dv]);	
-				eql0.hg	= VR_LIN[pot_8b[tim_dv]];	
-				eqr0.hg	= VR_LIN[pot_8b[tim_dv]];	
+				eql0.hg	= EQ_ISO[pot_8b[tim_dv]];	
+				eqr0.hg	= EQ_ISO[pot_8b[tim_dv]];	
 				}				
 			ADC_TMP = (pot_SUM[tim_dv-1]+4)>>3;	
 			if((ADC_TMP>(pot_out[tim_dv-1]+adc_hysteresis))||((ADC_TMP+adc_hysteresis)<pot_out[tim_dv-1]))	////////// HI1	
@@ -212,8 +212,8 @@ void TIM2_IRQHandler(void)
 					pot_out[tim_dv-1] = (pot_out[tim_dv-1]+ADC_TMP+1)>>1;	
 					}
 				pot_8b[tim_dv-1] = pot_convcd(pot_out[tim_dv-1]);	
-				eql1.hg	= VR_LIN[pot_8b[tim_dv-1]];	
-				eqr1.hg	= VR_LIN[pot_8b[tim_dv-1]];					
+				eql1.hg	= EQ_ISO[pot_8b[tim_dv-1]];	
+				eqr1.hg	= EQ_ISO[pot_8b[tim_dv-1]];					
 				}
 			}	
 		else if(tim_dv==4)		//////////////////////////////////////////			4			//////////////////////////////////////////
@@ -543,8 +543,8 @@ void TIM2_IRQHandler(void)
 					pot_out[tim_dv] = (pot_out[tim_dv]+ADC_TMP+1)>>1;	
 					}
 				pot_8b[tim_dv] = pot_convcd(pot_out[tim_dv]);	
-				eql0.lg	= VR_LIN[pot_8b[tim_dv]];	
-				eqr0.lg	= VR_LIN[pot_8b[tim_dv]];			
+				eql0.lg	= EQ_ISO[pot_8b[tim_dv]];	
+				eqr0.lg	= EQ_ISO[pot_8b[tim_dv]];			
 				}				
 			ADC_TMP = (pot_SUM[tim_dv-1]+4)>>3;	
 			if((ADC_TMP>(pot_out[tim_dv-1]+adc_hysteresis))||((ADC_TMP+adc_hysteresis)<pot_out[tim_dv-1]))	////////// LOW1		
@@ -558,8 +558,8 @@ void TIM2_IRQHandler(void)
 					pot_out[tim_dv-1] = (pot_out[tim_dv-1]+ADC_TMP+1)>>1;	
 					}
 				pot_8b[tim_dv-1] = pot_convcd(pot_out[tim_dv-1]);	
-				eql1.lg	= VR_LIN[pot_8b[tim_dv-1]];	
-				eqr1.lg	= VR_LIN[pot_8b[tim_dv-1]];			
+				eql1.lg	= EQ_ISO[pot_8b[tim_dv-1]];	
+				eqr1.lg	= EQ_ISO[pot_8b[tim_dv-1]];			
 				}	
 			////////added calc code				
 			if((GPIOB->IDR & 0x00000004)==0x00U)			//Bluetooth button
@@ -790,8 +790,8 @@ void TIM2_IRQHandler(void)
 					pot_out[tim_dv] = (pot_out[tim_dv]+ADC_TMP+1)>>1;	
 					}
 				pot_8b[tim_dv] = pot_convcd(pot_out[tim_dv]);	
-				eql0.mg	= VR_LIN[pot_8b[tim_dv]];	
-				eqr0.mg	= VR_LIN[pot_8b[tim_dv]];
+				eql0.mg	= EQ_ISO[pot_8b[tim_dv]];	
+				eqr0.mg	= EQ_ISO[pot_8b[tim_dv]];
 				}				
 			ADC_TMP = (pot_SUM[tim_dv-1]+4)>>3;	
 			if((ADC_TMP>(pot_out[tim_dv-1]+adc_hysteresis))||((ADC_TMP+adc_hysteresis)<pot_out[tim_dv-1]))	////////// MID1	
@@ -805,8 +805,8 @@ void TIM2_IRQHandler(void)
 					pot_out[tim_dv-1] = (pot_out[tim_dv-1]+ADC_TMP+1)>>1;	
 					}
 				pot_8b[tim_dv-1] = pot_convcd(pot_out[tim_dv-1]);	
-				eql1.mg	= VR_LIN[pot_8b[tim_dv-1]];	
-				eqr1.mg	= VR_LIN[pot_8b[tim_dv-1]];		
+				eql1.mg	= EQ_ISO[pot_8b[tim_dv-1]];	
+				eqr1.mg	= EQ_ISO[pot_8b[tim_dv-1]];		
 				}	
 			}	
 		else if(tim_dv==12)		//////////////////////////////////////////			12			//////////////////////////////////////////

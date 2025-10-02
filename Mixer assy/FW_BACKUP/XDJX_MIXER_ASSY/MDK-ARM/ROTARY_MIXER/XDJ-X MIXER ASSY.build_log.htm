@@ -22,7 +22,7 @@ Dialog DLL:      TCM.DLL V1.48.0.0
  
 <h2>Project:</h2>
 C:\Keil_v5\My_Project\XDJX_MIXER_ASSY\MDK-ARM\ROTARY_MIXER.uvprojx
-Project File Date:  03/12/2025
+Project File Date:  06/04/2025
 
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 7 (build 960)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
@@ -38,7 +38,7 @@ compiling main.c...
   #pragma GCC diagnostic ignored "-Wunused-parameter"
 ../Drivers/CMSIS/Include/arm_math.h(7148): warning:  #2803-D: unrecognized GCC pragma
   #pragma GCC diagnostic pop
-../Inc/global_variables.h(158): warning:  #1-D: last line of file ends without a newline
+../Inc/global_variables.h(161): warning:  #1-D: last line of file ends without a newline
   																																									
 ../Inc/audio_handler.h(252): warning:  #167-D: argument of type "int16_t *" is incompatible with parameter of type "uint8_t *"
   	HAL_SAI_Transmit_IT(&hsai_BlockA1, HP_BUS, 2);
@@ -74,29 +74,31 @@ compiling main.c...
   																																									
 ../Inc/MAX7219.h(199): warning:  #1-D: last line of file ends without a newline
   																																									
-../Src/main.c(295): warning:  #167-D: argument of type "int16_t *" is incompatible with parameter of type "uint8_t *"
+../Src/main.c(300): warning:  #167-D: argument of type "int16_t *" is incompatible with parameter of type "uint8_t *"
   	HAL_SAI_Transmit_IT(&hsai_BlockA1, MASTER_BUS, 2);	
-../Src/main.c(296): warning:  #167-D: argument of type "int16_t *" is incompatible with parameter of type "uint8_t *"
+../Src/main.c(301): warning:  #167-D: argument of type "int16_t *" is incompatible with parameter of type "uint8_t *"
   	HAL_SAI_Transmit_IT(&hsai_BlockA2, HP_BUS, 2);
-../Src/main.c(297): warning:  #167-D: argument of type "float *" is incompatible with parameter of type "uint8_t *"
+../Src/main.c(302): warning:  #167-D: argument of type "float *" is incompatible with parameter of type "uint8_t *"
   	HAL_SAI_Receive_IT(&hsai_BlockA3, CH0IN, 2);
-../Src/main.c(298): warning:  #167-D: argument of type "float *" is incompatible with parameter of type "uint8_t *"
+../Src/main.c(303): warning:  #167-D: argument of type "float *" is incompatible with parameter of type "uint8_t *"
   	HAL_SAI_Receive_IT(&hsai_BlockB3, CH1IN, 2);
-../Src/main.c(351): warning:  #223-D: function "sprintf" declared implicitly
-  		sprintf((char*)STR_BUFF, "126");	
-../Src/main.c(353): warning:  #167-D: argument of type "uint8_t *" is incompatible with parameter of type "char *"
-  		TFT_String(38, 77, STR_BUFF);		
-../Src/main.c(422): warning:  #167-D: argument of type "uint8_t *" is incompatible with parameter of type "char *"
-  		TFT_String(1, 122, &STR_BUFF[48]);
-../Src/main.c(451): warning:  #223-D: function "sprintf" declared implicitly
+../Inc/INAIR.h(45): warning:  #1-D: last line of file ends without a newline
+  																																									
+../Src/main.c(377): warning:  #223-D: function "sprintf" declared implicitly
+  			sprintf((char*)STR_BUFF, "%3lu", BPM_link);	
+../Src/main.c(379): warning:  #167-D: argument of type "uint8_t *" is incompatible with parameter of type "char *"
+  			TFT_String(38, 77, STR_BUFF);		
+../Src/main.c(384): warning:  #167-D: argument of type "uint8_t *" is incompatible with parameter of type "char *"
+  			TFT_String(1, 122, &STR_BUFF[48]);				
+../Src/main.c(412): warning:  #223-D: function "sprintf" declared implicitly
   		sprintf((char*)&STR_BUFF[32], "%03lu", pot_8b[B]);
-../Src/main.c(454): warning:  #167-D: argument of type "uint8_t *" is incompatible with parameter of type "char *"
+../Src/main.c(415): warning:  #167-D: argument of type "uint8_t *" is incompatible with parameter of type "char *"
   		TFT_String(1, 113, &STR_BUFF[32]);
-../Src/main.c: 32 warnings, 0 errors
+../Src/main.c: 33 warnings, 0 errors
 linking...
-Program Size: Code=41372 RO-data=11452 RW-data=300 ZI-data=4204  
+Program Size: Code=42068 RO-data=12476 RW-data=316 ZI-data=4204  
 FromELF: creating hex file...
-"ROTARY_MIXER\XDJ-X MIXER ASSY.axf" - 0 Error(s), 32 Warning(s).
+"ROTARY_MIXER\XDJ-X MIXER ASSY.axf" - 0 Error(s), 33 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -120,7 +122,7 @@ Package Vendor: Keil
 
    * Component: ARM::CMSIS:CORE:5.4.0
       Include file:  CMSIS\Core\Include\tz_context.h
-Build Time Elapsed:  00:00:05
+Build Time Elapsed:  00:00:04
 </pre>
 </body>
 </html>

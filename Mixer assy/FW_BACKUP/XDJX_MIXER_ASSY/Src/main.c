@@ -161,12 +161,16 @@
 //	ver. 0.40
 //	- improved leveler integrator coeff
 //	-	LEVEL_METER func bug fix
-//
-//
-//
-//
-//
-//
+//	ver. 0.41
+//	-	link uart up to 500000 baud
+//	ver. 0.42
+//	-	added inair sending
+//	ver. 0.43
+//	- ON AIR bug fixed
+//	ver. 0.44
+//	-	The frequency of checking and sending the in-air status has been changed
+//	-	crossfader curves added
+//	- EQ ISO curve added
 //
 //
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -193,6 +197,8 @@
 
 /* USER CODE BEGIN PV */
 
+uint16_t FW_VER = 44;
+
 #include "global_variables.h"
 
 #include "spi_st7735.h"
@@ -200,7 +206,6 @@
 #include "audio_handler.h"
 #include "tft_gui.h"
 #include "MAX7219.h"
-
 
 /* USER CODE END PV */
 
@@ -273,10 +278,10 @@ int main(void)
 	MAX7219_INIT();
 	HAL_Delay(2900);
 	
-	init_3band_state(&eql0, 880, 4000, 44100);
-	init_3band_state(&eqr0, 880, 4000, 44100);
-	init_3band_state(&eql1, 880, 4000, 44100);
-	init_3band_state(&eqr1, 880, 4000, 44100);
+	init_3band_state(&eql0, 950, 3900, 44100);		//880 4000
+	init_3band_state(&eqr0, 950, 3900, 44100);		//
+	init_3band_state(&eql1, 950, 3900, 44100);		//
+	init_3band_state(&eqr1, 950, 3900, 44100);		//
 	
 	
 	HAL_GPIO_WritePin(TFT_RST_GPIO_Port, TFT_RST_Pin, GPIO_PIN_SET);
@@ -336,93 +341,49 @@ int main(void)
   while (1)
   {
 	/////////////////TEMPORARY			
-	if((HAL_GetTick()-temp_time)>250)
-		{						
-		if(lay==0)
-			{
-			TFT_SetTextColor(TFT_WHITE);
-			lay = 1;	
-			}
-		else
-			{				
-			TFT_SetTextColor(TFT_BLACK);	
-			lay = 0;		
-			}
-		sprintf((char*)STR_BUFF, "126");	
-		TFT_SetFont(&FontVFD);					
-		TFT_String(38, 77, STR_BUFF);		
-			
-//		if(BFXON_prsd)
-//			{
-//			sprintf((char*)STR_BUFF, "BFXON");	
-//			}			
-//		else if(BEATm_prsd)
-//			{
-//			sprintf((char*)STR_BUFF, "BEATm");	
-//			}	
-//		else if(BEATp_prsd)
-//			{
-//			sprintf((char*)STR_BUFF, "BEATp");	
-//			}		
-//		else if(CUE1_prsd)
-//			{
-//			sprintf((char*)STR_BUFF, "CUE1 ");	
-//			}				
-//		else if(CUE2_prsd)
-//			{
-//			sprintf((char*)STR_BUFF, "CUE2 ");	
-//			}	
-//		else if(EQCURVE_prsd)
-//			{
-//			sprintf((char*)STR_BUFF, "EQCUR");	
-//			}	
-//		else if(CFX1_prsd)
-//			{
-//			sprintf((char*)STR_BUFF, "CFX1 ");	
-//			}
-//		else if(CFX2_prsd)
-//			{
-//			sprintf((char*)STR_BUFF, "CFX2 ");	
-//			}
-//		else if(CFX3_prsd)
-//			{
-//			sprintf((char*)STR_BUFF, "CFX3 ");	
-//			}
-//		else if(CFX4_prsd)
-//			{
-//			sprintf((char*)STR_BUFF, "CFX4 ");	
-//			}
-//		else if(CFX5_prsd)
-//			{
-//			sprintf((char*)STR_BUFF, "CFX5 ");	
-//			}
-//		else if(CFX6_prsd)
-//			{
-//			sprintf((char*)STR_BUFF, "CFX6 ");	
-//			}
-//		else if(CFX7_prsd)
-//			{
-//			sprintf((char*)STR_BUFF, "CFX7 ");	
-//			}
-//		else if(CFX8_prsd)
-//			{
-//			sprintf((char*)STR_BUFF, "CFX8 ");	
-//			}		
-//		else
-//			{
-//			sprintf((char*)STR_BUFF, "     ");	
-//			}		
-//		TFT_SetTextColor(TFT_BLUE);
-//		TFT_SetFont(&Font8);	
-//		TFT_String(1, 105, STR_BUFF);		
+	if((HAL_GetTick()-temp_time)>25)
+		{
+		#include "INAIR.h"	
 		
-		sprintf((char*)&STR_BUFF[48], "CH:%02lu", B);
-		TFT_SetTextColor(TFT_BLUE);
-		TFT_SetFont(&Font8);		
-		TFT_String(1, 122, &STR_BUFF[48]);
-//		HAL_UART_Transmit(&huart5, CH1IN, 8, 5);
-//		HAL_Delay(150);	
-//		HAL_UART_Transmit(&huart5, CH2IN, 8, 5);	
+		if(divdr<9)
+			{
+			divdr++;	
+			}			
+		else
+			{
+			if(last_bit_time<20)
+				{
+				last_bit_time++;	
+				}
+			
+			if(lay==0)
+				{
+				TFT_SetTextColor(TFT_WHITE);
+				lay = 1;	
+				}
+			else
+				{	
+				if(last_bit_time>19)
+					{				
+					TFT_SetTextColor(TFT_BLACK);
+					}	
+				else
+					{
+					TFT_SetTextColor(TFT_WHITE);	
+					}				
+				lay = 0;		
+				}
+				
+			sprintf((char*)STR_BUFF, "%3lu", BPM_link);	
+			TFT_SetFont(&FontVFD);					
+			TFT_String(38, 77, STR_BUFF);		
+						
+			sprintf((char*)&STR_BUFF[48], "CH:%02lu", B);
+			TFT_SetTextColor(TFT_BLUE);
+			TFT_SetFont(&Font8);		
+			TFT_String(1, 122, &STR_BUFF[48]);				
+			divdr = 0;	
+			}	
 		temp_time = HAL_GetTick();	
 		}
 
@@ -518,13 +479,59 @@ int main(void)
 		need_draw_bticon = 0;	
 		}		
 		
-		if(link_new_data)				//UART4 link handler
+	if(link_new_data)				//UART5 link handler
+		{	
+		if(link_urx_buf[0]==0x95 ||  link_urx_buf[0]==0x96)	//sending bpm at beats (BPM*100), 0x95-0x96 – first beat 1/4 
+			{
+			BPM_link = (0x100*link_urx_buf[1]+link_urx_buf[2]+50)/100;
+			last_bit_time = 0;	
+			}
+		else if(link_urx_buf[0]==0x91 && link_urx_buf[1]==0x60 && link_urx_buf[2]==0x31)		//firmware version request
+			{
+			link_utx_buf[0] = 0x91;
+			link_utx_buf[1] = FW_VER>>8;
+			link_utx_buf[2] =	FW_VER%256;
+			HAL_UART_Transmit(&huart5, link_utx_buf, 3, 5);	
+			}
+		else if(link_urx_buf[0]==0x92)		//setting table values of equalizer cutoff frequencies
+			{
+//				init_3band_state(&eql0, 880, 4000, 44100);
+//				init_3band_state(&eqr0, 880, 4000, 44100);
+//				init_3band_state(&eql1, 880, 4000, 44100);
+//				init_3band_state(&eqr1, 880, 4000, 44100);
+			}	
+		else if(link_urx_buf[0]==0x93 && link_urx_buf[1]==0xB1)		//setting fader curve type
 			{
 				
+			}	
+		else if(link_urx_buf[0]==0x94 && link_urx_buf[1]==0xA3)		//setting headphones cue type (pre EQ or post EQ)
+			{
 				
-				
-			link_new_data = 0;	
-			}
+			}	
+		else if(link_urx_buf[0]==0x97 && link_urx_buf[1]==0xFC)		//shutdown command)
+			{
+			TIM3->CCR2 = 0;	
+			HAL_GPIO_WritePin(GPIOC, PAEN_Pin, GPIO_PIN_RESET);			//analog power off	
+			BT_LED_OFF;	
+			MAX7219_DATA[0] = 0x00;	
+			MAX7219_DATA[1] = 0x00;
+			MAX7219_DATA[2] = 0x00;
+			MAX7219_DATA[3] = 0x00;
+			MAX7219_DATA[4] = 0x00;
+			MAX7219_DATA[5] = 0x00;
+			MAX7219_DATA[6] = 0x00;
+			MAX7219_DATA[7] = 0x00;
+			MAX7219_UPDATE(0);
+			MAX7219_UPDATE(1);
+			MAX7219_UPDATE(2);
+			MAX7219_UPDATE(3);
+			MAX7219_UPDATE(4);
+			MAX7219_UPDATE(5);
+			MAX7219_UPDATE(6);
+			MAX7219_UPDATE(7);					
+			}		
+		link_new_data = 0;	
+		}
 		
     /* USER CODE END WHILE */
 

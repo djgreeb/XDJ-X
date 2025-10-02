@@ -21,7 +21,7 @@ void UART5_IRQHandler(void)
 		{		
 		linkURX = (UART5->RDR);	
 		link_current_time = HAL_GetTick();	
-		if((link_current_time - link_usart_timeout)>20)					//5ms for hardware COM. 100ms for usb-com adapter
+		if((link_current_time - link_usart_timeout)>10)					//5ms for hardware COM. 100ms for usb-com adapter
 			{
 			link_usart_data_cnt = 0;
 			}
@@ -29,7 +29,7 @@ void UART5_IRQHandler(void)
 		if(link_usart_data_cnt<16)
 			{			
 			link_urx_buf[link_usart_data_cnt] = linkURX;	
-			if(link_usart_data_cnt==1)
+			if(link_usart_data_cnt==2)
 				{			
 				link_new_data = 1;
 				}
@@ -49,8 +49,8 @@ void USART1_IRQHandler(void)
 	if(USART1->ISR & USART_ISR_RXNE_RXFNE)		//have a new data
 		{		
 		CRSF_midi = (USART1->RDR);		//0..127			
-		CRSF0_ATT = CRSF_POS[127-CRSF_midi];
-		CRSF1_ATT = CRSF_POS[CRSF_midi];	
+		CRSF0_ATT = CRSF_POS[CRSFCURVE][127-CRSF_midi];
+		CRSF1_ATT = CRSF_POS[CRSFCURVE][CRSF_midi];	
 		}				
   HAL_UART_IRQHandler(&huart1);
 	};

@@ -1,10 +1,10 @@
 Dependencies for Project 'ROTARY_MIXER', Target 'ROTARY_MIXER': (DO NOT MODIFY !)
 CompilerVersion: 5060960::V5.06 update 7 (build 960)::.\ARMCC
 F (startup_stm32h743xx.s)(0x67CC9498)(--cpu Cortex-M7.fp.dp -g --apcs=interwork -I.\RTE\_ROTARY_MIXER-IC:\Users\Greeb\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\Greeb\AppData\Local\Arm\Packs\Keil\STM32H7xx_DFP\3.1.1\Drivers\CMSIS\Device\ST\STM32H7xx\Include--pd "__UVISION_VERSION SETA 534" --pd "_RTE_ SETA 1" --pd "STM32H743xx SETA 1" --pd "_RTE_ SETA 1"--list startup_stm32h743xx.lst --xref -o rotary_mixer\startup_stm32h743xx.o --depend rotary_mixer\startup_stm32h743xx.d)
-F (..\Inc\audio.h)(0x681BB39F)()
+F (..\Inc\audio.h)(0x68D5B4DE)()
 F (..\Inc\audio_handler.h)(0x681A0D8E)()
-F (..\Inc\global_variables.h)(0x681A08D2)()
-F (..\Inc\timer_handler.h)(0x681BB39F)()
+F (..\Inc\global_variables.h)(0x68D598F0)()
+F (..\Inc\timer_handler.h)(0x68D5B4DE)()
 F (..\Src\spi_st7735.c)(0x67D18002)(--c99 --gnu -c --cpu Cortex-M7.fp.dp -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32H7xx/Include -I ../Drivers/CMSIS/Include-I.\RTE\_ROTARY_MIXER-IC:\Users\Greeb\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\Greeb\AppData\Local\Arm\Packs\Keil\STM32H7xx_DFP\3.1.1\Drivers\CMSIS\Device\ST\STM32H7xx\Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32H743xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32H743xx-o rotary_mixer\spi_st7735.o --omf_browse rotary_mixer\spi_st7735.crf --depend rotary_mixer\spi_st7735.d)
 I (../Inc/spi_st7735.h)(0x67D13106)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h)(0x65F71400)
@@ -58,8 +58,8 @@ I (../Inc/font12.c)(0x5D13BDA4)
 I (../Inc/font8.c)(0x5D13BDA4)
 I (../Inc/fontVFD.c)(0x67C60E56)
 F (..\Inc\tft_gui.h)(0x67D1581C)()
-F (..\Inc\MAX7219.h)(0x681BB0C1)()
-F (../Src/main.c)(0x681BB407)(--c99 --gnu -c --cpu Cortex-M7.fp.dp -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32H7xx/Include -I ../Drivers/CMSIS/Include-I.\RTE\_ROTARY_MIXER-IC:\Users\Greeb\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\Greeb\AppData\Local\Arm\Packs\Keil\STM32H7xx_DFP\3.1.1\Drivers\CMSIS\Device\ST\STM32H7xx\Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32H743xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32H743xx-o rotary_mixer\main.o --omf_browse rotary_mixer\main.crf --depend rotary_mixer\main.d)
+F (..\Inc\MAX7219.h)(0x681BB0C2)()
+F (../Src/main.c)(0x68D5B8CE)(--c99 --gnu -c --cpu Cortex-M7.fp.dp -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32H7xx/Include -I ../Drivers/CMSIS/Include-I.\RTE\_ROTARY_MIXER-IC:\Users\Greeb\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\Greeb\AppData\Local\Arm\Packs\Keil\STM32H7xx_DFP\3.1.1\Drivers\CMSIS\Device\ST\STM32H7xx\Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32H743xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32H743xx-o rotary_mixer\main.o --omf_browse rotary_mixer\main.crf --depend rotary_mixer\main.d)
 I (../Inc/main.h)(0x6751B08E)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h)(0x65F71400)
 I (../Inc/stm32h7xx_hal_conf.h)(0x6751B08E)
@@ -111,17 +111,18 @@ I (../Inc/usart.h)(0x6751B08E)
 I (../Inc/gpio.h)(0x664C7E04)
 I (../Drivers/CMSIS/Include/arm_math.h)(0x67A4A582)
 I (C:\Keil_v5\ARM\ARMCC\include\string.h)(0x5E8E8312)
-I (../Inc/global_variables.h)(0x681A08D2)
+I (../Inc/global_variables.h)(0x68D598F0)
 I (../Inc/spi_st7735.h)(0x67D13106)
 I (C:\Keil_v5\ARM\ARMCC\include\cstdlib)(0x5E8E8312)
 I (C:\Keil_v5\ARM\ARMCC\include\stdlib.h)(0x5E8E8312)
 I (../Inc/fonts.h)(0x67D17F64)
-I (../Inc/audio.h)(0x681BB39F)
+I (../Inc/audio.h)(0x68D5B4DE)
 I (../Inc/audio_handler.h)(0x681A0D8E)
 I (../Inc/tft_gui.h)(0x67D1581C)
-I (../Inc/MAX7219.h)(0x681BB0C1)
-I (../Inc/uarts_handler.h)(0x680D518C)
-I (../Inc/timer_handler.h)(0x681BB39F)
+I (../Inc/MAX7219.h)(0x681BB0C2)
+I (../Inc/INAIR.h)(0x6840815C)
+I (../Inc/uarts_handler.h)(0x68D5AA29)
+I (../Inc/timer_handler.h)(0x68D5B4DE)
 I (../Inc/encoder_handler.h)(0x67D12E64)
 F (../Src/gpio.c)(0x6751B08A)(--c99 --gnu -c --cpu Cortex-M7.fp.dp -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32H7xx/Include -I ../Drivers/CMSIS/Include-I.\RTE\_ROTARY_MIXER-IC:\Users\Greeb\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\Greeb\AppData\Local\Arm\Packs\Keil\STM32H7xx_DFP\3.1.1\Drivers\CMSIS\Device\ST\STM32H7xx\Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32H743xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32H743xx-o rotary_mixer\gpio.o --omf_browse rotary_mixer\gpio.crf --depend rotary_mixer\gpio.d)
 I (../Inc/gpio.h)(0x664C7E04)
@@ -348,7 +349,7 @@ I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim.h)(0x65F71400)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim_ex.h)(0x65F71400)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h)(0x65F71400)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h)(0x65F71400)
-F (../Src/usart.c)(0x67CC9494)(--c99 --gnu -c --cpu Cortex-M7.fp.dp -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32H7xx/Include -I ../Drivers/CMSIS/Include-I.\RTE\_ROTARY_MIXER-IC:\Users\Greeb\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\Greeb\AppData\Local\Arm\Packs\Keil\STM32H7xx_DFP\3.1.1\Drivers\CMSIS\Device\ST\STM32H7xx\Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32H743xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32H743xx-o rotary_mixer\usart.o --omf_browse rotary_mixer\usart.crf --depend rotary_mixer\usart.d)
+F (../Src/usart.c)(0x6840807E)(--c99 --gnu -c --cpu Cortex-M7.fp.dp -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32H7xx/Include -I ../Drivers/CMSIS/Include-I.\RTE\_ROTARY_MIXER-IC:\Users\Greeb\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\Greeb\AppData\Local\Arm\Packs\Keil\STM32H7xx_DFP\3.1.1\Drivers\CMSIS\Device\ST\STM32H7xx\Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32H743xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32H743xx-o rotary_mixer\usart.o --omf_browse rotary_mixer\usart.crf --depend rotary_mixer\usart.d)
 I (../Inc/usart.h)(0x6751B08E)
 I (../Inc/main.h)(0x6751B08E)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h)(0x65F71400)
@@ -483,7 +484,8 @@ I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim_ex.h)(0x65F71400)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h)(0x65F71400)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h)(0x65F71400)
 F (..\Inc\encoder_handler.h)(0x67D12E64)()
-F (..\Inc\uarts_handler.h)(0x680D518C)()
+F (..\Inc\uarts_handler.h)(0x68D5AA29)()
+F (..\Inc\INAIR.h)(0x6840815C)()
 F (../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc.c)(0x65F71400)(--c99 --gnu -c --cpu Cortex-M7.fp.dp -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32H7xx/Include -I ../Drivers/CMSIS/Include-I.\RTE\_ROTARY_MIXER-IC:\Users\Greeb\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\Greeb\AppData\Local\Arm\Packs\Keil\STM32H7xx_DFP\3.1.1\Drivers\CMSIS\Device\ST\STM32H7xx\Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32H743xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32H743xx-o rotary_mixer\stm32h7xx_hal_adc.o --omf_browse rotary_mixer\stm32h7xx_hal_adc.crf --depend rotary_mixer\stm32h7xx_hal_adc.d)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h)(0x65F71400)
 I (../Inc/stm32h7xx_hal_conf.h)(0x6751B08E)

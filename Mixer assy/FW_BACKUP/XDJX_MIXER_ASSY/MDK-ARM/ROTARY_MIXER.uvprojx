@@ -534,6 +534,11 @@
               <FileType>5</FileType>
               <FilePath>..\Inc\uarts_handler.h</FilePath>
             </File>
+            <File>
+              <FileName>INAIR.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\INAIR.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

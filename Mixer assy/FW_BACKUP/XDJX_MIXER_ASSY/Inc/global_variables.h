@@ -49,6 +49,7 @@ const static uint16_t dBConv[12]={
 
 /* TFT ---------------------------------------------------------*/
 uint8_t previous_ch = 0xFF;
+uint16_t BPM_link = 0;
 
 /* BUTTONS ---------------------------------------------------------*/
 #define MUX_ADDR0		GPIOC->BSRR = 0x00070000	//000	
@@ -115,7 +116,7 @@ uint8_t blink_sync = 0;	//internal divider for very slow friquency blinking
 uint16_t pot_ADC[16][8] = {0};
 uint32_t pot_SUM[16] = {0};
 uint16_t pot_out[16];					//potenciometer value after gysteresis 0..4095 approx
-uint8_t  pot_8b[16] = {0};		//potenciometer value (after vonversion 4095 to 255) 0..255 approx
+uint8_t  pot_8b[16] = {0};		//potenciometer value (after conversion 4095 to 255) 0..255 approx
 uint32_t ADC_TMP;
 uint8_t cnt_ad = 0;
 uint16_t ADC_prev[4];
@@ -140,18 +141,20 @@ uint8_t link_usart_data_cnt = 0;
 uint8_t link_new_data = 0;
 uint8_t link_urx_buf[16];
 uint8_t linkURX;
-
-
-
+uint8_t link_utx_buf[8];
+uint8_t decka_inair = 0xFF;
+uint8_t deckb_inair = 0xFF;
+uint8_t need_send_inair = 0;
 
 
 /* TEMPORARY ---------------------------------------------------------*/
 uint32_t temp_time;
+uint8_t divdr;
 uint8_t lay = 0;
 uint8_t STR_BUFF[64] = {0};
 
 uint8_t B = 0;
-
+uint8_t last_bit_time = 0xFF;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				

@@ -61,6 +61,7 @@ rotary_mixer\main.o: ../Inc/audio.h
 rotary_mixer\main.o: ../Inc/audio_handler.h
 rotary_mixer\main.o: ../Inc/tft_gui.h
 rotary_mixer\main.o: ../Inc/MAX7219.h
+rotary_mixer\main.o: ../Inc/INAIR.h
 rotary_mixer\main.o: ../Inc/uarts_handler.h
 rotary_mixer\main.o: ../Inc/timer_handler.h
 rotary_mixer\main.o: ../Inc/encoder_handler.h
