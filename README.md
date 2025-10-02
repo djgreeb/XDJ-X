@@ -22,6 +22,8 @@ XDJ-X is based on 2 STM32H7 series ARMs, which handle the mixer and deck audio p
 
 Some videos:
 
+https://youtube.com/shorts/dMu84rqdVfA?si=jUdEivFD7gFBzyvY
+
 https://youtube.com/shorts/kgtJnk3ONWc?si=wLm2IKEQJ5OtroMM
 
 https://youtube.com/shorts/DCkOMFqDp7Y?si=G3mvCeku2s3VxJYp
