@@ -1,6 +1,6 @@
 Configuration	Power_manager
 STM32CubeMX 	6.10.0
-Date	03/17/2025
+Date	06/03/2025
 MCU	STM32G431CBUx
 
 
@@ -58,7 +58,7 @@ SOFTWARE PROJECT
 
 Project Settings : 
 Project Name : Power_manager
-Project Folder : C:\Keil_v5\Projects\Power_manager
+Project Folder : C:\Keil_v5\My_Project\Power_manager
 Toolchain / IDE : MDK-ARM V5.32
 Firmware Package Name and Version : STM32Cube FW_G4 V1.5.1
 

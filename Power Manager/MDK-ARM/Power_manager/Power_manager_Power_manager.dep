@@ -1,8 +1,8 @@
 Dependencies for Project 'Power_manager', Target 'Power_manager': (DO NOT MODIFY !)
 CompilerVersion: 5060960::V5.06 update 7 (build 960)::.\ARMCC
 F (startup_stm32g431xx.s)(0x67D80FF4)(--cpu Cortex-M4.fp.sp -g --apcs=interwork -I.\RTE\_Power_manager-IC:\Users\Greeb\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include--pd "__UVISION_VERSION SETA 534" --pd "_RTE_ SETA 1" --pd "STM32G431xx SETA 1" --pd "_RTE_ SETA 1"--list startup_stm32g431xx.lst --xref -o power_manager\startup_stm32g431xx.o --depend power_manager\startup_stm32g431xx.d)
-F (..\Inc\global_variables.h)(0x67B8F268)()
-F (../Src/main.c)(0x67F9130A)(--c99 -c --cpu Cortex-M4.fp.sp -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I ../Drivers/CMSIS/Include-I.\RTE\_Power_manager-IC:\Users\Greeb\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32G431xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32G431xx-o power_manager\main.o --omf_browse power_manager\main.crf --depend power_manager\main.d)
+F (..\Inc\global_variables.h)(0x683F32E2)()
+F (../Src/main.c)(0x684EC8A1)(--c99 -c --cpu Cortex-M4.fp.sp -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I ../Drivers/CMSIS/Include-I.\RTE\_Power_manager-IC:\Users\Greeb\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32G431xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32G431xx-o power_manager\main.o --omf_browse power_manager\main.crf --depend power_manager\main.d)
 I (../Inc/main.h)(0x6745CD9E)
 I (../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal.h)(0x6745D5C0)
 I (../Inc/stm32g4xx_hal_conf.h)(0x6745CD9E)
@@ -39,7 +39,7 @@ I (../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart_ex.h)(0x6745D5C0)
 I (../Inc/adc.h)(0x6745CD9E)
 I (../Inc/usart.h)(0x6745CD9E)
 I (../Inc/gpio.h)(0x6745CD9C)
-I (../Inc/global_variables.h)(0x67B8F268)
+I (../Inc/global_variables.h)(0x683F32E2)
 F (../Src/gpio.c)(0x6745CD9C)(--c99 -c --cpu Cortex-M4.fp.sp -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I ../Drivers/CMSIS/Include-I.\RTE\_Power_manager-IC:\Users\Greeb\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32G431xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32G431xx-o power_manager\gpio.o --omf_browse power_manager\gpio.crf --depend power_manager\gpio.d)
 I (../Inc/gpio.h)(0x6745CD9C)
 I (../Inc/main.h)(0x6745CD9E)
@@ -110,7 +110,7 @@ I (../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_pwr.h)(0x6745D5C0)
 I (../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_pwr_ex.h)(0x6745D5C0)
 I (../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart.h)(0x6745D5C0)
 I (../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart_ex.h)(0x6745D5C0)
-F (../Src/usart.c)(0x67D80FF0)(--c99 -c --cpu Cortex-M4.fp.sp -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I ../Drivers/CMSIS/Include-I.\RTE\_Power_manager-IC:\Users\Greeb\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32G431xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32G431xx-o power_manager\usart.o --omf_browse power_manager\usart.crf --depend power_manager\usart.d)
+F (../Src/usart.c)(0x683F32F4)(--c99 -c --cpu Cortex-M4.fp.sp -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc -I ../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32G4xx/Include -I ../Drivers/CMSIS/Include-I.\RTE\_Power_manager-IC:\Users\Greeb\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32G431xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32G431xx-o power_manager\usart.o --omf_browse power_manager\usart.crf --depend power_manager\usart.d)
 I (../Inc/usart.h)(0x6745CD9E)
 I (../Inc/main.h)(0x6745CD9E)
 I (../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal.h)(0x6745D5C0)

@@ -40,6 +40,7 @@ uint8_t TX_DATA[2] = {0xA1, 0x00};	//[0] - status: A1 no ac, A2 - AC_EN, A3_FULL
 #define AC_CHARGE		0xA2
 #define AC_FULL			0xA3
 #define BATT_RQ			0x55
+#define FW_RQ				0x01
 
 uint8_t usart_data_cnt = 0;
 char U_RX_DATA[4] = {0};

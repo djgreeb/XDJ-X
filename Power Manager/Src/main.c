@@ -78,14 +78,17 @@
 //		-	added UART IRQHandler
 //	ver. 0.25
 //		-	changed timings for button press and unpress
-//
-//
-//
+//	ver. 0.27
+//		- uart speed up to 256000
+//		-	main period changed 83,3Hz
+//	ver. 0.29
+//		- added % battery
 //
 //
 //
 ////////////////////////////////////////////////////////////////////////////////////////
 
+uint8_t fwver = 29;
 
 #include "global_variables.h"
 
@@ -143,7 +146,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	HAL_Delay(20);			//create 50Hz period			
+	HAL_Delay(12);			//create 83,3Hz period			
 		
 	if(HAL_GPIO_ReadPin(BUTTON_IN_GPIO_Port, BUTTON_IN_Pin)==0 && BUTTON_pressed==0)
 		{		
@@ -161,7 +164,7 @@ int main(void)
 			tim_button_press++;
 			if(XDJ_POWER_ON==0)
 				{
-				if(tim_button_press==5)	// 0,1 sec pressed
+				if(tim_button_press==2)	// 0,024 sec pressed
 					{	
 					HAL_GPIO_WritePin(PON_GPIO_Port, PON_Pin, GPIO_PIN_SET);	
 					LED_W_OFF;
@@ -171,7 +174,7 @@ int main(void)
 				}
 			else
 				{
-				if(tim_button_press==150)	//3 sec pressed (send turn off command to main assy, waitig answer)
+				if(tim_button_press==250)	//3 sec pressed (send turn off command to main assy, waitig answer)
 					{	
 					TX_DATA[1] = T_OFF;	
 					HAL_UART_Transmit(&huart1, TX_DATA, 2, 5);						
@@ -193,7 +196,7 @@ int main(void)
 				XDJ_POWER_ON = 1;		
 				need_change_status_power = 0;	
 				}
-			if(tim_button_press<50)  //short press
+			if(tim_button_press<83)  //short press
 				{
 				TX_DATA[1] = B_UNPRESS;	
 				HAL_UART_Transmit(&huart1, TX_DATA, 2, 5);		
@@ -284,10 +287,10 @@ int main(void)
 		}
 	else				//turn off sequence (waitig answer form main assy) 
 		{
-		if(timeout_power<1000)
+		if(timeout_power<1665)
 			{
 			timeout_power++;
-			if(timeout_power==999)			//20 sec pressed (hardware turn off)
+			if(timeout_power==1664)			//20 sec pressed (hardware turn off)
 				{
 				quick_blink = 0;		
 				HAL_GPIO_WritePin(PON_GPIO_Port, PON_Pin, GPIO_PIN_RESET);	
@@ -325,22 +328,41 @@ int main(void)
 			TX_DATA[1] = batt_prcntg;		//battery precentage	
 			HAL_UART_Transmit(&huart1, TX_DATA, 2, 5);	
 			}
+		else if((U_RX_DATA[0]==AC_DSBL) && (U_RX_DATA[1]==FW_RQ))				//firmware version request
+			{
+			TX_DATA[1] = fwver & 0x80;
+			HAL_UART_Transmit(&huart1, TX_DATA, 2, 5);	
+			}
 		usart_new_data = 0;		
 		}
 		
 	/////////////////////////////ADC process
+	//	12.392 - 2618
+	//	11.498 - 2418
+	//	9.898	 - 2070		- min	
+	//	12.605 - 2658		- max
 	ADC_TEMP = HAL_ADC_GetValue(&hadc1);
-	DATAV_TEMP*=3;	
+	DATAV_TEMP*=7;	
 	DATAV_TEMP+=ADC_TEMP;	
-	DATAV_TEMP+=2;	
-	DATAV_TEMP>>=2;	
-		
-	batt_prcntg = DATAV_TEMP/27;		//neeed table V to %	
-	if(batt_prcntg>100)
+	DATAV_TEMP+=4;	
+	DATAV_TEMP>>=3;
+	ADC_TEMP = DATAV_TEMP;	
+	if(ADC_TEMP>2069)
 		{
-		batt_prcntg = 100;	
+		ADC_TEMP-=2070;	
+		ADC_TEMP*=11146;	
+		ADC_TEMP>>=16;	
+		batt_prcntg = ADC_TEMP;
+		if(batt_prcntg>100)
+			{
+			batt_prcntg = 100;	
+			}				
 		}		
-	
+	else
+		{
+		batt_prcntg = 0;	
+		}		
+		
 	if(previous_batt_prcntg!=batt_prcntg)			//forceble tx batt prcntg to main assy
 		{	
 		if((HAL_GetTick() - adc_timeout)>1000)
@@ -424,7 +446,7 @@ void USART1_IRQHandler(void)
 	if(USART1->ISR & USART_ISR_RXNE)		//have a new data
 		{
 		USART_RX_B = (USART1->RDR);	
-		if(((HAL_GetTick() - usart_timeout)>200))
+		if(((HAL_GetTick() - usart_timeout)>120))
 			{	
 			if(USART_RX_B==AC_DSBL)
 				{
