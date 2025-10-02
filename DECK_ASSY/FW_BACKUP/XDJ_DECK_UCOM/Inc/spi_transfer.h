@@ -378,28 +378,36 @@ void DMA2_Stream3_IRQHandler(void)
 				need_update_pads = 2;			//force to send spi	
 				}				
 			}			
-			
-			
 		if(prev_pl_sect!=deckRbuf[4])
-			{
-			prev_pl_sect = deckRbuf[4];	
-			if(prev_pl_sect<137)
-				{
-				draw_playing_sector(prev_pl_sect);	
+			{	
+			if(deckRbuf[4]>136 && deckRbuf[4]<140)
+				{				
+				animation_enable = deckRbuf[4]-136;
 				}
+			if(animation_enable==0)
+				{	
+				prev_pl_sect = deckRbuf[4];
+				draw_playing_sector(prev_pl_sect);	
+				}	
 			}			
 		if(prev_cue_sect!=deckRbuf[6])
-			{
-			prev_cue_sect = deckRbuf[6];	
-			if((prev_cue_sect<85) && (prev_slip_sect>84))
+			{	
+			if(animation_enable==0)
 				{
-				draw_cue_sector(prev_cue_sect);	
+				prev_cue_sect = deckRbuf[6];	
+				if((prev_cue_sect<85) && (prev_slip_sect>84))
+					{
+					draw_cue_sector(prev_cue_sect);	
+					}
 				}
 			}		
 		if(prev_slip_sect!=deckRbuf[5])
 			{
-			prev_slip_sect = deckRbuf[5];	
-			draw_slip_sector(prev_slip_sect, prev_cue_sect);
+			if(animation_enable==0)
+				{
+				prev_slip_sect = deckRbuf[5];	
+				draw_slip_sector(prev_slip_sect, prev_cue_sect);
+				}	
 			}		
 		}
 		
@@ -901,26 +909,36 @@ void DMA2_Stream3_IRQHandler(void)
 				}				
 			}			
 		if(prev_pl_sect!=deckRbuf[12])
-			{
-			prev_pl_sect = deckRbuf[12];	
-			if(prev_pl_sect<137)
-				{
-				draw_playing_sector(prev_pl_sect);	
+			{	
+			if((deckRbuf[12]>136) && (deckRbuf[12]<140))
+				{				
+				animation_enable = deckRbuf[12]-136;
 				}
+			if(animation_enable==0)
+				{	
+				prev_pl_sect = deckRbuf[12];
+				draw_playing_sector(prev_pl_sect);	
+				}	
 			}			
 		if(prev_cue_sect!=deckRbuf[14])
-			{				
-			prev_cue_sect = deckRbuf[14];	
-			if((prev_cue_sect<85) && (prev_slip_sect>84))
+			{	
+			if(animation_enable==0)
 				{
-				draw_cue_sector(prev_cue_sect);	
+				prev_cue_sect = deckRbuf[14];	
+				if((prev_cue_sect<85) && (prev_slip_sect>84))
+					{
+					draw_cue_sector(prev_cue_sect);	
+					}
 				}
 			}		
 		if(prev_slip_sect!=deckRbuf[13])
 			{
-			prev_slip_sect = deckRbuf[13];
-			draw_slip_sector(prev_slip_sect, prev_cue_sect);	
-			}		
+			if(animation_enable==0)
+				{
+				prev_slip_sect = deckRbuf[13];	
+				draw_slip_sector(prev_slip_sect, prev_cue_sect);
+				}	
+			}
 		}	
 		
 	/* BUTTON PLAY ---------------------------------------------------------*/	
@@ -1108,60 +1126,59 @@ void DMA2_Stream3_IRQHandler(void)
 
 		
 		
-cnts = TIM4->CNT;	
-_tims = tims;		
-if(cnts<32768)
-	{
-	cnts = 32768 - cnts;
-	#ifdef DECK_1
-	deckTbuf[4]|=0x80;
-	#endif
-		
-	#ifndef DECK_1
-	deckTbuf[12]|=0x80;
-	#endif	
-	}
-else
-	{
-	cnts-=32768; 	
-	#ifdef DECK_1
-	deckTbuf[4]&=0x7F;
-	#endif
-		
-	#ifndef DECK_1
-	deckTbuf[12]&=0x7F;
-	#endif	
-
-	if(cnts==0)
+	cnts = TIM4->CNT;
+	if(cnts<32768)			//rev
 		{	
+		cnts = 32768 - cnts;
+		mJOGSPD = (TIM2->CNT)/cnts;	
 		#ifdef DECK_1
-		deckTbuf[2]&=0xF7;	
-		deckTbuf[5] = 0xFF;
-		deckTbuf[6] = 0xFF;	
+		deckTbuf[4]|=0x80;
 		#endif
-
+		
 		#ifndef DECK_1
-		deckTbuf[10]&=0xF7;	
-		deckTbuf[13] = 0xFF;
-		deckTbuf[14] = 0xFF;	
+		deckTbuf[12]|=0x80;
+		#endif		
+		}
+	else if(cnts>32768)			//fwd
+		{
+		cnts-=32768; 
+		mJOGSPD = (TIM2->CNT)/cnts;	
+		#ifdef DECK_1
+		deckTbuf[4]&=0x7F;
+		#endif
+		
+		#ifndef DECK_1
+		deckTbuf[12]&=0x7F;
 		#endif	
 		}
-	}			
+	else
+		{
+		cnts = 0;
+		mJOGSPD = 0xFFFF;		
+		}			
+	TIM2->CNT = 0;		
+	TIM4->CNT = 32768;	
+		
+	if(mJOGSPD<5000)		//fast speed
+		{
+		JOGSPD = (JOGSPD+mJOGSPD+1)>>1;
+		}		
+	else if(mJOGSPD<25000)					//slow speed
+		{
+		JOGSPD = (3*JOGSPD+mJOGSPD+2)>>2;	
+		}
+	else
+		{
+		JOGSPD = (7*JOGSPD+mJOGSPD+4)>>3;		
+		}		
 	
-if(dma_div<22)
-	{
-	dma_div++;	
-	}
-else
-	{
-	dma_div = 0;
-	}	
+	if(JOGSPD>65420)
+		{
+		JOGSPD = 0xFFFF;		
+		}
 	
-if(dma_div==0 || cnts>7)				// 1/23
-	{
-	if(cnts>0)
-		{			
-		JOGSPD = _tims/cnts;				
+	if(JOGSPD>70)
+		{
 		if(JOGSPD>=0xFFFF)
 			{
 			JOGSPD = 0xFFFF;	
@@ -1178,7 +1195,7 @@ if(dma_div==0 || cnts>7)				// 1/23
 			#endif		
 			}
 		else
-			{
+			{											//557 = 100% pitch
 			#ifdef DECK_1
 			deckTbuf[2]|=0x08;	
 			deckTbuf[5] = JOGSPD>>8;
@@ -1190,17 +1207,9 @@ if(dma_div==0 || cnts>7)				// 1/23
 			deckTbuf[13] = JOGSPD>>8;
 			deckTbuf[14] = JOGSPD%256;	
 			#endif					
-			}			
-			
-		TIM4->CNT = 32768;
-		tims = 0;	
-		TIM2->CNT = 0;	
-		new_measure_spd = 1;			
-			
+			}					
+		}
 
-		}		
-				
-	}	
 
 	///////////////////////////////////////////ADCs	
 	pot_SUM-=pot_ADC[cnt_ad];		
@@ -1255,7 +1264,6 @@ if(dma_div==0 || cnts>7)				// 1/23
 	deckTbuf[10]|=(pot_10b>>8);
 	deckTbuf[11] = pot_10b%256;	
 	#endif
-		
 		
 	//HAL_ADC_Start(&hadc1);
 	//HAL_ADC_Start(&hadc2);

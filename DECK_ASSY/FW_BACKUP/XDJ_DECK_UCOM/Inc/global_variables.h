@@ -102,14 +102,14 @@ uint8_t PAD_BUF[100] =  {0x88, 0x88, 0x88, 0x88,
 uint8_t R_rx, G_rx, B_rx;						
 
 /* JOG timer ---------------------------------------------------------*/													
-uint8_t new_measure_spd = 0;						
-uint32_t cnts = 0;												
-uint32_t tims = 0;
-uint32_t _tims = 0;												
-uint32_t JOGSPD = 0;												
+uint32_t cnts = 0;																							
+uint32_t JOGSPD = 0;	
+uint32_t mJOGSPD = 0;																					
+uint8_t animation_enable = 3;
+uint16_t step_animation = 0;												
+												
 
 /* SPI DMA TRANSFER ---------------------------------------------------------*/																			 
-uint8_t	dma_div = 0;
 uint8_t	adc_div = 0;													
 uint8_t deckRbuf[16];		
 												

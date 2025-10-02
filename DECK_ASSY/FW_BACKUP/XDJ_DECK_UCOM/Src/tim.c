@@ -133,7 +133,7 @@ void MX_TIM2_Init(void)
   TIM_MasterConfigTypeDef sMasterConfig;
 
   htim2.Instance = TIM2;
-  htim2.Init.Prescaler = 39;
+  htim2.Init.Prescaler = 19;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim2.Init.Period = 0xFFFFFFFF;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV4;
@@ -214,15 +214,15 @@ void MX_TIM4_Init(void)
   htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim4.Init.Period = 0xFFFF;
   htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  sConfig.EncoderMode = TIM_ENCODERMODE_TI1;
+  sConfig.EncoderMode = TIM_ENCODERMODE_TI12;
   sConfig.IC1Polarity = TIM_ICPOLARITY_FALLING;
   sConfig.IC1Selection = TIM_ICSELECTION_DIRECTTI;
   sConfig.IC1Prescaler = TIM_ICPSC_DIV1;
-  sConfig.IC1Filter = 8;
+  sConfig.IC1Filter = 14;
   sConfig.IC2Polarity = TIM_ICPOLARITY_FALLING;
   sConfig.IC2Selection = TIM_ICSELECTION_DIRECTTI;
   sConfig.IC2Prescaler = TIM_ICPSC_DIV1;
-  sConfig.IC2Filter = 8;
+  sConfig.IC2Filter = 14;
   if (HAL_TIM_Encoder_Init(&htim4, &sConfig) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);

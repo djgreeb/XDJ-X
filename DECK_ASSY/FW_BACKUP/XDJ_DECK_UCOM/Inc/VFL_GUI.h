@@ -12,8 +12,8 @@
 void draw_playing_sector(uint8_t sc);
 void draw_cue_sector(uint8_t sc);
 void draw_slip_sector(uint8_t sc, uint8_t cue);
-
-
+void draw_load_animation(uint8_t sc);
+void draw_power_animation(uint16_t sc);
 
 
 
@@ -201,9 +201,62 @@ void draw_slip_sector(uint8_t sc, uint8_t cue)
 	}
 	
 	
+/////////////////////////////////////////////////////
+//
+//	0...68 (69 steps)
+//
+void draw_load_animation(uint8_t sc)
+	{
+	if(sc>68)
+		{
+		return;	
+		}		
+	uint8_t i;
+	if(sc==0)
+		{	
+		for(i=0;i<135;i++)
+			{
+			VFL_DATA[PSEGM[i]>>3]&=BITOFF[PSEGM[i]%8];
+			}		
+		}
+	else if(sc==1)
+		{
+		VFL_DATA[PSEGM[0]>>3]|=BITON[PSEGM[0]%8];	
+		}
+	else
+		{
+		VFL_DATA[PSEGM[sc-1]>>3]|=BITON[PSEGM[sc-1]%8];	
+		VFL_DATA[PSEGM[136-sc]>>3]|=BITON[PSEGM[136-sc]%8];	
+		}
+	}
 
-
-
+/////////////////////////////////////////////////////
+//
+//	0...270 (271 steps)
+//
+void draw_power_animation(uint16_t sc)
+	{	
+	if(sc>270)
+		{
+		return;	
+		}		
+	uint8_t i;
+	if(sc==0)
+		{	
+		for(i=0;i<135;i++)
+			{
+			VFL_DATA[PSEGM[i]>>3]&=BITOFF[PSEGM[i]%8];
+			}		
+		}
+	else if(sc<136)
+		{
+		VFL_DATA[PSEGM[sc-1]>>3]|=BITON[PSEGM[sc-1]%8];	
+		}
+	else
+		{
+		VFL_DATA[PSEGM[sc-136]>>3]&=BITOFF[PSEGM[sc-136]%8];	
+		}
+	}	
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

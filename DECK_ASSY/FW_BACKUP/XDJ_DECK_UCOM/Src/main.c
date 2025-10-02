@@ -123,6 +123,15 @@
 //		- adc pitch gysteresis added 
 //	ver. 0.31
 //		- PWM ring is changed
+//	ver. 0.34
+//		- load animation added
+//		- power animation added
+//		- spi transfer up to 2X
+//	ver. 0.36
+//		- improved jog encoder code
+//
+//
+//
 //
 //
 //
@@ -147,7 +156,7 @@
 #include "CRC.h"
 extern DMA_HandleTypeDef hdma_spi1_tx;
 
-uint8_t FIRMWARE_VERSION = 31;			//127 max!
+uint8_t FIRMWARE_VERSION = 36;			//127 max!
 
 /* USER CODE END PV */
 
@@ -278,6 +287,47 @@ int main(void)
 		need_update_pads = 0;
 		}
 		
+	if(animation_enable==1)			//load animation
+		{
+		draw_load_animation(step_animation);	
+		if(step_animation==0)
+			{			
+			draw_cue_sector(85);	
+			prev_pl_sect = 0xFF;	
+			prev_cue_sect = 0xFF;	
+			prev_slip_sect = 0xFF;	
+			HAL_Delay(200);		//stay on first step - empty circle	
+			}
+		HAL_Delay(9);
+		step_animation++;
+		if(step_animation==69)
+			{
+			HAL_Delay(400);	
+			animation_enable = 0;
+			step_animation = 0;	
+			}	
+		}		
+	else if(animation_enable==3)
+		{
+		draw_power_animation(step_animation);	
+		if(step_animation==0)
+			{			
+			draw_cue_sector(85);	
+			prev_pl_sect = 0xFF;	
+			prev_cue_sect = 0xFF;	
+			prev_slip_sect = 0xFF;	
+			HAL_Delay(100);		//stay on first step - empty circle	
+			}
+		HAL_Delay(9);
+		step_animation++;
+		if(step_animation==271)
+			{
+			HAL_Delay(50);	
+			animation_enable = 0;
+			step_animation = 0;	
+			}	
+		}				
+		
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
@@ -353,17 +403,7 @@ void SystemClock_Config(void)
 //
 void TIM4_IRQHandler(void)
 	{
-	if(new_measure_spd==1)
-		{
-		TIM4->CNT = 32768;
-		tims = 0;	
-		TIM2->CNT = 0;
-		new_measure_spd = 0;	
-		}
-	else
-		{
-		tims = TIM2->CNT;
-		}
+				
   HAL_TIM_IRQHandler(&htim4);	
 	}
 

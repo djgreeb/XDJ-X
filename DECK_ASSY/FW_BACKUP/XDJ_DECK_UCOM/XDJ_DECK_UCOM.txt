@@ -1,6 +1,6 @@
 Configuration	XDJ_DECK_UCOM
 STM32CubeMX 	4.25.1
-Date	05/10/2025
+Date	06/14/2025
 MCU	STM32F446RETx
 
 

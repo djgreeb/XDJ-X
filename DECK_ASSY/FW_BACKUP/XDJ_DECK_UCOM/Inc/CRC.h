@@ -45,36 +45,36 @@ void CalcTXCRC(void)
 //
 uint8_t CheckRXCRC(void)
 	{
+	sm = 0;		
+		
 	#ifdef DECK_1	
-	sm = 0;	
 	for(n=0;n<7;n++)
 		{
 		sm+=deckRbuf[n];	
 		}
-//	if(sm==deckRbuf[7])
-//		{
+	if(sm==deckRbuf[7])
+		{
 		return 1;	
-//		}		
-//	else
-//		{
-//		return 0;	
-//		}
+		}		
+	else
+		{
+		return 0;	
+		}
 	#endif
 
-	#ifndef DECK_1
-	sm = 0;		
+	#ifndef DECK_1	
 	for(n=8;n<15;n++)
 		{
 		sm+=deckRbuf[n];	
 		}
-//	if(sm==deckRbuf[15])
-//		{
+	if(sm==deckRbuf[15])
+		{
 		return 1;	
-//		}		
-//	else
-//		{
-//		return 0;	
-//		}	
+		}		
+	else
+		{
+		return 0;	
+		}	
 	#endif
 	}
 
