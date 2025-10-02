@@ -15,7 +15,7 @@ And the most important advantage for me: my source code, scheme, printed circuit
 
 OVERALL BLOCK DIAGRAM
 
-![OVERALL BLOCK DIAGRAM](https://github.com/user-attachments/assets/cbc446ae-c7ef-409f-bf2b-90ac37aeba47)
+![OVERALL BLOCK DIAGRAM](OVERALL BLOCK DIAGRAM.png)
 
 XDJ-X is based on 2 STM32H7 series ARMs, which handle the mixer and deck audio parts. Two STM32F446RET6 microcontrollers handle the buttons and jog wheels in the decks. And STM32G431CBU6 microcontroller handles power, battery charge and standby.
 
