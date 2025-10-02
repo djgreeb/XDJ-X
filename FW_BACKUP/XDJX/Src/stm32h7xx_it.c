@@ -97,7 +97,7 @@ void HardFault_Handler(void)
 	extern char U_TX_DATA[64];	
 	
 	sprintf((char*)U_TX_DATA, "HardFault\n\r");	
-	HAL_UART_Transmit(&huart4, U_TX_DATA, 11, 5);		
+	UART_TX(&huart4, U_TX_DATA, 11, 5);		
 	HAL_Delay(1000);
 	
 	
@@ -222,16 +222,7 @@ void SysTick_Handler(void)
 /**
   * @brief This function handles TIM3 global interrupt.
   */
-void TIM3_IRQHandler(void)
-{
-  /* USER CODE BEGIN TIM3_IRQn 0 */
 
-  /* USER CODE END TIM3_IRQn 0 */
-  HAL_TIM_IRQHandler(&htim3);
-  /* USER CODE BEGIN TIM3_IRQn 1 */
-
-  /* USER CODE END TIM3_IRQn 1 */
-}
 
 /**
   * @brief This function handles SPI2 global interrupt.
@@ -251,10 +242,6 @@ void SPI2_IRQHandler(void)
   * @brief This function handles USART1 global interrupt.
   */
 
-
-/**
-  * @brief This function handles UART4 global interrupt.
-  */
 
 
 /**

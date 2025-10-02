@@ -215,9 +215,9 @@
 /  Note that enabling exFAT discards C89 compatibility. */
 
 #define _FS_NORTC	1
-#define _NORTC_MON	5
-#define _NORTC_MDAY	3
-#define _NORTC_YEAR	2024
+#define _NORTC_MON	6
+#define _NORTC_MDAY	20
+#define _NORTC_YEAR	2025
 /* The option _FS_NORTC switches timestamp functiton. If the system does not have
 /  any RTC function or valid timestamp is not needed, set _FS_NORTC = 1 to disable
 /  the timestamp function. All objects modified by FatFs will have a fixed timestamp
@@ -227,7 +227,7 @@
 /  _NORTC_MDAY and _NORTC_YEAR have no effect.
 /  These options have no effect at read-only configuration (_FS_READONLY = 1). */
 
-#define _FS_LOCK    0     /* 0:Disable or >=1:Enable */
+#define _FS_LOCK    3     /* 0:Disable or >=1:Enable */
 /* The option _FS_LOCK switches file lock function to control duplicated file open
 /  and illegal operation to open objects. This option must be 0 when _FS_READONLY
 /  is 1.

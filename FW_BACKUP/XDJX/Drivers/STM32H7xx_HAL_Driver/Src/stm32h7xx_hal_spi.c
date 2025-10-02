@@ -2446,12 +2446,6 @@ HAL_StatusTypeDef HAL_SPI_TransmitReceive_DMA(SPI_HandleTypeDef *hspi, const uin
 
 
 
-
-
-
-
-
-
 ///////////////////////////////////////////////////////////////////////////////////
 //
 //	based HAL_SPI_TransmitReceive_DMA
@@ -2475,12 +2469,12 @@ HAL_StatusTypeDef Decks_DMA(SPI_HandleTypeDef *hspi, const uint8_t *pTxData, uin
     return errorcode;
   }
 
-  if ((pTxData == NULL) || (pRxData == NULL) || (Size == 0UL))
-  {
-    errorcode = HAL_ERROR;
-    __HAL_UNLOCK(hspi);
-    return errorcode;
-  }
+//  if ((pTxData == NULL) || (pRxData == NULL) || (Size == 0UL))
+//  {
+//    errorcode = HAL_ERROR;
+//    __HAL_UNLOCK(hspi);
+//    return errorcode;
+//  }
 
   /* Set the transaction information */
   hspi->State       = HAL_SPI_STATE_BUSY_TX_RX;
@@ -2515,8 +2509,8 @@ HAL_StatusTypeDef Decks_DMA(SPI_HandleTypeDef *hspi, const uint8_t *pTxData, uin
   }
 
   /* Adjust XferCount according to DMA alignment / Data size */
-  if (hspi->Init.DataSize <= SPI_DATASIZE_8BIT)
-  {
+//  if (hspi->Init.DataSize <= SPI_DATASIZE_8BIT)
+//  {
     if (hspi->hdmatx->Init.MemDataAlignment == DMA_MDATAALIGN_HALFWORD)
     {
       hspi->TxXferCount = (hspi->TxXferCount + (uint16_t) 1UL) >> 1UL;
@@ -2533,22 +2527,22 @@ HAL_StatusTypeDef Decks_DMA(SPI_HandleTypeDef *hspi, const uint8_t *pTxData, uin
     {
       hspi->RxXferCount = (hspi->RxXferCount + (uint16_t) 3UL) >> 2UL;
     }
-  }
-  else if (hspi->Init.DataSize <= SPI_DATASIZE_16BIT)
-  {
-    if (hspi->hdmatx->Init.MemDataAlignment == DMA_MDATAALIGN_WORD)
-    {
-      hspi->TxXferCount = (hspi->TxXferCount + (uint16_t) 1UL) >> 1UL;
-    }
-    if (hspi->hdmarx->Init.MemDataAlignment == DMA_MDATAALIGN_WORD)
-    {
-      hspi->RxXferCount = (hspi->RxXferCount + (uint16_t) 1UL) >> 1UL;
-    }
-  }
-  else
-  {
-    /* Adjustment done */
-  }
+//  }
+//  else if (hspi->Init.DataSize <= SPI_DATASIZE_16BIT)
+//  {
+//    if (hspi->hdmatx->Init.MemDataAlignment == DMA_MDATAALIGN_WORD)
+//    {
+//      hspi->TxXferCount = (hspi->TxXferCount + (uint16_t) 1UL) >> 1UL;
+//    }
+//    if (hspi->hdmarx->Init.MemDataAlignment == DMA_MDATAALIGN_WORD)
+//    {
+//      hspi->RxXferCount = (hspi->RxXferCount + (uint16_t) 1UL) >> 1UL;
+//    }
+//  }
+//  else
+//  {
+//    /* Adjustment done */
+//  }
 
   /* Set the SPI Tx/Rx DMA Half transfer complete callback */
   hspi->hdmarx->XferHalfCpltCallback = SPI_DMAHalfTransmitReceiveCplt;

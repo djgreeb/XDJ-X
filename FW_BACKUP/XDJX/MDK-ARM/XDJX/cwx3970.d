@@ -5,7 +5,7 @@ xdjx\cwx3970.o: ../Inc/stm32h7xx_hal_conf.h
 xdjx\cwx3970.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_rcc.h
 xdjx\cwx3970.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_def.h
 xdjx\cwx3970.o: ../Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h7xx.h
-xdjx\cwx3970.o: ../Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h750xx.h
+xdjx\cwx3970.o: ../Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h743xx.h
 xdjx\cwx3970.o: ../Drivers/CMSIS/Include/core_cm7.h
 xdjx\cwx3970.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 xdjx\cwx3970.o: ../Drivers/CMSIS/Include/cmsis_version.h
@@ -51,13 +51,10 @@ xdjx\cwx3970.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim_ex.h
 xdjx\cwx3970.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h
 xdjx\cwx3970.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h
 xdjx\cwx3970.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/../../../Utilities/Fonts/fonts.h
-xdjx\cwx3970.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/../../../Utilities/Fonts/font23D.c
-xdjx\cwx3970.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/../../../Utilities/Fonts/font26D.c
-xdjx\cwx3970.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/../../../Utilities/Fonts/font20D.c
 xdjx\cwx3970.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/../../../Utilities/Fonts/font15P.c
 xdjx\cwx3970.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/../../../Utilities/Fonts/fontBMP.c
 xdjx\cwx3970.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/../../../Utilities/Fonts/font14D.c
 xdjx\cwx3970.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/../../../Utilities/Fonts/font18D.c
-xdjx\cwx3970.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/../../../Utilities/Fonts/font11D.c
-xdjx\cwx3970.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/../../../Utilities/Fonts/font13D.c
+xdjx\cwx3970.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/../../../Utilities/Fonts/font9D.c
+xdjx\cwx3970.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/../../../Utilities/Fonts/font7W.c
 xdjx\cwx3970.o: ../Inc/main.h

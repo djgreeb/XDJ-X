@@ -1271,7 +1271,7 @@ interwork --depend=xdjx\startup_stm32h750xx.d -oxdjx\startup_stm32h750xx.o -I.\
 RTE\_XDJX -IC:\Users\Greeb\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\I
 nclude -IC:\Users\Greeb\AppData\Local\Arm\Packs\Keil\STM32H7xx_DFP\3.1.1\Driver
 s\CMSIS\Device\ST\STM32H7xx\Include --predefine="__MICROLIB SETA 1" --predefine
-="__UVISION_VERSION SETA 534" --predefine="_RTE_ SETA 1" --predefine="STM32H750
+="__UVISION_VERSION SETA 534" --predefine="_RTE_ SETA 1" --predefine="STM32H743
 xx SETA 1" --predefine="_RTE_ SETA 1" --list=startup_stm32h750xx.lst startup_st
 m32h750xx.s
 

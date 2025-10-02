@@ -1,5 +1,5 @@
 --cpu Cortex-M7.fp.sp
-"xdjx\startup_stm32h750xx.o"
+"xdjx\startup_stm32h743xx.o"
 "xdjx\main.o"
 "xdjx\gpio.o"
 "xdjx\dma.o"

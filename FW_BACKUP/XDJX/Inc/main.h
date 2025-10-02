@@ -65,6 +65,8 @@ void Error_Handler(void);
 #define SD_DETECT_GPIO_Port GPIOD
 #define BT_MENU_Pin GPIO_PIN_7
 #define BT_MENU_GPIO_Port GPIOI
+#define AMP_EN_Pin GPIO_PIN_2
+#define AMP_EN_GPIO_Port GPIOE
 #define BT_SHIFT_Pin GPIO_PIN_9
 #define BT_SHIFT_GPIO_Port GPIOB
 #define BT_TAG_Pin GPIO_PIN_2
@@ -75,8 +77,6 @@ void Error_Handler(void);
 #define LED_LOAD0_GPIO_Port GPIOA
 #define BT_BACK_Pin GPIO_PIN_3
 #define BT_BACK_GPIO_Port GPIOH
-#define BUTTON_Pin GPIO_PIN_4
-#define BUTTON_GPIO_Port GPIOH
 #define BACKLIGHT_EN_Pin GPIO_PIN_15
 #define BACKLIGHT_EN_GPIO_Port GPIOI
 #define LED_MENU_Pin GPIO_PIN_10

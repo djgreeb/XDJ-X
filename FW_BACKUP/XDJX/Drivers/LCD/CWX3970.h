@@ -52,15 +52,35 @@ typedef enum
 
 #define LCD_COLOR_BLUE          ((uint16_t)0x801F)
 #define LCD_COLOR_GREEN         ((uint16_t)0x83E0)
+#define LCD_COLOR_DARKGREEN     ((uint16_t)0xABC1)
 #define LCD_COLOR_RED           ((uint16_t)0xFC00)
 #define LCD_COLOR_WHITE					((uint16_t)0xFFFF)
 #define LCD_COLOR_GRAY					((uint16_t)0xBDEF)
+#define LCD_COLOR_DARKGRAY			((uint16_t)0xA108)
 #define LCD_COLOR_BLACK         ((uint16_t)0x8000)
+#define LCD_COLOR_CUE						((uint16_t)0xFE65)
 #define LCD_COLOR_TRANSPARENT   ((uint16_t)0x0000)
+#define LOOP_ACTIVE_COLOR				((uint16_t)0xD960)
+#define LOOP_INACTIVE_COLOR 		((uint16_t)0x98C6)
+#define LOOP_INACTIVELP_COLOR 	((uint16_t)0xB9CE)
 
-/** 
-  * @brief LCD default font 
-  */ 
+////////////////////////////BATT colors///////////////////////
+#define BATT_GRAYR 							((uint16_t)0xD6B5) //66%
+#define BATT_GRAYL 							((uint16_t)0xE318) //75%
+#define BATT_REDR 							((uint16_t)0xD400) //66%
+#define BATT_REDL 							((uint16_t)0xE000) //75%
+#define BATT_YELLOW 						((uint16_t)0xFFA0)
+#define BATT_GREEN 							((uint16_t)0xA3A5)
+
+////////////////////////////Socket colors///////////////////////
+#define SOCK_GRAY 						((uint16_t)0xA108)
+
+////////////////////////////lightning colors///////////////////////
+#define LI_COLOR_1						((uint16_t)0x9040)
+#define LI_COLOR_2						((uint16_t)0xD163)
+#define LI_COLOR_3						((uint16_t)0xF625)
+
+
 #define LCD_DEFAULT_FONT        Font15P     
 
 uint8_t  BSP_LCD_Init(void);
@@ -98,13 +118,12 @@ void     BSP_LCD_DisplayChar(uint16_t Xpos, uint16_t Ypos, uint8_t Ascii);
 
 void     BSP_LCD_DrawHLine(uint16_t Xpos, uint16_t Ypos, uint16_t Length);
 void 		 ForceDrawVLine(uint16_t Xpos, uint16_t Ypos, uint16_t Length, uint32_t color);
-void     BSP_LCD_DrawVLine(uint16_t Xpos, uint16_t Ypos, uint16_t Length);
+void     BSP_LCD_DrawVLine(uint16_t Xpos, uint8_t Ypos, uint8_t Length);
 void     BSP_LCD_DrawLine(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);
 void     BSP_LCD_DrawRect(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint16_t Height);
 void     BSP_LCD_DrawCircle(uint16_t Xpos, uint16_t Ypos, uint16_t Radius);
 void     BSP_LCD_DrawPolygon(pPoint Points, uint16_t PointCount);
 void     BSP_LCD_DrawEllipse(int Xpos, int Ypos, int XRadius, int YRadius);
-void     BSP_LCD_DrawBitmap(uint32_t Xpos, uint32_t Ypos, uint8_t *pbmp);
 
 void     BSP_LCD_FillRect(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint16_t Height);
 void     BSP_LCD_FillCircle(uint16_t Xpos, uint16_t Ypos, uint16_t Radius);

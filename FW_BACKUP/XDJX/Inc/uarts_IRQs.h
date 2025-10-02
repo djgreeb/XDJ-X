@@ -20,16 +20,16 @@ void USART1_IRQHandler(void)
 		{		
 		mxrURX = (USART1->RDR);	
 		mxr_current_time = HAL_GetTick();	
-		if((mxr_current_time - mxr_usart_timeout)>100)					//5ms for hardware COM. 100ms for usb-com adapter
+		if((mxr_current_time - mxr_usart_timeout)>20)					//5ms for hardware COM. 100ms for usb-com adapter
 			{
 			mxr_usart_data_cnt = 0;
 			}
 		mxr_usart_timeout = mxr_current_time;	
 
-		if(mxr_usart_data_cnt<16)
+		if(mxr_usart_data_cnt<8)
 			{			
 			mxr_urx_buf[mxr_usart_data_cnt] = mxrURX;	
-			if(mxr_usart_data_cnt==1)
+			if(mxr_usart_data_cnt==2)
 				{			
 				mxr_new_data = 1;
 				}

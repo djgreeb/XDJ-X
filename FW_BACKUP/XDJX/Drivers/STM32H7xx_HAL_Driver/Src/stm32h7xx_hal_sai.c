@@ -258,6 +258,7 @@ typedef enum
   * @{
   */
 static void SAI_FillFifo(SAI_HandleTypeDef *hsai);
+static void SFillFifo(SAI_HandleTypeDef *hsai);
 static uint32_t SAI_InterruptFlag(const SAI_HandleTypeDef *hsai, SAI_ModeTypedef mode);
 static HAL_StatusTypeDef SAI_InitI2S(SAI_HandleTypeDef *hsai, uint32_t protocol, uint32_t datasize, uint32_t nbslot);
 static HAL_StatusTypeDef SAI_InitPCM(SAI_HandleTypeDef *hsai, uint32_t protocol, uint32_t datasize, uint32_t nbslot);
@@ -1344,10 +1345,10 @@ HAL_StatusTypeDef HAL_SAI_Receive(SAI_HandleTypeDef *hsai, uint8_t *pData, uint1
   */
 HAL_StatusTypeDef HAL_SAI_Transmit_IT(SAI_HandleTypeDef *hsai, uint8_t *pData, uint16_t Size)
 {
-  if ((pData == NULL) || (Size == 0U))
-  {
-    return  HAL_ERROR;
-  }
+//  if ((pData == NULL) || (Size == 0U))
+//  {
+//    return  HAL_ERROR;
+//  }
 
   if (hsai->State == HAL_SAI_STATE_READY)
   {
@@ -1360,21 +1361,21 @@ HAL_StatusTypeDef HAL_SAI_Transmit_IT(SAI_HandleTypeDef *hsai, uint8_t *pData, u
     hsai->ErrorCode = HAL_SAI_ERROR_NONE;
     hsai->State = HAL_SAI_STATE_BUSY_TX;
 
-    if ((hsai->Init.DataSize == SAI_DATASIZE_8) && (hsai->Init.CompandingMode == SAI_NOCOMPANDING))
-    {
-      hsai->InterruptServiceRoutine = SAI_Transmit_IT8Bit;
-    }
-    else if (hsai->Init.DataSize <= SAI_DATASIZE_16)
-    {
-      hsai->InterruptServiceRoutine = SAI_Transmit_IT16Bit;
-    }
-    else
-    {
+//    if ((hsai->Init.DataSize == SAI_DATASIZE_8) && (hsai->Init.CompandingMode == SAI_NOCOMPANDING))
+//    {
+//      hsai->InterruptServiceRoutine = SAI_Transmit_IT8Bit;
+//    }
+//    else if (hsai->Init.DataSize <= SAI_DATASIZE_16)
+//    {
+//      hsai->InterruptServiceRoutine = SAI_Transmit_IT16Bit;
+//    }
+//    else
+//    {
       hsai->InterruptServiceRoutine = SAI_Transmit_IT32Bit;
-    }
+//    }
 
     /* Fill the fifo before starting the communication */
-    SAI_FillFifo(hsai);
+    SFillFifo(hsai);
 
     /* Enable FRQ and OVRUDR interrupts */
     __HAL_SAI_ENABLE_IT(hsai, SAI_InterruptFlag(hsai, SAI_MODE_IT));
@@ -1395,6 +1396,37 @@ HAL_StatusTypeDef HAL_SAI_Transmit_IT(SAI_HandleTypeDef *hsai, uint8_t *pData, u
     return HAL_BUSY;
   }
 }
+
+
+void SAI_Transmit(SAI_HandleTypeDef *hsai, uint8_t *pData, uint16_t Size)
+	{
+	if (hsai->State == HAL_SAI_STATE_READY)
+		{
+		// __HAL_LOCK(hsai);
+    hsai->pBuffPtr = pData;
+    hsai->XferSize = Size;
+    hsai->XferCount = Size;
+    hsai->ErrorCode = HAL_SAI_ERROR_NONE;
+    hsai->State = HAL_SAI_STATE_BUSY_TX;
+    hsai->InterruptServiceRoutine = SAI_Transmit_IT32Bit;
+
+    /* Fill the fifo before starting the communication */
+    SFillFifo(hsai);
+
+    /* Enable FRQ and OVRUDR interrupts */
+    __HAL_SAI_ENABLE_IT(hsai, SAI_InterruptFlag(hsai, SAI_MODE_IT));
+
+    /* Check if the SAI is already enabled */
+    if ((hsai->Instance->CR1 & SAI_xCR1_SAIEN) == 0U)
+			{
+      __HAL_SAI_ENABLE(hsai);
+			}
+    __HAL_UNLOCK(hsai);
+    return;
+		}
+	}
+
+
 
 /**
   * @brief  Receive an amount of data in non-blocking mode with Interrupt.
@@ -2145,6 +2177,229 @@ void HAL_SAI_IRQHandler(SAI_HandleTypeDef *hsai)
   }
 }
 
+
+void SAI_IRQHndlr(SAI_HandleTypeDef *hsai)
+	{
+
+    uint32_t itflags = hsai->Instance->SR;
+    uint32_t itsources = hsai->Instance->IMR;
+    uint32_t cr1config = hsai->Instance->CR1;
+    uint32_t tmperror;
+
+    /* SAI Fifo request interrupt occurred ------------------------------------*/
+    if (((itflags & SAI_xSR_FREQ) == SAI_xSR_FREQ) && ((itsources & SAI_IT_FREQ) == SAI_IT_FREQ))
+    {
+      hsai->InterruptServiceRoutine(hsai);
+    }
+    /* SAI Overrun error interrupt occurred ----------------------------------*/
+    else if (((itflags & SAI_FLAG_OVRUDR) == SAI_FLAG_OVRUDR) && ((itsources & SAI_IT_OVRUDR) == SAI_IT_OVRUDR))
+    {
+      /* Clear the SAI Overrun flag */
+      __HAL_SAI_CLEAR_FLAG(hsai, SAI_FLAG_OVRUDR);
+      /* Get the SAI error code */
+      tmperror = ((hsai->State == HAL_SAI_STATE_BUSY_RX) ? HAL_SAI_ERROR_OVR : HAL_SAI_ERROR_UDR);
+      /* Change the SAI error code */
+      hsai->ErrorCode |= tmperror;
+
+    }
+    /* SAI mutedet interrupt occurred ----------------------------------*/
+    else if (((itflags & SAI_FLAG_MUTEDET) == SAI_FLAG_MUTEDET) && ((itsources & SAI_IT_MUTEDET) == SAI_IT_MUTEDET))
+    {
+      /* Clear the SAI mutedet flag */
+      __HAL_SAI_CLEAR_FLAG(hsai, SAI_FLAG_MUTEDET);
+      /* call the call back function */
+      if (hsai->mutecallback != NULL)
+      {
+        /* inform the user that an RX mute event has been detected */
+        hsai->mutecallback();
+      }
+    }
+    /* SAI AFSDET interrupt occurred ----------------------------------*/
+    else if (((itflags & SAI_FLAG_AFSDET) == SAI_FLAG_AFSDET) && ((itsources & SAI_IT_AFSDET) == SAI_IT_AFSDET))
+    {
+      /* Clear the SAI AFSDET flag */
+      __HAL_SAI_CLEAR_FLAG(hsai, SAI_FLAG_AFSDET);
+
+      /* Change the SAI error code */
+      hsai->ErrorCode |= HAL_SAI_ERROR_AFSDET;
+
+      /* Check SAI DMA is enabled or not */
+      if ((cr1config & SAI_xCR1_DMAEN) == SAI_xCR1_DMAEN)
+      {
+        /* Abort the SAI DMA Streams */
+        if (hsai->hdmatx != NULL)
+        {
+          /* Set the DMA Tx abort callback */
+          hsai->hdmatx->XferAbortCallback = SAI_DMAAbort;
+
+          /* Abort DMA in IT mode */
+          if (HAL_DMA_Abort_IT(hsai->hdmatx) != HAL_OK)
+          {
+            /* Update SAI error code */
+            hsai->ErrorCode |= HAL_SAI_ERROR_DMA;
+
+
+          }
+        }
+        if (hsai->hdmarx != NULL)
+        {
+          /* Set the DMA Rx abort callback */
+          hsai->hdmarx->XferAbortCallback = SAI_DMAAbort;
+
+          /* Abort DMA in IT mode */
+          if (HAL_DMA_Abort_IT(hsai->hdmarx) != HAL_OK)
+          {
+            /* Update SAI error code */
+            hsai->ErrorCode |= HAL_SAI_ERROR_DMA;
+
+  
+
+          }
+        }
+      }
+      else
+      {
+        /* Abort SAI */
+        /* No need to check return value because HAL_SAI_ErrorCallback will be called later */
+        (void) HAL_SAI_Abort(hsai);
+
+        /* Set error callback */
+
+      }
+    }
+    /* SAI LFSDET interrupt occurred ----------------------------------*/
+    else if (((itflags & SAI_FLAG_LFSDET) == SAI_FLAG_LFSDET) && ((itsources & SAI_IT_LFSDET) == SAI_IT_LFSDET))
+    {
+      /* Clear the SAI LFSDET flag */
+      __HAL_SAI_CLEAR_FLAG(hsai, SAI_FLAG_LFSDET);
+
+      /* Change the SAI error code */
+      hsai->ErrorCode |= HAL_SAI_ERROR_LFSDET;
+
+      /* Check SAI DMA is enabled or not */
+      if ((cr1config & SAI_xCR1_DMAEN) == SAI_xCR1_DMAEN)
+      {
+        /* Abort the SAI DMA Streams */
+        if (hsai->hdmatx != NULL)
+        {
+          /* Set the DMA Tx abort callback */
+          hsai->hdmatx->XferAbortCallback = SAI_DMAAbort;
+
+          /* Abort DMA in IT mode */
+          if (HAL_DMA_Abort_IT(hsai->hdmatx) != HAL_OK)
+          {
+            /* Update SAI error code */
+            hsai->ErrorCode |= HAL_SAI_ERROR_DMA;
+
+            /* Call SAI error callback */
+
+          }
+        }
+        if (hsai->hdmarx != NULL)
+        {
+          /* Set the DMA Rx abort callback */
+          hsai->hdmarx->XferAbortCallback = SAI_DMAAbort;
+
+          /* Abort DMA in IT mode */
+          if (HAL_DMA_Abort_IT(hsai->hdmarx) != HAL_OK)
+          {
+            /* Update SAI error code */
+            hsai->ErrorCode |= HAL_SAI_ERROR_DMA;
+
+            /* Call SAI error callback */
+
+          }
+        }
+      }
+      else
+      {
+        /* Abort SAI */
+        /* No need to check return value because HAL_SAI_ErrorCallback will be called later */
+        (void) HAL_SAI_Abort(hsai);
+
+        /* Set error callback */
+
+      }
+    }
+    /* SAI WCKCFG interrupt occurred ----------------------------------*/
+    else if (((itflags & SAI_FLAG_WCKCFG) == SAI_FLAG_WCKCFG) && ((itsources & SAI_IT_WCKCFG) == SAI_IT_WCKCFG))
+    {
+      /* Clear the SAI WCKCFG flag */
+      __HAL_SAI_CLEAR_FLAG(hsai, SAI_FLAG_WCKCFG);
+
+      /* Change the SAI error code */
+      hsai->ErrorCode |= HAL_SAI_ERROR_WCKCFG;
+
+      /* Check SAI DMA is enabled or not */
+      if ((cr1config & SAI_xCR1_DMAEN) == SAI_xCR1_DMAEN)
+      {
+        /* Abort the SAI DMA Streams */
+        if (hsai->hdmatx != NULL)
+        {
+          /* Set the DMA Tx abort callback */
+          hsai->hdmatx->XferAbortCallback = SAI_DMAAbort;
+
+          /* Abort DMA in IT mode */
+          if (HAL_DMA_Abort_IT(hsai->hdmatx) != HAL_OK)
+          {
+            /* Update SAI error code */
+            hsai->ErrorCode |= HAL_SAI_ERROR_DMA;
+
+            /* Call SAI error callback */
+
+          }
+        }
+        if (hsai->hdmarx != NULL)
+        {
+          /* Set the DMA Rx abort callback */
+          hsai->hdmarx->XferAbortCallback = SAI_DMAAbort;
+
+          /* Abort DMA in IT mode */
+          if (HAL_DMA_Abort_IT(hsai->hdmarx) != HAL_OK)
+          {
+            /* Update SAI error code */
+            hsai->ErrorCode |= HAL_SAI_ERROR_DMA;
+
+            /* Call SAI error callback */
+
+          }
+        }
+      }
+      else
+      {
+        /* If WCKCFG occurs, SAI audio block is automatically disabled */
+        /* Disable all interrupts and clear all flags */
+        hsai->Instance->IMR = 0U;
+        hsai->Instance->CLRFR = 0xFFFFFFFFU;
+        /* Set the SAI state to ready to be able to start again the process */
+        hsai->State = HAL_SAI_STATE_READY;
+
+        /* Initialize XferCount */
+        hsai->XferCount = 0U;
+
+        /* SAI error Callback */
+
+      }
+    }
+    /* SAI CNRDY interrupt occurred ----------------------------------*/
+    else if (((itflags & SAI_FLAG_CNRDY) == SAI_FLAG_CNRDY) && ((itsources & SAI_IT_CNRDY) == SAI_IT_CNRDY))
+    {
+      /* Clear the SAI CNRDY flag */
+      __HAL_SAI_CLEAR_FLAG(hsai, SAI_FLAG_CNRDY);
+      /* Change the SAI error code */
+      hsai->ErrorCode |= HAL_SAI_ERROR_CNREADY;
+      /* the transfer is not stopped, we will forward the information to the user and we let the user decide what needs to be done */
+
+    }
+	}
+
+
+
+
+
+
+
+
 /**
   * @brief Tx Transfer completed callback.
   * @param  hsai pointer to a SAI_HandleTypeDef structure that contains
@@ -2462,21 +2717,21 @@ static void SAI_FillFifo(SAI_HandleTypeDef *hsai)
   /* fill the fifo with data before to enabled the SAI */
   while (((hsai->Instance->SR & SAI_xSR_FLVL) != SAI_FIFOSTATUS_FULL) && (hsai->XferCount > 0U))
   {
-    if ((hsai->Init.DataSize == SAI_DATASIZE_8) && (hsai->Init.CompandingMode == SAI_NOCOMPANDING))
-    {
-      hsai->Instance->DR = *hsai->pBuffPtr;
-      hsai->pBuffPtr++;
-    }
-    else if (hsai->Init.DataSize <= SAI_DATASIZE_16)
-    {
-      temp = (uint32_t)(*hsai->pBuffPtr);
-      hsai->pBuffPtr++;
-      temp |= ((uint32_t)(*hsai->pBuffPtr) << 8);
-      hsai->pBuffPtr++;
-      hsai->Instance->DR = temp;
-    }
-    else
-    {
+//    if ((hsai->Init.DataSize == SAI_DATASIZE_8) && (hsai->Init.CompandingMode == SAI_NOCOMPANDING))
+//    {
+//      hsai->Instance->DR = *hsai->pBuffPtr;
+//      hsai->pBuffPtr++;
+//    }
+//    else if (hsai->Init.DataSize <= SAI_DATASIZE_16)
+//    {
+//      temp = (uint32_t)(*hsai->pBuffPtr);
+//      hsai->pBuffPtr++;
+//      temp |= ((uint32_t)(*hsai->pBuffPtr) << 8);
+//      hsai->pBuffPtr++;
+//      hsai->Instance->DR = temp;
+//    }
+//    else
+//    {
       temp = (uint32_t)(*hsai->pBuffPtr);
       hsai->pBuffPtr++;
       temp |= ((uint32_t)(*hsai->pBuffPtr) << 8);
@@ -2486,10 +2741,31 @@ static void SAI_FillFifo(SAI_HandleTypeDef *hsai)
       temp |= ((uint32_t)(*hsai->pBuffPtr) << 24);
       hsai->pBuffPtr++;
       hsai->Instance->DR = temp;
-    }
+//   }
     hsai->XferCount--;
   }
 }
+
+
+static void SFillFifo(SAI_HandleTypeDef *hsai)
+	{
+  uint32_t temp;
+  while (((hsai->Instance->SR & SAI_xSR_FLVL) != SAI_FIFOSTATUS_FULL) && (hsai->XferCount > 0U))
+		{
+      temp = (uint32_t)(*hsai->pBuffPtr);
+      hsai->pBuffPtr++;
+      temp |= ((uint32_t)(*hsai->pBuffPtr) << 8);
+      hsai->pBuffPtr++;
+      temp |= ((uint32_t)(*hsai->pBuffPtr) << 16);
+      hsai->pBuffPtr++;
+      temp |= ((uint32_t)(*hsai->pBuffPtr) << 24);
+      hsai->pBuffPtr++;
+      hsai->Instance->DR = temp;
+    hsai->XferCount--;
+		}
+	}
+
+
 
 /**
   * @brief  Return the interrupt flag to set according the SAI setup.

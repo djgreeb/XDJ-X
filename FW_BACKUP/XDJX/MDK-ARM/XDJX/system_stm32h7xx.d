@@ -1,6 +1,6 @@
 xdjx\system_stm32h7xx.o: ../Src/system_stm32h7xx.c
 xdjx\system_stm32h7xx.o: ../Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h7xx.h
-xdjx\system_stm32h7xx.o: ../Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h750xx.h
+xdjx\system_stm32h7xx.o: ../Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h743xx.h
 xdjx\system_stm32h7xx.o: ../Drivers/CMSIS/Include/core_cm7.h
 xdjx\system_stm32h7xx.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 xdjx\system_stm32h7xx.o: ../Drivers/CMSIS/Include/cmsis_version.h

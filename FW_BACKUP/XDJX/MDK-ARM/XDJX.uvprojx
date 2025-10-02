@@ -14,11 +14,11 @@
       <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
-          <Device>STM32H750XBHx</Device>
+          <Device>STM32H743XIHx</Device>
           <Vendor>STMicroelectronics</Vendor>
           <PackID>Keil.STM32H7xx_DFP.3.1.1</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
-          <Cpu>IRAM(0x20000000-0x2001FFFF) IRAM2(0x24000000-0x2407FFFF) IROM(0x8000000-0x801FFFF) CLOCK(12000000) FPU3(DFPU) CPUTYPE("Cortex-M7") ELITTLE TZ</Cpu>
+          <Cpu>IRAM(0x20000000-0x2001FFFF) IRAM2(0x24000000-0x2407FFFF) IROM(0x8000000-0x81FFFFF)  CLOCK(12000000) FPU3(DFPU) CPUTYPE("Cortex-M7") ELITTLE TZ</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
           <FlashDriverDll></FlashDriverDll>
@@ -52,7 +52,7 @@
           <OutputName>XDJX</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
-          <CreateHexFile>1</CreateHexFile>
+          <CreateHexFile>0</CreateHexFile>
           <DebugInformation>1</DebugInformation>
           <BrowseInformation>1</BrowseInformation>
           <ListingPath></ListingPath>
@@ -251,7 +251,7 @@
               <IROM>
                 <Type>1</Type>
                 <StartAddress>0x8000000</StartAddress>
-                <Size>0x20000</Size>
+                <Size>0x200000</Size>
               </IROM>
               <XRAM>
                 <Type>0</Type>
@@ -337,9 +337,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>--C99</MiscControls>
-              <Define>USE_HAL_DRIVER,STM32H750xx</Define>
+              <Define>USE_HAL_DRIVER,STM32H743xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;../Drivers/STM32H7xx_HAL_Driver/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32H7xx/Include;../Drivers/CMSIS/Include;../Drivers/LCD/Components/Common;../Utilities/Fonts;../Middlewares/Third_Party/FatFs/src;..\Drivers\QSPI;..\Drivers\LCD</IncludePath>
+              <IncludePath>../Inc;../Drivers/STM32H7xx_HAL_Driver/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32H7xx/Include;../Drivers/CMSIS/Include;../Drivers/LCD/Components/Common;../Utilities/Fonts;../Drivers/QSPI;../Drivers/LCD;../Middlewares/Third_Party/FatFs/src</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -384,9 +384,9 @@
           <GroupName>Application/MDK-ARM</GroupName>
           <Files>
             <File>
-              <FileName>startup_stm32h750xx.s</FileName>
+              <FileName>startup_stm32h743xx.s</FileName>
               <FileType>2</FileType>
-              <FilePath>startup_stm32h750xx.s</FilePath>
+              <FilePath>.\startup_stm32h743xx.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -402,6 +402,16 @@
               <FileName>deck_transfer.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Inc\deck_transfer.h</FilePath>
+            </File>
+            <File>
+              <FileName>decka_handler.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\decka_handler.h</FilePath>
+            </File>
+            <File>
+              <FileName>deckb_handler.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\deckb_handler.h</FilePath>
             </File>
             <File>
               <FileName>pm_uart_handler.h</FileName>
@@ -422,6 +432,26 @@
               <FileName>uarts_IRQs.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Inc\uarts_IRQs.h</FilePath>
+            </File>
+            <File>
+              <FileName>qspi_const.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\qspi_const.h</FilePath>
+            </File>
+            <File>
+              <FileName>rekordbox.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\rekordbox.h</FilePath>
+            </File>
+            <File>
+              <FileName>spi_mem.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\spi_mem.h</FilePath>
+            </File>
+            <File>
+              <FileName>encoder_handler.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\encoder_handler.h</FilePath>
             </File>
             <File>
               <FileName>main.c</FileName>
@@ -1022,16 +1052,6 @@
               <FileName>stm32h7xx_hal_msp.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Src/stm32h7xx_hal_msp.c</FilePath>
-            </File>
-            <File>
-              <FileName>qspi_const.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Inc\qspi_const.h</FilePath>
-            </File>
-            <File>
-              <FileName>rekordbox.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Inc\rekordbox.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1695,6 +1715,21 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>Audio</GroupName>
+          <Files>
+            <File>
+              <FileName>audio_handler.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\audio_handler.h</FilePath>
+            </File>
+            <File>
+              <FileName>audio.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\audio.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>Middlewares/FatFs</GroupName>
           <GroupOption>
             <CommonProperty>
@@ -2045,21 +2080,6 @@
                   </Cads>
                 </FileArmAds>
               </FileOption>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>Audio</GroupName>
-          <Files>
-            <File>
-              <FileName>audio_handler.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Inc\audio_handler.h</FilePath>
-            </File>
-            <File>
-              <FileName>audio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Inc\audio.h</FilePath>
             </File>
           </Files>
         </Group>

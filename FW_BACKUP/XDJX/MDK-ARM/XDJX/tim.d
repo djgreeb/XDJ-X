@@ -6,7 +6,7 @@ xdjx\tim.o: ../Inc/stm32h7xx_hal_conf.h
 xdjx\tim.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_rcc.h
 xdjx\tim.o: ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_def.h
 xdjx\tim.o: ../Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h7xx.h
-xdjx\tim.o: ../Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h750xx.h
+xdjx\tim.o: ../Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h743xx.h
 xdjx\tim.o: ../Drivers/CMSIS/Include/core_cm7.h
 xdjx\tim.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 xdjx\tim.o: ../Drivers/CMSIS/Include/cmsis_version.h
