@@ -17,6 +17,8 @@ And the most important advantage for me: my source code, scheme, printed circuit
 
 ![Jog ring](https://github.com/user-attachments/assets/1ce37538-82dd-4ca3-b058-db011ed5bf31)
 
+<img width="1222" height="738" alt="xdj-x 3d" src="https://github.com/user-attachments/assets/b24baeba-8410-4cd9-b7cd-d23a4c7c9fcd" />
+
 OVERALL BLOCK DIAGRAM
 
 <img width="5582" height="4295" alt="OVERALL BLOCK DIAGRAM" src="https://github.com/user-attachments/assets/aa3e1833-3abd-4080-b526-4c376a3c9836" />
