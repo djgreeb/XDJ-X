@@ -11,6 +11,8 @@ The XDJ-X has such advantages as an optical crossfader, a Bluetooth transmitter 
 
 And the most important advantage for me: my source code, scheme, printed circuit board. This will allow adding and testing ideas, algorithms of effects, gui, which in the future will be presented in new models of dj equipment from large companies.
 
+![xdj-x3](https://github.com/user-attachments/assets/7357a49d-29d7-436a-b6e0-6af250d46f76)
+
 ![photo_2025-03-18_16-56-35](https://github.com/user-attachments/assets/776a656b-e4bb-47ea-8eb2-ad1e017a59a6)
 
 ![Jog ring](https://github.com/user-attachments/assets/1ce37538-82dd-4ca3-b058-db011ed5bf31)
