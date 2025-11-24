@@ -129,7 +129,8 @@
 //		- spi transfer up to 2X
 //	ver. 0.36
 //		- improved jog encoder code
-//
+//	ver. 0.39
+//		-	The WH2812B data transfer lib has been modified due to the SPI frequency not being suitable for 4-bit data transfer. The buffer has been changed from 100=>75 bytes. 4=>3 bit data transfer.
 //
 //
 //
@@ -156,7 +157,7 @@
 #include "CRC.h"
 extern DMA_HandleTypeDef hdma_spi1_tx;
 
-uint8_t FIRMWARE_VERSION = 36;			//127 max!
+uint8_t FIRMWARE_VERSION = 39;			//127 max!
 
 /* USER CODE END PV */
 
@@ -250,16 +251,16 @@ int main(void)
 		
 	HAL_SPI_TransmitReceive_DMA(&hspi1, deckTbuf, deckRbuf, 16);
 
-	HAL_Delay(300);		
-	COLOR_SET(PAD[0], 0);
-	COLOR_SET(PAD[1], 1);
-	COLOR_SET(PAD[2], 2);
-	COLOR_SET(PAD[3], 3);
-	COLOR_SET(PAD[4], 4);
-	COLOR_SET(PAD[5], 5);
-	COLOR_SET(PAD[6], 6);
-	COLOR_SET(PAD[7], 7);	
-	HAL_SPI_Transmit_DMA(&hspi2, PAD_BUF, 100);		
+	HAL_Delay(300);				
+	COLOR_SET(0xFFA5006D, 0);
+	COLOR_SET(0xFFA5006D, 1);
+	COLOR_SET(0xFFA5006D, 2);
+	COLOR_SET(0xFFA5006D, 3);
+	COLOR_SET(0xFFA5006D, 4);
+	COLOR_SET(0xFFA5006D, 5);
+	COLOR_SET(0xFFA5006D, 6);
+	COLOR_SET(0xFFA5006D, 7);		
+	HAL_SPI_Transmit_DMA(&hspi2, PAD_BUF, 75);		
 		
 	HAL_GPIO_WritePin(GPIOC, LED_PLAY_Pin, GPIO_PIN_SET);
   HAL_GPIO_WritePin(GPIOA, LED_REV_Pin|LED_CUE_Pin|LED_MT_Pin, GPIO_PIN_SET);
@@ -280,10 +281,9 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-
 	if(need_update_pads==2)
 		{		
-		HAL_SPI_Transmit_DMA(&hspi2, PAD_BUF, 100);		
+		HAL_SPI_Transmit_DMA(&hspi2, PAD_BUF, 75);		
 		need_update_pads = 0;
 		}
 		
@@ -421,77 +421,80 @@ void COLOR_SET(uint32_t color, uint8_t LD)
 		{
 		return;	
 		}		
-	uint8_t j, r, g, b;	
+	uint8_t j, g[3];	
 		
-	if(LD<4)
+	LD = 7-LD;	
+	
+	g[1] = (color>>16) & 0x000000FF;	
+	g[0] = (color>>8) & 0x000000FF;	
+	g[2] = color & 0x000000FF;
+	for(j=0;j<3;j++)
 		{
-		LD+= 4;	
-		}
-	else
-		{
-		LD = 7-LD;	
-		}
-		
-	r = (color>>16) & 0x000000FF;	
-	g = (color>>8) & 0x000000FF;	
-	b = color & 0x000000FF; 
-	for(j=0;j<4;j++)
-		{
-		if((g<<(2*j)&0x80)!=0)
+		if((g[j]&0x80)!=0)
 			{
-			PAD_BUF[j+(12*LD)] = 0xC0;	
-			}
+			PAD_BUF[(9*LD)+(3*j)]|= 0x40;
+			}		
 		else
 			{
-			PAD_BUF[j+(12*LD)] = 0x80;	
-			}
-		if(((g<<(2*j+1))&0x80)!=0)
+			PAD_BUF[(9*LD)+(3*j)]&= 0xBF;	
+			}		
+		if(((g[j]<<1)&0x80)!=0)
 			{
-			PAD_BUF[j+(12*LD)]|=0x0C;	
-			}
+			PAD_BUF[(9*LD)+(3*j)]|= 0x08;
+			}		
 		else
 			{
-			PAD_BUF[j+(12*LD)]|=0x08;	
+			PAD_BUF[(9*LD)+(3*j)]&= 0xF7;	
 			}	
+		if(((g[j]<<2)&0x80)!=0)
+			{
+			PAD_BUF[(9*LD)+(3*j)]|= 0x01;
+			}		
+		else
+			{
+			PAD_BUF[(9*LD)+(3*j)]&= 0xFE;	
+			}			
+		if(((g[j]<<3)&0x80)!=0)
+			{
+			PAD_BUF[1+(9*LD)+(3*j)]|= 0x20;
+			}		
+		else
+			{
+			PAD_BUF[1+(9*LD)+(3*j)]&= 0xDF;	
+			}				
+		if(((g[j]<<4)&0x80)!=0)
+			{
+			PAD_BUF[1+(9*LD)+(3*j)]|= 0x04;
+			}		
+		else
+			{
+			PAD_BUF[1+(9*LD)+(3*j)]&= 0xFB;	
+			}				
+		if(((g[j]<<5)&0x80)!=0)
+			{
+			PAD_BUF[2+(9*LD)+(3*j)]|= 0x80;
+			}		
+		else
+			{
+			PAD_BUF[2+(9*LD)+(3*j)]&= 0x7F;	
+			}				
+		if(((g[j]<<6)&0x80)!=0)
+			{
+			PAD_BUF[2+(9*LD)+(3*j)]|= 0x10;
+			}		
+		else
+			{
+			PAD_BUF[2+(9*LD)+(3*j)]&= 0xEF;	
+			}			
+		if(((g[j]<<7)&0x80)!=0)
+			{
+			PAD_BUF[2+(9*LD)+(3*j)]|= 0x02;
+			}		
+		else
+			{
+			PAD_BUF[2+(9*LD)+(3*j)]&= 0xFD;	
+			}		
 		}
-	for(j=0;j<4;j++)
-		{
-		if((r<<(2*j)&0x80)!=0)
-			{
-			PAD_BUF[j+4+(12*LD)] = 0xC0;	
-			}
-		else
-			{
-			PAD_BUF[j+4+(12*LD)] = 0x80;	
-			}
-		if(((r<<(2*j+1))&0x80)!=0)
-			{
-			PAD_BUF[j+4+(12*LD)]|=0x0C;	
-			}
-		else
-			{
-			PAD_BUF[j+4+(12*LD)]|=0x08;	
-			}	
-		}	
-	for(j=0;j<4;j++)
-		{
-		if((b<<(2*j)&0x80)!=0)
-			{
-			PAD_BUF[j+8+(12*LD)] = 0xC0;	
-			}
-		else
-			{
-			PAD_BUF[j+8+(12*LD)] = 0x80;	
-			}
-		if(((b<<(2*j+1))&0x80)!=0)
-			{
-			PAD_BUF[j+8+(12*LD)]|=0x0C;	
-			}
-		else
-			{
-			PAD_BUF[j+8+(12*LD)]|=0x08;	
-			}	
-		}	
 	return;	
 	};		
 	

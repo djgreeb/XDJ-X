@@ -731,7 +731,7 @@ I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_spi.h)(0x5B191D4A)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h)(0x5B191D4A)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h)(0x5B191D4A)
 I (../Inc/gpio.h)(0x680B8DDE)
-F (../Src/spi.c)(0x680B8DDE)(--c99 -c --cpu Cortex-M4.fp.sp -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include-I.\RTE\_XDJ_DECK_UCOM-IC:\Users\Greeb\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32F446xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F446xx-o xdj_deck_ucom\spi.o --omf_browse xdj_deck_ucom\spi.crf --depend xdj_deck_ucom\spi.d)
+F (../Src/spi.c)(0x6918B8C9)(--c99 -c --cpu Cortex-M4.fp.sp -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include-I.\RTE\_XDJ_DECK_UCOM-IC:\Users\Greeb\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32F446xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F446xx-o xdj_deck_ucom\spi.o --omf_browse xdj_deck_ucom\spi.crf --depend xdj_deck_ucom\spi.d)
 I (../Inc/spi.h)(0x680B8DE0)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x5B191D4A)
 I (../Inc/stm32f4xx_hal_conf.h)(0x680B8DE0)
@@ -802,7 +802,7 @@ I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_spi.h)(0x5B191D4A)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h)(0x5B191D4A)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h)(0x5B191D4A)
 I (../Inc/gpio.h)(0x680B8DDE)
-F (../Src/main.c)(0x684D7773)(--c99 -c --cpu Cortex-M4.fp.sp -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include-I.\RTE\_XDJ_DECK_UCOM-IC:\Users\Greeb\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32F446xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F446xx-o xdj_deck_ucom\main.o --omf_browse xdj_deck_ucom\main.crf --depend xdj_deck_ucom\main.d)
+F (../Src/main.c)(0x6918E6F7)(--c99 -c --cpu Cortex-M4.fp.sp -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include-I.\RTE\_XDJ_DECK_UCOM-IC:\Users\Greeb\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32F446xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F446xx-o xdj_deck_ucom\main.o --omf_browse xdj_deck_ucom\main.crf --depend xdj_deck_ucom\main.d)
 I (../Inc/main.h)(0x680B8DE0)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x5B191D4A)
 I (../Inc/stm32f4xx_hal_conf.h)(0x680B8DE0)
@@ -841,7 +841,7 @@ I (../Inc/spi.h)(0x680B8DE0)
 I (../Inc/tim.h)(0x680B8DE0)
 I (../Inc/gpio.h)(0x680B8DDE)
 I (../Inc/VFL_data.h)(0x67A20838)
-I (../Inc/global_variables.h)(0x684D7438)
+I (../Inc/global_variables.h)(0x6918E30B)
 I (../Inc/CRC.h)(0x684C52F3)
 I (../Inc/VFL_GUI.h)(0x68488C63)
 I (../Inc/spi_transfer.h)(0x684D754C)
@@ -880,7 +880,7 @@ I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h)(0x5B191D4A)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h)(0x5B191D4A)
 I (../Inc/stm32f4xx_it.h)(0x680B8DE0)
 F (..\Inc\VFL_data.h)(0x67A20838)()
-F (..\Inc\global_variables.h)(0x684D7438)()
+F (..\Inc\global_variables.h)(0x6918E30B)()
 F (..\Inc\CRC.h)(0x684C52F3)()
 F (..\Inc\VFL_GUI.h)(0x68488C63)()
 F (..\Inc\spi_transfer.h)(0x684D754C)()
