@@ -30,12 +30,14 @@ uint16_t FindCurrBar(uint8_t dk, uint32_t pos);		//search current bar number
 //extended to 8 hot cues reading from *.EXT files
 //bug fixed: path_ANLZ expanded to 46 bytes, for final 0 
 //BEATGRID and BPMGRID changed 4096->2048
+//Rekordbox database parser ver. 0.44
+//Cyrillic symbols added
 //
 ////////////////////////////////////////////////////////////////////////
 uint16_t DATABASE_PARSER(void)
 	{	
 	#if defined(DEBUG_UART_EN)		
-	sprintf((char*)U_TX_DATA, "Start Rekordbox parser ver. 0.42\n\r");	
+	sprintf((char*)U_TX_DATA, "Start Rekordbox parser ver. 0.44\n\r");	
 	UART_TX(&huart4, U_TX_DATA, 34, 55);	
 	#endif		
 	res = f_open(&file, path_export, FA_READ);
@@ -51,6 +53,7 @@ uint16_t DATABASE_PARSER(void)
 	uint16_t all_trks = 0;			//512 max
 	uint16_t T_ID = 0;
 	uint16_t i  = 0;	
+	uint16_t wi;	
 	uint32_t NEXT_PAGE_0, LAST_PAGE_0, P_PAGE_0;	
 	uint32_t NEXT_PAGE_5, LAST_PAGE_5; //page for KEY
 	uint32_t NEXT_PAGE_7, LAST_PAGE_7; //page for PLAYLIST tree
@@ -192,44 +195,42 @@ uint16_t DATABASE_PARSER(void)
 					duration[T_ID-1] = WFORMDYNAMIC[dkA][crsr] + 256*WFORMDYNAMIC[dkA][crsr+1];	
 					crsr+= 4;
 					rating[T_ID-1] = WFORMDYNAMIC[dkA][crsr] + 256*WFORMDYNAMIC[dkA][crsr+1];
-					crsr+= 4;						
-					cycle_en = 1;							
-					while(crsr<4095 && cycle_en)
-						{	
-						if(WFORMDYNAMIC[dkA][crsr]==str[1])
+					crsr+=34;			//offset 14 File path of track analysis
+					parcser_adress[T_ID-1] = (4096*P_PAGE_0)+(((crsr + (WFORMDYNAMIC[dkA][crsr] + 256*WFORMDYNAMIC[dkA][crsr+1])) - 122) + 41);	//save position ".[D]AT"
+					crsr+=6;	//offset 17 Track title
+					crsr+=WFORMDYNAMIC[dkA][crsr] + 256*WFORMDYNAMIC[dkA][crsr+1];	
+					crsr-=128;	
+
+					if(WFORMDYNAMIC[dkA][crsr]==0x90)		//Unicode	
+						{
+						wi = ((WFORMDYNAMIC[dkA][crsr+1] + 256*WFORMDYNAMIC[dkA][crsr+2])/2)-2;	
+						for(i=0;i<wi;i++)
 							{
-							if(WFORMDYNAMIC[dkA][crsr-1]==str[0] && 
-								 WFORMDYNAMIC[dkA][crsr+1]==str[2] && 
-								 WFORMDYNAMIC[dkA][crsr+2]==str[3])				//".DAT" Finded!
+							if(WFORMDYNAMIC[dkA][crsr+5+i*2]==0)
 								{
-								parcser_adress[T_ID-1] = (4096*P_PAGE_0)+crsr;										//save position ".[D]AT"	
-								crsr = crsr+16;									
-								for(i=0;((i<54) && (WFORMDYNAMIC[dkA][crsr+i]!=3));i++)						//copy track name	
-									{		
-									if((WFORMDYNAMIC[dkA][crsr+i]<32) || (WFORMDYNAMIC[dkA][crsr+i]>126))				//filtering UNICODE symbols
-										{
-										playlist[T_ID-1][i] = 32;	
-										}										
-									else
-										{										
-										playlist[T_ID-1][i] = WFORMDYNAMIC[dkA][crsr+i];
-										}		
-									}
-								while(i<54)																				//Fill spaces
-									{
-									playlist[T_ID-1][i] = 0;
-									i++;		
-									}									
-								playlist[T_ID-1][53] = 0;
-								playlist[T_ID-1][54] = 0;	
-									
-								i = 0;	
-								crsr+= 10;	
-								cycle_en = 0;	
-								}
+								playlist[T_ID-1][i] =	WFORMDYNAMIC[dkA][crsr+4+i*2];	
+								}								
+							else
+								{
+								playlist[T_ID-1][i] =	CYRtoCP866[WFORMDYNAMIC[dkA][crsr+4+i*2]];	
+								}								
+							}	
+						}
+					else			//ASCII	
+						{
+						wi = ((WFORMDYNAMIC[dkA][crsr]-1)/2)-1;
+						for(i=0;i<wi;i++)
+							{
+							playlist[T_ID-1][i] =	WFORMDYNAMIC[dkA][crsr+1+i];		
 							}
-						crsr++;	
-						}	
+						}
+					while(i<54)																				//Fill zeros
+						{
+						playlist[T_ID-1][i] = 0;
+						i++;		
+						}									
+					playlist[T_ID-1][53] = 0;
+					playlist[T_ID-1][54] = 0;								
 					}
 				crsr++;	
 				}				
@@ -631,10 +632,21 @@ uint16_t LOAD_TRACKA(uint16_t TRACK_NUMBER)
 		fsz<<=8;
 		fsz+=WFORMDYNAMIC[dkA][StPosHead+15];							//Path Size
 		char path_AUDIOTRACK[(fsz/2)+2];			//Create a Path for audiotrack
-		while(E<(fsz+4))
-			{
-			path_AUDIOTRACK[(E/2)+2] = WFORMDYNAMIC[dkA][SPP+E];			//Fill path
-			E=E+2;	
+		E = 0;	
+		while(E<fsz)
+			{	
+			if(WFORMDYNAMIC[dkA][SPP+E-1]==0)
+				{
+				path_AUDIOTRACK[(E/2)+2] = WFORMDYNAMIC[dkA][SPP+E];			//Fill path	
+				}				
+			else if(WFORMDYNAMIC[dkA][SPP+E-1]==0x04)				//Convert Unicode to CP866
+				{	
+				if(WFORMDYNAMIC[dkA][SPP+E]<96)
+					{
+					path_AUDIOTRACK[(E/2)+2] = CYRtoCP866[WFORMDYNAMIC[dkA][SPP+E]];		
+					}									
+				}
+			E+=2;					
 			}
 		path_AUDIOTRACK[0] = 48;
 		path_AUDIOTRACK[1] = 58;	
@@ -740,9 +752,9 @@ uint16_t LOAD_TRACKA(uint16_t TRACK_NUMBER)
 		uint16_t ampl;
 		uint32_t y;	
 
-		for(E=0;E<203;E++)					//Fill Static Waveform 400->203
+		for(E=0;E<202;E++)					//Fill Static Waveform 400->203
 			{
-			y = 506*E;			//506
+			y = 509*E;
 			y>>=8;	
 			ampl = (WFORMDYNAMIC[dkA][fsz+y]&0x1F)*192;	 //convert amplitude 24->18
 			ampl>>=8;
@@ -973,7 +985,11 @@ uint16_t LOAD_TRACKA(uint16_t TRACK_NUMBER)
 			fsz = FILSIZE;
 			if(fsz>WFD_SIZE)
 				{
-				fsz = WFD_SIZE;	
+				fsz = WFD_SIZE;
+				#if defined(DEBUG_UART_EN)		
+				sprintf((char*)U_TX_DATA, "SIZE>90000 \n\r");	
+				UART_TX(&huart4, U_TX_DATA, 13, 5);		
+				#endif						
 				}
 			res = f_read(&file, WFORMDYNAMIC[dkA], fsz, &nbytes);
 			if(res != FR_OK)
@@ -1027,6 +1043,10 @@ uint16_t LOAD_TRACKA(uint16_t TRACK_NUMBER)
 						   WFORMDYNAMIC[dkA][StPosHead+2] != 86 | 
 						   WFORMDYNAMIC[dkA][StPosHead+3] != 51)		//Check PWV3 position in file
 							{
+							#if defined(DEBUG_UART_EN)		
+							sprintf((char*)U_TX_DATA, "Check PWV3 \n\r");	
+							UART_TX(&huart4, U_TX_DATA, 13, 5);		
+							#endif				
 							return 11;	//ANLZXXXX.EXT file is damadge			
 							}
 						else
@@ -1062,6 +1082,10 @@ uint16_t LOAD_TRACKA(uint16_t TRACK_NUMBER)
 								 WFORMDYNAMIC[dkA][StPosHead+2] != 79 | 
 								 WFORMDYNAMIC[dkA][StPosHead+3] != 66)		//Check PCOB position in file
 								{
+								#if defined(DEBUG_UART_EN)		
+								sprintf((char*)U_TX_DATA, "Check PCOB \n\r");	
+								UART_TX(&huart4, U_TX_DATA, 13, 5);		
+								#endif		
 								return 11;	//ANLZXXXX.EXT file is damadge			
 								}
 							else
@@ -1095,7 +1119,7 @@ uint16_t LOAD_TRACKA(uint16_t TRACK_NUMBER)
 									 WFORMDYNAMIC[dkA][StPosHead+1] != 67 | 
 									 WFORMDYNAMIC[dkA][StPosHead+2] != 79 | 
 									 WFORMDYNAMIC[dkA][StPosHead+3] != 50)		//Check PCO2 position in file
-										{
+										{		
 										return 11;	//ANLZXXXX.EXT file is damadge			
 										}	
 									else
@@ -1104,8 +1128,6 @@ uint16_t LOAD_TRACKA(uint16_t TRACK_NUMBER)
 										sprintf((char*)U_TX_DATA, "Enter PCO2\n\r");	
 										UART_TX(&huart4, U_TX_DATA, 12, 5);	
 										#endif		
-											
-											
 										if(WFORMDYNAMIC[dkA][StPosHead+15]==1)				//HOT CUE TYPE
 											{
 											number_of_hot_cue_points[dkA] = WFORMDYNAMIC[dkA][StPosHead+17];
@@ -1126,6 +1148,11 @@ uint16_t LOAD_TRACKA(uint16_t TRACK_NUMBER)
 													 WFORMDYNAMIC[dkA][StPosHead+3] != 50)		//Check PCP2 position in file
 														{
 														j = 100;	
+															
+														#if defined(DEBUG_UART_EN)		
+														sprintf((char*)U_TX_DATA, "J100\n\r");	
+														UART_TX(&huart4, U_TX_DATA, 6, 5);		
+														#endif			
 														return 11;	//ANLZXXXX.EXT file is damadge			
 														}
 												else
@@ -1289,7 +1316,7 @@ uint16_t LOAD_TRACKA(uint16_t TRACK_NUMBER)
 												sprintf((char*)U_TX_DATA, "MEMORY in %06lu ms\n\r", MEMORY_adr[dkA][0][E]);											
 												UART_TX(&huart4, U_TX_DATA, 21, 15);	
 												#endif		
-												mem_pos	= 609*MEMORY_adr[dkA][0][E];
+												mem_pos	= 605*MEMORY_adr[dkA][0][E];
 												mem_pos/= (20*all_long[dkA]);
 												DrawMemoryMarker(dkA, mem_pos, MEMORY_MARK, LCD_COLOR_RED);
 												MEMORY_adr[dkA][0][E] = (MEMORY_adr[dkA][0][E]*3)/20;				//translate ms to 1/150s frames
@@ -1331,7 +1358,7 @@ uint16_t LOAD_TRACKA(uint16_t TRACK_NUMBER)
 												g = (HCUE32COLOR[dkA][E]&0x0000FFFF)>>11;
 												b = (HCUE32COLOR[dkA][E]&0x000000FF)>>3;	
 												HCUE16COLOR[dkA][E] = 0x8000+(0x400*r)+(0x20*g)+b; 
-												mem_pos	= 609*HCUE_adr[dkA][0][E];
+												mem_pos	= 605*HCUE_adr[dkA][0][E];
 												mem_pos/= (20*all_long[dkA]);
 												DrawMemoryMarker(dkA, mem_pos, 2+E, HCUE16COLOR[dkA][E]);				//square
 												#if defined(DEBUG_UART_EN)		
@@ -1397,16 +1424,17 @@ uint16_t LOAD_TRACKA(uint16_t TRACK_NUMBER)
 			}
 
 		res = f_open(&file, path_AUDIOTRACK, FA_READ);				//Open audio file
-		if (res != FR_OK)
-			{
-			return 13;	//cannot open AUDIOTRACK
-			}
 		#if defined(DEBUG_UART_EN)	
 		sprintf((char*)U_TX_DATA, "\n\r");	
 		UART_TX(&huart4, U_TX_DATA, 2, 5);				
 		UART_TX(&huart4, path_AUDIOTRACK, 150, 45);	
 		UART_TX(&huart4, U_TX_DATA, 2, 5);	
-		#endif		
+		#endif
+		if (res != FR_OK)
+			{
+			return 13;	//cannot open AUDIOTRACK
+			}
+	
 		res = f_read(&file, PCM, 512, &nbytes);
 		if(res != FR_OK)
 			{
@@ -1533,10 +1561,21 @@ uint16_t LOAD_TRACKB(uint16_t TRACK_NUMBER)
 		fsz<<=8;
 		fsz+=WFORMDYNAMIC[dkB][StPosHead+15];							//Path Size
 		char path_AUDIOTRACK[(fsz/2)+2];			//Create a Path for audiotrack
-		while(E<(fsz+4))
-			{
-			path_AUDIOTRACK[(E/2)+2] = WFORMDYNAMIC[dkB][SPP+E];			//Fill path
-			E=E+2;	
+		E = 0;	
+		while(E<fsz)
+			{	
+			if(WFORMDYNAMIC[dkB][SPP+E-1]==0)
+				{
+				path_AUDIOTRACK[(E/2)+2] = WFORMDYNAMIC[dkB][SPP+E];			//Fill path	
+				}				
+			else if(WFORMDYNAMIC[dkB][SPP+E-1]==0x04)				//Convert Unicode to CP866
+				{	
+				if(WFORMDYNAMIC[dkB][SPP+E]<96)
+					{
+					path_AUDIOTRACK[(E/2)+2] = CYRtoCP866[WFORMDYNAMIC[dkB][SPP+E]];		
+					}									
+				}
+			E+=2;					
 			}
 		path_AUDIOTRACK[0] = 48;
 		path_AUDIOTRACK[1] = 58;	
@@ -1642,9 +1681,9 @@ uint16_t LOAD_TRACKB(uint16_t TRACK_NUMBER)
 		uint16_t ampl;
 		uint32_t y;	
 
-		for(E=0;E<203;E++)					//Fill Static Waveform 400->203
+		for(E=0;E<202;E++)					//Fill Static Waveform 400->203
 			{
-			y = 506*E;			//506
+			y = 509*E;
 			y>>=8;	
 			ampl = (WFORMDYNAMIC[dkB][fsz+y]&0x1F)*192;	 //convert amplitude 24->18
 			ampl>>=8;
@@ -2192,7 +2231,7 @@ uint16_t LOAD_TRACKB(uint16_t TRACK_NUMBER)
 												sprintf((char*)U_TX_DATA, "MEMORY in %06lu ms\n\r", MEMORY_adr[dkB][0][E]);											
 												UART_TX(&huart4, U_TX_DATA, 21, 15);	
 												#endif		
-												mem_pos	= 609*MEMORY_adr[dkB][0][E];
+												mem_pos	= 605*MEMORY_adr[dkB][0][E];
 												mem_pos/= (20*all_long[dkB]);
 												DrawMemoryMarker(dkB, mem_pos, MEMORY_MARK, LCD_COLOR_RED);
 												MEMORY_adr[dkB][0][E] = (MEMORY_adr[dkB][0][E]*3)/20;				//translate ms to 1/150s frames
@@ -2234,7 +2273,7 @@ uint16_t LOAD_TRACKB(uint16_t TRACK_NUMBER)
 												g = (HCUE32COLOR[dkB][E]&0x0000FFFF)>>11;
 												b = (HCUE32COLOR[dkB][E]&0x000000FF)>>3;	
 												HCUE16COLOR[dkB][E] = 0x8000+(0x400*r)+(0x20*g)+b; 
-												mem_pos	= 609*HCUE_adr[dkB][0][E];
+												mem_pos	= 605*HCUE_adr[dkB][0][E];
 												mem_pos/= (20*all_long[dkB]);
 												DrawMemoryMarker(dkB, mem_pos, 2+E, HCUE16COLOR[dkB][E]);				//square
 												#if defined(DEBUG_UART_EN)		
@@ -2300,16 +2339,17 @@ uint16_t LOAD_TRACKB(uint16_t TRACK_NUMBER)
 			}
 
 		res = f_open(&fileb, path_AUDIOTRACK, FA_READ);				//Open audio file
-		if (res != FR_OK)
-			{
-			return 13;	//cannot open AUDIOTRACK
-			}
 		#if defined(DEBUG_UART_EN)	
 		sprintf((char*)U_TX_DATA, "\n\r");	
 		UART_TX(&huart4, U_TX_DATA, 2, 5);				
 		UART_TX(&huart4, path_AUDIOTRACK, 150, 45);	
 		UART_TX(&huart4, U_TX_DATA, 2, 5);	
-		#endif		
+		#endif			
+		if (res != FR_OK)
+			{
+			return 13;	//cannot open AUDIOTRACK
+			}
+	
 		res = f_read(&fileb, PCM[dkB], 512, &nbytesb);
 		if(res != FR_OK)
 			{
@@ -2572,6 +2612,58 @@ void PREPARE_LOAD_TRACK(uint8_t dk, uint16_t TRACK_NUMBER, uint16_t TRACK_IN_PLA
 		DrawStaticWFM(dk, MS_ERROR+ERR);		
 		RED_CRCL_CUE_ADR[dk] = 85;
 		}
+	if(dk==dkA)
+		{
+		if(prev_inair[dkA]==0)		//inactive
+			{
+			if(UT_SET[11]<9)
+				{
+				jog_work_color[dkA] = jog_color[UT_SET[12]][UT_SET[11]];	
+				}					
+			else
+				{
+				jog_work_color[dkA] = jog_color[UT_SET[12]][curr_trck_color[dkA]];		
+				}
+			}
+		else		//in air
+			{
+			if(UT_SET[10]<9)
+				{
+				jog_work_color[dkA] = jog_color[UT_SET[12]][UT_SET[10]];	
+				}					
+			else
+				{
+				jog_work_color[dkA] = jog_color[UT_SET[12]][curr_trck_color[dkA]];		
+				}		
+			}				
+		SET_JOG_COLOR(dkA, jog_work_color[dkA]);	
+		}
+	else
+		{
+		if(prev_inair[dkB]==0)		//inactive
+			{
+			if(UT_SET[11]<9)
+				{
+				jog_work_color[dkB] = jog_color[UT_SET[12]][UT_SET[11]];	
+				}					
+			else
+				{
+				jog_work_color[dkB] = jog_color[UT_SET[12]][curr_trck_color[dkB]];		
+				}
+			}
+		else		//in air
+			{
+			if(UT_SET[10]<9)
+				{
+				jog_work_color[dkB] = jog_color[UT_SET[12]][UT_SET[10]];	
+				}					
+			else
+				{
+				jog_work_color[dkB] = jog_color[UT_SET[12]][curr_trck_color[dkB]];		
+				}		
+			}				
+		SET_JOG_COLOR(dkB, jog_work_color[dkB]);
+		}	
 	if(ERR==0)								//the sequence of functions in this place is very important!
 		{		
 		lock_control[dk] = 0;

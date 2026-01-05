@@ -28,25 +28,69 @@
 				}
 			else if(pm_urx_buf[1]==0xFC)			//need turn off 
 				{
-				f_close(&file);	
-				TIM8->CCR1 = 0;
-				HAL_GPIO_WritePin(BACKLIGHT_EN_GPIO_Port, BACKLIGHT_EN_Pin, GPIO_PIN_RESET);
-				HAL_GPIO_WritePin(GPIOA, LED_LOAD1_Pin|LED_LOAD0_Pin|LED_ENC_Pin, GPIO_PIN_RESET);
+				f_close(&file);
+				f_close(&fileb);	
+				uint16_t i;				
 				for(j=0;j<19;j++)		//write to eeprom
 					{		
 					WR_EEMEM(j, UT_SET[j]);
-					}		
-				HAL_GPIO_WritePin(GPIOH, P8EN_Pin, GPIO_PIN_RESET);			
+					}	
+
+				U_TX_DATA[0] = 0x97;			//Turn off mixer
+				U_TX_DATA[1] = 0xFC;			//
+				U_TX_DATA[2] = 0xFC;			//
+				UART_TX(&huart1, U_TX_DATA, 3, 5);	
+		
+				TIM8->CCR1 = 0;
+				HAL_GPIO_WritePin(BACKLIGHT_EN_GPIO_Port, BACKLIGHT_EN_Pin, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOA, LED_LOAD1_Pin|LED_LOAD0_Pin|LED_ENC_Pin, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOH, P8EN_Pin, GPIO_PIN_RESET);	
+
+				HAL_Delay(1000);		
+					
 				lock_control[dkA] = 1;		
 				pitch[dkA] = 0;	
 				play_enable[dkA] = 0;					
 				play_adr[dkA] = 0;	
-				all_long[dkA] = 0;		
-				end_adata[dkA] = 0xFFFF;
-				U_TX_DATA[0] = 0x97;			//Turn off mixer
-				U_TX_DATA[1] = 0xFC;			//
-				U_TX_DATA[2] = 0xFC;			//
-				UART_TX(&huart1, U_TX_DATA, 3, 5);
+				all_long[dkA] = 0;
+				start_adata[dkA] = 0;	
+				end_adata[dkA] = 0;
+				slip_pl_adr[dkA] = 0;
+				loop_active[dkA] = 0;
+				loop_act_gui[dkA] = 0;			
+				track_play_now[dkA] = 0;
+				TRACK_n_PLAY[dkA] = 0;	
+				RED_CRCL_CUE_ADR[dkA] = 85;	
+				SET_JOG_COLOR(dkA, 0);	
+				
+				lock_control[dkB] = 1;
+				pitch[dkB] = 0;	
+				play_enable[dkB] = 0;					
+				play_adr[dkB] = 0;	
+				all_long[dkB] = 0;
+				start_adata[dkB] = 0;	
+				end_adata[dkB] = 0;
+				slip_pl_adr[dkB] = 0;
+				loop_active[dkB] = 0;
+				loop_act_gui[dkB] = 0;			
+				track_play_now[dkB] = 0;
+				TRACK_n_PLAY[dkB] = 0;	
+				RED_CRCL_CUE_ADR[dkB] = 85;	
+				SET_JOG_COLOR(dkB, 0);
+				HAL_Delay(200);	
+				
+				for(i=0;i<8;i++)
+					{
+					deckTbuf[i][1] = 0x00;
+					deckTbuf[i][2] = 0x00;
+					deckTbuf[i][3] = 0x00;
+					deckTbuf[i][9] = 0x00;
+					deckTbuf[i][10] = 0x00;
+					deckTbuf[i][11] = 0x00;
+					deckTbuf[i][0] = i;	
+					deckTbuf[i][8] = i;					
+					}		
+					
 				#if defined(DEBUG_UART_EN)	
 				sprintf((char*)U_TX_DATA, "Turn off\n\r");	
 				UART_TX(&huart4, U_TX_DATA, 10, 5);

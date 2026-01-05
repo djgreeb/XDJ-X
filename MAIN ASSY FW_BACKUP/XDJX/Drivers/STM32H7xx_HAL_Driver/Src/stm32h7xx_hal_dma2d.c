@@ -665,8 +665,8 @@ HAL_StatusTypeDef HAL_DMA2D_Start(DMA2D_HandleTypeDef *hdma2d, uint32_t pdata, u
                                   uint32_t Height)
 	{
 //  /* Check the parameters */
-//  assert_param(IS_DMA2D_LINE(Height));
-//  assert_param(IS_DMA2D_PIXEL(Width));
+  //assert_param(IS_DMA2D_LINE(Height));
+  //assert_param(IS_DMA2D_PIXEL(Width));
 
   /* Process locked */
   __HAL_LOCK(hdma2d);
@@ -1432,7 +1432,7 @@ HAL_StatusTypeDef HAL_DMA2D_PollForTransfer(DMA2D_HandleTypeDef *hdma2d, uint32_
         /* Process unlocked */
         __HAL_UNLOCK(hdma2d);
 
-        return HAL_ERROR;
+        //return HAL_ERROR;			/*!< Configuration error  */
       }
       /* Check for the Timeout */
       if (Timeout != HAL_MAX_DELAY)

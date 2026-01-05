@@ -83,6 +83,7 @@ xdjx\main.o: ../Inc/decka_handler.h
 xdjx\main.o: ../Inc/deckb_handler.h
 xdjx\main.o: ../Inc/rekordbox.h
 xdjx\main.o: ../Inc/spi_mem.h
+xdjx\main.o: ../Inc/screenshot.h
 xdjx\main.o: ../Inc/pm_uart_handler.h
 xdjx\main.o: ../Inc/mixer_uart_handler.h
 xdjx\main.o: ../Inc/debug_uart_handler.h

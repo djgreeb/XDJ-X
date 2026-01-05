@@ -57,7 +57,9 @@ typedef enum
 #define LCD_COLOR_RED           ((uint16_t)0xFC00)
 #define LCD_COLOR_WHITE					((uint16_t)0xFFFF)
 #define LCD_COLOR_GRAY					((uint16_t)0xBDEF)
+#define LCD_COLOR_GGRAY					((uint16_t)0xCE73)		//+15% from LCD_COLOR_GRAY
 #define LCD_COLOR_DARKGRAY			((uint16_t)0xAD6B)
+#define LCD_COLOR_DDARKGRAY			((uint16_t)0xA108)		//-9% from LCD_COLOR_DARKGRAY
 #define LCD_COLOR_BLACK         ((uint16_t)0x8000)
 #define LCD_COLOR_CUE						((uint16_t)0xFE65)
 #define LCD_COLOR_TRANSPARENT   ((uint16_t)0x0000)
@@ -80,6 +82,12 @@ typedef enum
 #define LI_COLOR_1						((uint16_t)0x9040)
 #define LI_COLOR_2						((uint16_t)0xD163)
 #define LI_COLOR_3						((uint16_t)0xF625)
+
+////////////////////////////bars colors///////////////////////
+#define LCD_COLOR_UT					((uint16_t)0xD294)
+#define LCD_COLOR_BR          ((uint16_t)0x82BA)
+#define LCD_COLOR_TG          ((uint16_t)0x8D55)
+
 
 
 #define LCD_DEFAULT_FONT        Font15P     

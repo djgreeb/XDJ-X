@@ -163,18 +163,29 @@
 				UART_TX(&huart4, U_TX_DATA, 2, 5);
 				}
 			}	
-		else if(dbg_urx_buf[0]==10)					//pads color
+		else if(dbg_urx_buf[0]==10)					//waveform color
 			{	
-			for(j=0;j<8;j++)
-				{
-				deckTbuf[j][1] = dbg_urx_buf[1];
-				deckTbuf[j][2] = dbg_urx_buf[2];
-				deckTbuf[j][3] = dbg_urx_buf[3];
-				deckTbuf[j][9] = dbg_urx_buf[1];
-				deckTbuf[j][10] = dbg_urx_buf[2];
-				deckTbuf[j][11] = dbg_urx_buf[3];
-				}	
+			//COLOR_MAP[dbg_urx_buf[1]][dbg_urx_buf[2]] = 256*dbg_urx_buf[3] + dbg_urx_buf[4];
 			}	
+		else if(dbg_urx_buf[0]==11)					//create screenshot
+			{	
+			sprintf((char*)U_TX_DATA, "%s", "Prepare screen wait...\n\r");
+			UART_TX(&huart4, U_TX_DATA, 24, 5);
+			uint16_t uart_tmp;	
+			uart_tmp = CREATE_SCREEN();	
+			if(uart_tmp==0xFFFF)
+				{
+				sprintf((char*)U_TX_DATA, "%s", "Error. Screen not created.\n\r");	
+				UART_TX(&huart4, U_TX_DATA, 28, 15);		
+				}
+			else
+				{
+				sprintf((char*)U_TX_DATA, "%s", "Done!\n\r");	
+				UART_TX(&huart4, U_TX_DATA, 7, 15);
+				sprintf((char*)U_TX_DATA, "SCREEN_%03lu.bmp\n\r", uart_tmp);
+				UART_TX(&huart4, U_TX_DATA, 16, 15);
+				}
+			}
 		dbg_new_data = 0;		
 		};
 	
