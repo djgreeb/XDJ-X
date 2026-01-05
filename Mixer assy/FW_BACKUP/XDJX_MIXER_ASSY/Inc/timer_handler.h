@@ -42,8 +42,8 @@ void TIM2_IRQHandler(void)
 						}	
 					else
 						{	
-						MAX7219_DATA[6] = CFXmask[CFXON-1];	
 						CFXON = 8;	
+						MAX7219_DATA[6] = CFXmask[CFXON-1];		
 						}
 					MAX7219_need_update|=0x40;
 					CFX8_prsd = 1;	
@@ -112,7 +112,7 @@ void TIM2_IRQHandler(void)
 					pot_out[tim_dv] = (pot_out[tim_dv]+ADC_TMP+1)>>1;	
 					}
 				pot_8b[tim_dv] = pot_convln(pot_out[tim_dv]);	
-				HPHN_ATT = VR_LOG[pot_8b[tim_dv]];	
+				HPHN_ATT = VR_FDR[pot_8b[tim_dv]];	
 				}				
 			ADC_TMP = (pot_SUM[tim_dv-1]+4)>>3;	
 			if((ADC_TMP>(pot_out[tim_dv-1]+adc_hysteresis))||((ADC_TMP+adc_hysteresis)<pot_out[tim_dv-1]))	////////// PRMT	
@@ -142,9 +142,9 @@ void TIM2_IRQHandler(void)
 						CFXON = 0;			
 						}	
 					else
-						{	
+						{
+						CFXON = 1;		
 						MAX7219_DATA[6] = CFXmask[CFXON-1];	
-						CFXON = 1;	
 						}
 					MAX7219_need_update|=0x40;		
 					CFX1_prsd = 1;	
@@ -197,8 +197,8 @@ void TIM2_IRQHandler(void)
 					pot_out[tim_dv] = (pot_out[tim_dv]+ADC_TMP+1)>>1;	
 					}
 				pot_8b[tim_dv] = pot_convcd(pot_out[tim_dv]);	
-				eql0.hg	= EQ_ISO[pot_8b[tim_dv]];	
-				eqr0.hg	= EQ_ISO[pot_8b[tim_dv]];	
+				eql0.hg	= EQ_26[EQCURVE_prsd][pot_8b[tim_dv]];	
+				eqr0.hg	= EQ_26[EQCURVE_prsd][pot_8b[tim_dv]];	
 				}				
 			ADC_TMP = (pot_SUM[tim_dv-1]+4)>>3;	
 			if((ADC_TMP>(pot_out[tim_dv-1]+adc_hysteresis))||((ADC_TMP+adc_hysteresis)<pot_out[tim_dv-1]))	////////// HI1	
@@ -212,8 +212,8 @@ void TIM2_IRQHandler(void)
 					pot_out[tim_dv-1] = (pot_out[tim_dv-1]+ADC_TMP+1)>>1;	
 					}
 				pot_8b[tim_dv-1] = pot_convcd(pot_out[tim_dv-1]);	
-				eql1.hg	= EQ_ISO[pot_8b[tim_dv-1]];	
-				eqr1.hg	= EQ_ISO[pot_8b[tim_dv-1]];					
+				eql1.hg	= EQ_26[EQCURVE_prsd][pot_8b[tim_dv-1]];	
+				eqr1.hg	= EQ_26[EQCURVE_prsd][pot_8b[tim_dv-1]];					
 				}
 			}	
 		else if(tim_dv==4)		//////////////////////////////////////////			4			//////////////////////////////////////////
@@ -231,8 +231,8 @@ void TIM2_IRQHandler(void)
 						}	
 					else
 						{	
-						MAX7219_DATA[6] = CFXmask[CFXON-1];	
-						CFXON = 2;	
+						CFXON = 2;		
+						MAX7219_DATA[6] = CFXmask[CFXON-1];
 						}
 					MAX7219_need_update|=0x40;		
 					CFX2_prsd = 1;	
@@ -489,8 +489,8 @@ void TIM2_IRQHandler(void)
 						}	
 					else
 						{	
-						MAX7219_DATA[6] = CFXmask[CFXON-1];	
 						CFXON = 3;	
+						MAX7219_DATA[6] = CFXmask[CFXON-1];	
 						}
 					MAX7219_need_update|=0x40;		
 					CFX3_prsd = 1;	
@@ -543,8 +543,8 @@ void TIM2_IRQHandler(void)
 					pot_out[tim_dv] = (pot_out[tim_dv]+ADC_TMP+1)>>1;	
 					}
 				pot_8b[tim_dv] = pot_convcd(pot_out[tim_dv]);	
-				eql0.lg	= EQ_ISO[pot_8b[tim_dv]];	
-				eqr0.lg	= EQ_ISO[pot_8b[tim_dv]];			
+				eql0.lg	= EQ_26[EQCURVE_prsd][pot_8b[tim_dv]];	
+				eqr0.lg	= EQ_26[EQCURVE_prsd][pot_8b[tim_dv]];			
 				}				
 			ADC_TMP = (pot_SUM[tim_dv-1]+4)>>3;	
 			if((ADC_TMP>(pot_out[tim_dv-1]+adc_hysteresis))||((ADC_TMP+adc_hysteresis)<pot_out[tim_dv-1]))	////////// LOW1		
@@ -558,8 +558,8 @@ void TIM2_IRQHandler(void)
 					pot_out[tim_dv-1] = (pot_out[tim_dv-1]+ADC_TMP+1)>>1;	
 					}
 				pot_8b[tim_dv-1] = pot_convcd(pot_out[tim_dv-1]);	
-				eql1.lg	= EQ_ISO[pot_8b[tim_dv-1]];	
-				eqr1.lg	= EQ_ISO[pot_8b[tim_dv-1]];			
+				eql1.lg	= EQ_26[EQCURVE_prsd][pot_8b[tim_dv-1]];	
+				eqr1.lg	= EQ_26[EQCURVE_prsd][pot_8b[tim_dv-1]];			
 				}	
 			////////added calc code				
 			if((GPIOB->IDR & 0x00000004)==0x00U)			//Bluetooth button
@@ -628,8 +628,8 @@ void TIM2_IRQHandler(void)
 						}	
 					else
 						{	
-						MAX7219_DATA[6] = CFXmask[CFXON-1];	
-						CFXON = 4;	
+						CFXON = 4;		
+						MAX7219_DATA[6] = CFXmask[CFXON-1];
 						}
 					MAX7219_need_update|=0x40;		
 					CFX4_prsd = 1;	
@@ -646,7 +646,20 @@ void TIM2_IRQHandler(void)
 				{
 				if(EQCURVE_prsd==0)
 					{
-					EQCURVE_prsd = 1;	
+					EQCURVE_prsd = 1;
+					//realtime upadete curve
+					eql0.hg	= EQ_26[EQCURVE_prsd][pot_8b[HI0]];	
+					eqr0.hg	= EQ_26[EQCURVE_prsd][pot_8b[HI0]];	
+					eql1.hg	= EQ_26[EQCURVE_prsd][pot_8b[HI1]];	
+					eqr1.hg	= EQ_26[EQCURVE_prsd][pot_8b[HI1]];	
+					eql0.lg	= EQ_26[EQCURVE_prsd][pot_8b[LOW0]];	
+					eqr0.lg	= EQ_26[EQCURVE_prsd][pot_8b[LOW0]];
+					eql1.lg	= EQ_26[EQCURVE_prsd][pot_8b[LOW1]];	
+					eqr1.lg	= EQ_26[EQCURVE_prsd][pot_8b[LOW1]];
+					eql0.mg	= EQ_26[EQCURVE_prsd][pot_8b[MID0]];	
+					eqr0.mg	= EQ_26[EQCURVE_prsd][pot_8b[MID0]];
+					eql1.mg	= EQ_26[EQCURVE_prsd][pot_8b[MID1]];	
+					eqr1.mg	= EQ_26[EQCURVE_prsd][pot_8b[MID1]];
 					}
 				}		
 			else
@@ -654,6 +667,19 @@ void TIM2_IRQHandler(void)
 				if(EQCURVE_prsd==1)
 					{
 					EQCURVE_prsd = 0;	
+					//realtime upadete curve
+					eql0.hg	= EQ_26[EQCURVE_prsd][pot_8b[HI0]];	
+					eqr0.hg	= EQ_26[EQCURVE_prsd][pot_8b[HI0]];	
+					eql1.hg	= EQ_26[EQCURVE_prsd][pot_8b[HI1]];	
+					eqr1.hg	= EQ_26[EQCURVE_prsd][pot_8b[HI1]];	
+					eql0.lg	= EQ_26[EQCURVE_prsd][pot_8b[LOW0]];	
+					eqr0.lg	= EQ_26[EQCURVE_prsd][pot_8b[LOW0]];
+					eql1.lg	= EQ_26[EQCURVE_prsd][pot_8b[LOW1]];	
+					eqr1.lg	= EQ_26[EQCURVE_prsd][pot_8b[LOW1]];
+					eql0.mg	= EQ_26[EQCURVE_prsd][pot_8b[MID0]];	
+					eqr0.mg	= EQ_26[EQCURVE_prsd][pot_8b[MID0]];
+					eql1.mg	= EQ_26[EQCURVE_prsd][pot_8b[MID1]];	
+					eqr1.mg	= EQ_26[EQCURVE_prsd][pot_8b[MID1]];
 					}	
 				}				
 			if((GPIOD->IDR & 0x00000008) != 0x00U)			//Key in 2 (BFX)
@@ -736,9 +762,9 @@ void TIM2_IRQHandler(void)
 						CFXON = 0;			
 						}	
 					else
-						{	
-						MAX7219_DATA[6] = CFXmask[CFXON-1];	
-						CFXON = 5;	
+						{
+						CFXON = 5;		
+						MAX7219_DATA[6] = CFXmask[CFXON-1];
 						}
 					MAX7219_need_update|=0x40;						
 					CFX5_prsd = 1;	
@@ -790,8 +816,8 @@ void TIM2_IRQHandler(void)
 					pot_out[tim_dv] = (pot_out[tim_dv]+ADC_TMP+1)>>1;	
 					}
 				pot_8b[tim_dv] = pot_convcd(pot_out[tim_dv]);	
-				eql0.mg	= EQ_ISO[pot_8b[tim_dv]];	
-				eqr0.mg	= EQ_ISO[pot_8b[tim_dv]];
+				eql0.mg	= EQ_26[EQCURVE_prsd][pot_8b[tim_dv]];	
+				eqr0.mg	= EQ_26[EQCURVE_prsd][pot_8b[tim_dv]];
 				}				
 			ADC_TMP = (pot_SUM[tim_dv-1]+4)>>3;	
 			if((ADC_TMP>(pot_out[tim_dv-1]+adc_hysteresis))||((ADC_TMP+adc_hysteresis)<pot_out[tim_dv-1]))	////////// MID1	
@@ -805,8 +831,8 @@ void TIM2_IRQHandler(void)
 					pot_out[tim_dv-1] = (pot_out[tim_dv-1]+ADC_TMP+1)>>1;	
 					}
 				pot_8b[tim_dv-1] = pot_convcd(pot_out[tim_dv-1]);	
-				eql1.mg	= EQ_ISO[pot_8b[tim_dv-1]];	
-				eqr1.mg	= EQ_ISO[pot_8b[tim_dv-1]];		
+				eql1.mg	= EQ_26[EQCURVE_prsd][pot_8b[tim_dv-1]];	
+				eqr1.mg	= EQ_26[EQCURVE_prsd][pot_8b[tim_dv-1]];		
 				}	
 			}	
 		else if(tim_dv==12)		//////////////////////////////////////////			12			//////////////////////////////////////////
@@ -824,8 +850,8 @@ void TIM2_IRQHandler(void)
 						}	
 					else
 						{	
-						MAX7219_DATA[6] = CFXmask[CFXON-1];	
 						CFXON = 6;	
+						MAX7219_DATA[6] = CFXmask[CFXON-1];	
 						}
 					MAX7219_need_update|=0x40;
 					CFX6_prsd = 1;	
@@ -902,7 +928,7 @@ void TIM2_IRQHandler(void)
 					pot_out[tim_dv] = (pot_out[tim_dv]+ADC_TMP+1)>>1;	
 					}
 				pot_8b[tim_dv] = pot_convln(pot_out[tim_dv]);	
-				FDR0_ATT = VR_LOG[pot_8b[tim_dv]];	
+				FDR0_ATT = VR_FDR[pot_8b[tim_dv]];	
 				}				
 			ADC_TMP = (pot_SUM[tim_dv-1]+4)>>3;	
 			if((ADC_TMP>(pot_out[tim_dv-1]+adc_hysteresis))||((ADC_TMP+adc_hysteresis)<pot_out[tim_dv-1]))	////////// FDR1	
@@ -916,7 +942,7 @@ void TIM2_IRQHandler(void)
 					pot_out[tim_dv-1] = (pot_out[tim_dv-1]+ADC_TMP+1)>>1;	
 					}
 				pot_8b[tim_dv-1] = pot_convln(pot_out[tim_dv-1]);
-				FDR1_ATT = VR_LOG[pot_8b[tim_dv-1]];	
+				FDR1_ATT = VR_FDR[pot_8b[tim_dv-1]];	
 				}						
 			}	
 		else if(tim_dv==14)		//////////////////////////////////////////			14			//////////////////////////////////////////
@@ -934,8 +960,8 @@ void TIM2_IRQHandler(void)
 						}	
 					else
 						{	
-						MAX7219_DATA[6] = CFXmask[CFXON-1];	
-						CFXON = 7;	
+						CFXON = 7;		
+						MAX7219_DATA[6] = CFXmask[CFXON-1];
 						}
 					MAX7219_need_update|=0x40;
 					CFX7_prsd = 1;	
@@ -1023,18 +1049,20 @@ void TIM2_IRQHandler(void)
 			TRM1_ATT = TRM[pot_8b[tim_dv-1]];	
 			}	
 		////////added calc code	
-		if(CRSFCURVE_scan==0)
+		if(CRSFCURVE!=CRSFCURVE_scan)
 			{
-			CRSFCURVE = 0;	
+			if(CRSFCURVE_scan<3)
+				{
+				CRSFCURVE = CRSFCURVE_scan;	
+				}
+			else
+				{
+				CRSFCURVE = 2;	
+				}
+			//realtime updete crossfader
+			CRSF0_ATT = CRSF_POS[CRSFCURVE][127-CRSF_midi];
+			CRSF1_ATT = CRSF_POS[CRSFCURVE][CRSF_midi];	
 			}			
-		else if(CRSFCURVE_scan==1)
-			{
-			CRSFCURVE = 1;	
-			}	
-		else
-			{
-			CRSFCURVE = 2;	
-			}	
 		CRSFCURVE_scan = 0;
 		if(cnt_ad<7)
 			{

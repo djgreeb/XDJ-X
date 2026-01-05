@@ -83,9 +83,9 @@ uint8_t CUE1_prsd = 0;
 uint8_t CUE2_prsd = 0;
 uint8_t BT_bBUTT_prsd = 0; 
 
-const uint8_t CFXmask[8] = {0xFE, 0xFD, 0xFB, 0xF7, 0xEF, 0xDF, 0xBF, 0x7F};
+const static uint8_t CFXmask[8] = {0xFE, 0xFD, 0xFB, 0xF7, 0xEF, 0xDF, 0xBF, 0x7F};
 uint8_t CFXON = 0;				//0 - disable, 1...8 - run effect
-uint8_t BFXON = 0;				//0 - disable, 1 - run effect
+uint8_t BFXON = 0;		 		//0 - disable, 1 - run effect
 uint8_t CUE1ON = 0;
 uint8_t CUE2ON = 0;
 
@@ -116,7 +116,10 @@ uint8_t blink_sync = 0;	//internal divider for very slow friquency blinking
 uint16_t pot_ADC[16][8] = {0};
 uint32_t pot_SUM[16] = {0};
 uint16_t pot_out[16];					//potenciometer value after gysteresis 0..4095 approx
-uint8_t  pot_8b[16] = {0};		//potenciometer value (after conversion 4095 to 255) 0..255 approx
+uint8_t pot_8b[16] = {0};		//potenciometer value (after conversion 4095 to 255) 0..255 approx
+uint8_t prev_pot_8b_CFX0;
+uint8_t prev_pot_8b_CFX1;
+uint8_t prev_pot_8b_PRMT;
 uint32_t ADC_TMP;
 uint8_t cnt_ad = 0;
 uint16_t ADC_prev[4];
@@ -132,7 +135,7 @@ uint16_t ADC_prev[4];
 #define POTxCD2	279				//
 
 /* CROSSFADER ---------------------------------------------------------*/
-uint8_t CRSF_midi = 0;
+uint8_t CRSF_midi = 63;
 
 /* LINK UART5 ---------------------------------------------------------*/
 uint32_t link_usart_timeout = 0;
@@ -157,5 +160,5 @@ uint8_t B = 0;
 uint8_t last_bit_time = 0xFF;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-				
-																																									
+								
+

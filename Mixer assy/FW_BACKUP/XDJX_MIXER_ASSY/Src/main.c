@@ -171,6 +171,16 @@
 //	-	The frequency of checking and sending the in-air status has been changed
 //	-	crossfader curves added
 //	- EQ ISO curve added
+//	ver. 0.51
+//	-	LEDs CFX blink buf fixed
+//	- EQ -26dB curve added (pio curve dump)
+//	-	CRSFCURVE realtime update added
+//	-	CFX FITER added
+//
+//
+//
+//
+//
 //
 //
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -197,7 +207,7 @@
 
 /* USER CODE BEGIN PV */
 
-uint16_t FW_VER = 44;
+uint16_t FW_VER = 51;
 
 #include "global_variables.h"
 
@@ -278,10 +288,10 @@ int main(void)
 	MAX7219_INIT();
 	HAL_Delay(2900);
 	
-	init_3band_state(&eql0, 950, 3900, 44100);		//880 4000
-	init_3band_state(&eqr0, 950, 3900, 44100);		//
-	init_3band_state(&eql1, 950, 3900, 44100);		//
-	init_3band_state(&eqr1, 950, 3900, 44100);		//
+	init_3band_state(&eql0, 850, 3500, 44100);		//850 3500 pio standart
+	init_3band_state(&eqr0, 850, 3500, 44100);		//
+	init_3band_state(&eql1, 850, 3500, 44100);		//
+	init_3band_state(&eqr1, 850, 3500, 44100);		//
 	
 	
 	HAL_GPIO_WritePin(TFT_RST_GPIO_Port, TFT_RST_Pin, GPIO_PIN_SET);
@@ -513,6 +523,10 @@ int main(void)
 			TIM3->CCR2 = 0;	
 			HAL_GPIO_WritePin(GPIOC, PAEN_Pin, GPIO_PIN_RESET);			//analog power off	
 			BT_LED_OFF;	
+			CFXON = 0;	
+			BFXON = 0;			
+			CUE1ON = 0;
+			CUE2ON = 0;
 			MAX7219_DATA[0] = 0x00;	
 			MAX7219_DATA[1] = 0x00;
 			MAX7219_DATA[2] = 0x00;
@@ -532,6 +546,25 @@ int main(void)
 			}		
 		link_new_data = 0;	
 		}
+		
+		
+	if(prev_pot_8b_CFX0!=pot_8b[CFX0])		///FILTER CH1
+		{
+		prev_pot_8b_CFX0 = pot_8b[CFX0];
+		CALC_CUTF_0();		
+		}
+	if(prev_pot_8b_CFX1!=pot_8b[CFX1])		///FILTER CH2
+		{
+		prev_pot_8b_CFX1 = pot_8b[CFX1];		
+		CALC_CUTF_1();		
+		}
+	if(prev_pot_8b_PRMT!=pot_8b[PRMT])		/// QFAC
+		{
+		prev_pot_8b_PRMT = pot_8b[PRMT];	
+		CALC_CUTF_0();		
+		CALC_CUTF_1();	
+		}				
+		
 		
     /* USER CODE END WHILE */
 

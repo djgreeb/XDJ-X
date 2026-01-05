@@ -71,7 +71,7 @@ double do_3band(EQSTATE* es, double sample)
   double  l,m,h;      // Low / Mid / High - Sample Values
 
   // Filter #1 (lowpass)
-  es->f1p0  += (es->lf * (sample   - es->f1p0)) + vsa;
+  es->f1p0  += (es->lf * (sample   - es->f1p0))+ vsa;
   es->f1p1  += (es->lf * (es->f1p0 - es->f1p1));
   es->f1p2  += (es->lf * (es->f1p1 - es->f1p2));
   es->f1p3  += (es->lf * (es->f1p2 - es->f1p3));
@@ -102,7 +102,307 @@ double do_3band(EQSTATE* es, double sample)
 	}
 	
 	
+///////////////////////////////////////////////
+//
+//	CALC_CUTF_0	
+//	
+void CALC_CUTF_0(void)
+	{
+	if(pot_8b[CFX0]<128)
+		{
+		fcutoff_0 = VR_VCFx116[pot_8b[CFX0]];	
+		resonanse_0 = VR_QFAC[pot_8b[PRMT]]*VR_VCF1minusKV[pot_8b[CFX0]];		
+		}
+	else if(pot_8b[CFX0]>128)
+		{
+		fcutoff_0h = VR_VCFx116[pot_8b[CFX0]-129];	
+		resonanse_0h = VR_QFAC[pot_8b[PRMT]]*VR_VCF1minusKV[pot_8b[CFX0]-129];		
+		}		
+	};
+
+///////////////////////////////////////////////
+//
+//	CALC_CUTF_1	
+//	
+void CALC_CUTF_1(void)
+	{
+	if(pot_8b[CFX1]<128)
+		{
+		fcutoff_1 = VR_VCFx116[pot_8b[CFX1]];
+		resonanse_1 = VR_QFAC[pot_8b[PRMT]]*VR_VCF1minusKV[pot_8b[CFX1]];
+		}	
+	else if(pot_8b[CFX1]>128)
+		{
+		fcutoff_1h = VR_VCFx116[pot_8b[CFX1]-129];	
+		resonanse_1h = VR_QFAC[pot_8b[PRMT]]*VR_VCF1minusKV[pot_8b[CFX1]-129];		
+		}		
+	};	
 	
+
+/////////////////////////////////	
+//
+// filter 
+//		
+float MoogVCF_0(float input_0, float f_0, float fb_0)
+	{	
+  input_0 -= out4_0 * fb_0;
+  input_0 *= 0.35013 * (f_0*f_0)*(f_0*f_0);		
+  out1_0 = input_0 + 0.3 * in1_0 + (1 - f_0) * out1_0; // Pole 1
+  in1_0  = input_0;
+  out2_0 = out1_0 + 0.3 * in2_0 + (1 - f_0) * out2_0;  // Pole 2
+  in2_0  = out1_0;
+  out3_0 = out2_0 + 0.3 * in3_0 + (1 - f_0) * out3_0;  // Pole 3
+  in3_0  = out2_0;
+  out4_0 = out3_0 + 0.3 * in4_0 + (1 - f_0) * out4_0;  // Pole 4
+  in4_0  = out3_0;
+	return TRIM_FILTER[pot_8b[PRMT]]*out4_0;	
+	};	
+
+/////////////////////////////////	
+//
+// filter 
+//		
+float MoogVCF_1(float input_1, float f_1, float fb_1)
+	{
+  input_1 -= out4_1 * fb_1;
+  input_1 *= 0.35013 * (f_1*f_1)*(f_1*f_1);		
+  out1_1 = input_1 + 0.3 * in1_1 + (1 - f_1) * out1_1; // Pole 1
+  in1_1  = input_1;
+  out2_1 = out1_1 + 0.3 * in2_1 + (1 - f_1) * out2_1;  // Pole 2
+  in2_1  = out1_1;
+  out3_1 = out2_1 + 0.3 * in3_1 + (1 - f_1) * out3_1;  // Pole 3
+  in3_1  = out2_1;
+  out4_1 = out3_1 + 0.3 * in4_1 + (1 - f_1) * out4_1;  // Pole 4
+  in4_1  = out3_1;
+	return TRIM_FILTER[pot_8b[PRMT]]*out4_1;	
+	};		
+
+/////////////////////////////////	
+//
+// filter 
+//		
+float MoogVCF_2(float input_2, float f_2, float fb_2)
+	{
+  input_2 -= out4_2 * fb_2;
+  input_2 *= 0.35013 * (f_2*f_2)*(f_2*f_2);		
+  out1_2 = input_2 + 0.3 * in1_2 + (1 - f_2) * out1_2; // Pole 1
+  in1_2  = input_2;
+  out2_2 = out1_2 + 0.3 * in2_2 + (1 - f_2) * out2_2;  // Pole 2
+  in2_2  = out1_2;
+  out3_2 = out2_2 + 0.3 * in3_2 + (1 - f_2) * out3_2;  // Pole 3
+  in3_2  = out2_2;
+  out4_2 = out3_2 + 0.3 * in4_2 + (1 - f_2) * out4_2;  // Pole 4
+  in4_2  = out3_2;
+	return TRIM_FILTER[pot_8b[PRMT]]*out4_2;	
+	};			
+
+/////////////////////////////////	
+//
+// filter 
+//		
+float MoogVCF_3(float input_3, float f_3, float fb_3)
+	{
+  input_3 -= out4_3 * fb_3;
+  input_3 *= 0.35013 * (f_3*f_3)*(f_3*f_3);		
+  out1_3 = input_3 + 0.3 * in1_3 + (1 - f_3) * out1_3; // Pole 1
+  in1_3  = input_3;
+  out2_3 = out1_3 + 0.3 * in2_3 + (1 - f_3) * out2_3;  // Pole 2
+  in2_3  = out1_3;
+  out3_3 = out2_3 + 0.3 * in3_3 + (1 - f_3) * out3_3;  // Pole 3
+  in3_3  = out2_3;
+  out4_3 = out3_3 + 0.3 * in4_3 + (1 - f_3) * out4_3;  // Pole 4
+  in4_3  = out3_3;
+	return TRIM_FILTER[pot_8b[PRMT]]*out4_3;	
+	};			
+	
+	
+///////////////////////////////////////////////////////////////HPF FILTERS////////////////////////////////////////////////////
+
+
+/////////////////////////////////	
+//
+// filter 
+//		
+float MoogHVCF_0(float input_0h, float f_0h, float fb_0h)
+	{
+	tmpin_0 = input_0h;	
+  input_0h -= out4_0h * fb_0h;
+  input_0h *= 0.35013 * (f_0h*f_0h)*(f_0h*f_0h);		
+  out1_0h = input_0h + 0.3 * in1_0h + (1 - f_0h) * out1_0h; // Pole 1
+  in1_0h  = input_0h;
+  out2_0h = out1_0h + 0.3 * in2_0h + (1 - f_0h) * out2_0h;  // Pole 2
+  in2_0h  = out1_0h;
+  out3_0h = out2_0h + 0.3 * in3_0h + (1 - f_0h) * out3_0h;  // Pole 3
+  in3_0h  = out2_0h;
+  out4_0h = out3_0h + 0.3 * in4_0h + (1 - f_0h) * out4_0h;  // Pole 4
+  in4_0h  = out3_0h;
+  return tmpin_0-(TRIM_FILTER[pot_8b[PRMT]]*out4_0h);
+	};	
+
+/////////////////////////////////	
+//
+// filter 
+//		
+float MoogHVCF_1(float input_1h, float f_1h, float fb_1h)
+	{
+	tmpin_1 = input_1h;	
+  input_1h -= out4_1h * fb_1h;
+  input_1h *= 0.35013 * (f_1h*f_1h)*(f_1h*f_1h);		
+  out1_1h = input_1h + 0.3 * in1_1h + (1 - f_1h) * out1_1h; // Pole 1
+  in1_1h  = input_1h;
+  out2_1h = out1_1h + 0.3 * in2_1h + (1 - f_1h) * out2_1h;  // Pole 2
+  in2_1h  = out1_1h;
+  out3_1h = out2_1h + 0.3 * in3_1h + (1 - f_1h) * out3_1h;  // Pole 3
+  in3_1h  = out2_1h;
+  out4_1h = out3_1h + 0.3 * in4_1h + (1 - f_1h) * out4_1h;  // Pole 4
+  in4_1h  = out3_1h;
+  return tmpin_1-(TRIM_FILTER[pot_8b[PRMT]]*out4_1h);
+	};		
+
+/////////////////////////////////	
+//
+// filter 
+//		
+float MoogHVCF_2(float input_2h, float f_2h, float fb_2h)
+	{
+	tmpin_2 = input_2h;	
+  input_2h -= out4_2h * fb_2h;
+  input_2h *= 0.35013 * (f_2h*f_2h)*(f_2h*f_2h);		
+  out1_2h = input_2h + 0.3 * in1_2h + (1 - f_2h) * out1_2h; // Pole 1
+  in1_2h  = input_2h;
+  out2_2h = out1_2h + 0.3 * in2_2h + (1 - f_2h) * out2_2h;  // Pole 2
+  in2_2h  = out1_2h;
+  out3_2h = out2_2h + 0.3 * in3_2h + (1 - f_2h) * out3_2h;  // Pole 3
+  in3_2h  = out2_2h;
+  out4_2h = out3_2h + 0.3 * in4_2h + (1 - f_2h) * out4_2h;  // Pole 4
+  in4_2h  = out3_2h;
+  return tmpin_2-(TRIM_FILTER[pot_8b[PRMT]]*out4_2h);
+	};			
+
+/////////////////////////////////	
+//
+// filter 
+//		
+float MoogHVCF_3(float input_3h, float f_3h, float fb_3h)
+	{
+	tmpin_3 = input_3h;	
+  input_3h -= out4_3h * fb_3h;
+  input_3h *= 0.35013 * (f_3h*f_3h)*(f_3h*f_3h);		
+  out1_3h = input_3h + 0.3 * in1_3h+ (1 - f_3h) * out1_3h; // Pole 1
+  in1_3h  = input_3h;
+  out2_3h = out1_3h + 0.3 * in2_3h + (1 - f_3h) * out2_3h;  // Pole 2
+  in2_3h  = out1_3h;
+  out3_3h = out2_3h + 0.3 * in3_3h + (1 - f_3h) * out3_3h;  // Pole 3
+  in3_3h  = out2_3h;
+  out4_3h = out3_3h + 0.3 * in4_3h + (1 - f_3h) * out4_3h;  // Pole 4
+  in4_3h  = out3_3h;
+  return tmpin_3-(TRIM_FILTER[pot_8b[PRMT]]*out4_3h);
+	};			
+	
+	
+//////////////////////////////////////////////////////////
+//	CFX process
+//	
+float CFX0r(float in)
+	{
+	if(CFXON==8)
+		{
+		if(pot_8b[CFX0]<128)	//LPF
+			{
+			return MoogVCF_0(in, fcutoff_0, resonanse_0);
+			}	
+		else if(pot_8b[CFX0]==128)		//disable filter
+			{
+			return in;	
+			}
+		else	//HPF
+			{
+			return MoogHVCF_0(in, fcutoff_0h, resonanse_0h);
+			}	
+		}
+	else
+		{
+		return in;	
+		}
+	};	
+
+//////////////////////////////////////////////////////////
+//	CFX process
+//	
+float CFX0l(float in)
+	{
+	if(CFXON==8)
+		{
+		if(pot_8b[CFX0]<128)	//LPF
+			{
+			return MoogVCF_1(in, fcutoff_0, resonanse_0);
+			}	
+		else if(pot_8b[CFX0]==128)		//disable filter
+			{
+			return in;	
+			}
+		else	//HPF
+			{
+			return MoogHVCF_1(in, fcutoff_0h, resonanse_0h);
+			}	
+		}
+	else
+		{
+		return in;	
+		}
+	};	
+	
+//////////////////////////////////////////////////////////
+//	CFX process
+//	
+float CFX1r(float in)
+	{
+	if(CFXON==8)
+		{
+		if(pot_8b[CFX1]<128)	//LPF
+			{
+			return MoogVCF_2(in, fcutoff_1, resonanse_1);
+			}	
+		else if(pot_8b[CFX1]==128)		//disable filter
+			{
+			return in;	
+			}
+		else	//HPF
+			{
+			return MoogHVCF_2(in, fcutoff_1h, resonanse_1h);
+			}	
+		}
+	else
+		{
+		return in;	
+		}
+	};	
+	
+//////////////////////////////////////////////////////////
+//	CFX process
+//	
+float CFX1l(float in)
+	{
+	if(CFXON==8)
+		{
+		if(pot_8b[CFX1]<128)	//LPF
+			{
+			return MoogVCF_3(in, fcutoff_1, resonanse_1);
+			}	
+		else if(pot_8b[CFX1]==128)		//disable filter
+			{
+			return in;	
+			}
+		else	//HPF
+			{
+			return MoogHVCF_3(in, fcutoff_1h, resonanse_1h);
+			}	
+		}
+	else
+		{
+		return in;	
+		}
+	};	
 	
 	
 	
@@ -116,10 +416,10 @@ void SAI1_IRQHandler(void)
 	HAL_SAI_IRQHandler(&hsai_BlockA1);
 
 	//TRIM +EQ		
-	POSTEQCH0[0] = do_3band(&eql0, CH0IN[0]*TRM0_ATT);	
-	POSTEQCH0[1] = do_3band(&eqr0, CH0IN[1]*TRM0_ATT);	
-	POSTEQCH1[0] = do_3band(&eql1, CH1IN[0]*TRM1_ATT);	
-	POSTEQCH1[1] = do_3band(&eqr1, CH1IN[1]*TRM1_ATT);	
+	POSTEQCH0[0] = do_3band(&eql0, CFX0r(CH0IN[0]*TRM0_ATT));	
+	POSTEQCH0[1] = do_3band(&eqr0, CFX0l(CH0IN[1]*TRM0_ATT));	
+	POSTEQCH1[0] = do_3band(&eql1, CFX1r(CH1IN[0]*TRM1_ATT));	
+	POSTEQCH1[1] = do_3band(&eqr1, CFX1l(CH1IN[1]*TRM1_ATT));	
 	
 	if(POSTEQCH0[0]<0)
 		{
