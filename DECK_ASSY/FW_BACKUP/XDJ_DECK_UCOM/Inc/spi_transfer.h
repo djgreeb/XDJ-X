@@ -30,7 +30,7 @@ uint16_t pot_convcd(uint16_t dt)
 			}		
 		else	//0...511
 			{	
-			res = dt-POTL;		//2000
+			res = dt-POTL;		//2060
 			res*=POTxCD1;
 			return (res>>12);
 			}
@@ -45,7 +45,7 @@ uint16_t pot_convcd(uint16_t dt)
 			{
 			dt = POTH;	
 			}	
-		res = dt-POTCH;		//1914
+		res = dt-POTCH;		//1974
 		res*=POTxCD2;
 		return ((res>>12)+512);
 		}		
@@ -395,7 +395,7 @@ void DMA2_Stream3_IRQHandler(void)
 			if(animation_enable==0)
 				{
 				prev_cue_sect = deckRbuf[6];	
-				if((prev_cue_sect<85) && (prev_slip_sect>84))
+				if((prev_cue_sect<86) && (prev_slip_sect>84))
 					{
 					draw_cue_sector(prev_cue_sect);	
 					}
@@ -925,7 +925,7 @@ void DMA2_Stream3_IRQHandler(void)
 			if(animation_enable==0)
 				{
 				prev_cue_sect = deckRbuf[14];	
-				if((prev_cue_sect<85) && (prev_slip_sect>84))
+				if((prev_cue_sect<86) && (prev_slip_sect>84))
 					{
 					draw_cue_sector(prev_cue_sect);	
 					}

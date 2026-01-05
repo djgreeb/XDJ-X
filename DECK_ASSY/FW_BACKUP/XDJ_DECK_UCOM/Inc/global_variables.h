@@ -28,7 +28,6 @@ uint8_t VFL_DATA[48] = {0x60, 0x00, 0x00, 0x00,
 												0x00, 0x00, 0x00, 0x00,
 												0x00, 0x00, 0x00, 0x00,
 												0x00, 0x00, 0x00, 0x00 };
-
 																								
 #define	LAT_L		GPIOC->BSRR = 0x08000000  //HAL_GPIO_WritePin(LAT_GPIO_Port, LAT_Pin, GPIO_PIN_RESET);
 #define	LAT_H		GPIOC->BSRR = 0x00000800  //HAL_GPIO_WritePin(LAT_GPIO_Port, LAT_Pin, GPIO_PIN_SET);								
@@ -135,15 +134,12 @@ uint8_t cnt_ad = 0;
 #define adc_hysteresis2	15	
 
 #define POTL	20						//for conversion 4095 to 255
-#define POTCL	2021					//		2091 - center
-#define POTCH	2161					//
+#define POTCL	2081					//		2091 - center
+#define POTCH	2101					//
 #define POTH	4075					//	
 
-
-#define POTxCD1	1047					//				
-#define POTxCD2	1094					//
-
-
+#define POTxCD1	1018					//				
+#define POTxCD2	1062					//
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

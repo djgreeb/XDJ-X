@@ -122,7 +122,7 @@
 //		- slip mode round clear fixed
 //		- adc pitch gysteresis added 
 //	ver. 0.31
-//		- PWM ring is changed
+//		- PWM ring have been changed
 //	ver. 0.34
 //		- load animation added
 //		- power animation added
@@ -131,6 +131,14 @@
 //		- improved jog encoder code
 //	ver. 0.39
 //		-	The WH2812B data transfer lib has been modified due to the SPI frequency not being suitable for 4-bit data transfer. The buffer has been changed from 100=>75 bytes. 4=>3 bit data transfer.
+//	ver. 0.41
+//		-	draw_cue_sector (prev_cue_sect<86) bug fixed
+//		- startup pads color have been changed
+//		- pitch ADC (pot_convcd, POTCL, POTCH, POTxCD1, POTxCD2) have been changed
+//
+//
+//
+//
 //
 //
 //
@@ -157,7 +165,7 @@
 #include "CRC.h"
 extern DMA_HandleTypeDef hdma_spi1_tx;
 
-uint8_t FIRMWARE_VERSION = 39;			//127 max!
+uint8_t FIRMWARE_VERSION = 41;			//127 max!
 
 /* USER CODE END PV */
 
@@ -252,14 +260,14 @@ int main(void)
 	HAL_SPI_TransmitReceive_DMA(&hspi1, deckTbuf, deckRbuf, 16);
 
 	HAL_Delay(300);				
-	COLOR_SET(0xFFA5006D, 0);
-	COLOR_SET(0xFFA5006D, 1);
-	COLOR_SET(0xFFA5006D, 2);
-	COLOR_SET(0xFFA5006D, 3);
-	COLOR_SET(0xFFA5006D, 4);
-	COLOR_SET(0xFFA5006D, 5);
-	COLOR_SET(0xFFA5006D, 6);
-	COLOR_SET(0xFFA5006D, 7);		
+	COLOR_SET(0xFF780030, 0);
+	COLOR_SET(0xFF780030, 1);
+	COLOR_SET(0xFF780030, 2);
+	COLOR_SET(0xFF780030, 3);
+	COLOR_SET(0xFF780030, 4);
+	COLOR_SET(0xFF780030, 5);
+	COLOR_SET(0xFF780030, 6);
+	COLOR_SET(0xFF780030, 7);		
 	HAL_SPI_Transmit_DMA(&hspi2, PAD_BUF, 75);		
 		
 	HAL_GPIO_WritePin(GPIOC, LED_PLAY_Pin, GPIO_PIN_SET);
