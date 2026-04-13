@@ -1,6 +1,6 @@
 Configuration	XDJX
 STM32CubeMX 	6.10.0
-Date	06/20/2025
+Date	01/08/2026
 MCU	STM32H743XIHx
 
 
@@ -444,7 +444,7 @@ SOFTWARE PROJECT
 
 Project Settings : 
 Project Name : XDJX
-Project Folder : C:\Keil_v5\My_Project\XDJX
+Project Folder : C:\Keil_v5\Projects\XDJX
 Toolchain / IDE : MDK-ARM V5.32
 Firmware Package Name and Version : STM32Cube FW_H7 V1.11.1
 

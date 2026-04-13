@@ -260,6 +260,118 @@
 //	ver. 1.25
 //	- added 30 sec markers
 //	- added waveform left posotion
+//	ver. 1.26
+//	- track name and artist name added
+//	ver. 1.27
+//	-	BROWSER GUI added
+//	-	NAVIGATOR func. added
+//	-	Key icon added
+//	-	bmp background disabled
+//	ver. 1.28
+//	- font Font7W dynamic width added
+//	ver. 1.29
+//	-	phase bar sync added
+//	- CUE+SHIFT combination fixed
+//	ver. 1.30
+//	-	the algorithm for searching the current bar has been changed
+//	-	added code for determining the synchronization phase
+//	ver. 1.31
+//	- BEATGRID array from 1/150 frames migrated in ms 
+//	- pitch band sensivity changed
+//	ver. 1.32
+//	- Bug fixed synchronization phase bar code
+//	ver. 1.33
+//	-	PADs leds control added
+//	ver. 1.35
+//	- 4 panel buttons added
+//	-	TAG LIST, BROWSE INFO code uncommented
+//	ver. 1.36
+//	- noise button filter added
+//	- MENU long press code added
+//	-	UTILITY const func. added
+//	ver. 1.37
+//	-	MENU code bug fixed
+//	ver. 1.39
+//	- GUI INFO bug fixed
+//	ver. 1.40
+//	- GUI UTILITY improved
+//	ver. 1.41
+//	- GUI UTILITY improved
+//	ver. 1.42
+//	- XDJX.sct: LR_IROM1 and ER_IROM1 is changes size for H743	
+//	- GUI animation code added
+//	ver. 1.43
+//	-	GUI improved
+//	ver. 1.45
+//	-	modify int_DRAW_TRANSPARENT_BAR, added alpha pallette in qspi
+//	ver. 1.46
+//	-	added realtime load parameter color jog
+//	- added bar colors
+//	ver. 1.47
+//	- GUI
+//	ver. 1.49
+//	- GUI improved Browse, Taglist, Playlist
+//	ver. 1.50
+//	- improved GUI Utility 	
+//	- RGB waveform color map is changed
+//	- Track name bars is changed
+//	ver. 1.51
+//	-	static waveform wide is changed 203px => 202px
+//	- improved DrawMinuteMarkers func.
+//	ver. 1.53
+//	- screenshot debug code added
+//	- GUI improved
+//	ver. 1.54
+//	- RGB waveform color map is changed
+//	- GUI improved
+//	ver. 1.55
+//	-	Track number in info mode added
+//	ver. 1.57
+//	-	Rekordbox logo added
+//	ver. 1.58
+//	-	Track number icon adden in INFO MODE
+//	ver. 1.59
+//	- reconfig FMC clk 67MHz => 135,5MHz   PeriphClkInitStruct.PLL2.PLL2R = 1;
+//	-	Optimization level -O3
+//	-	speed SDRAM test added
+//	-	LL_FillBuffer is changed
+//	ver. 1.61
+//	-	Unicode, CP866 filename support added
+//	ver. 1.62
+//	-	Rekordbox database parser update up to ver. 0.44
+//	-	Cyrillic Pioneer font added
+//	ver. 1.64
+//	-	Rekordbox database parser ver. 0.45, KEYSmatchtable bug fixed
+//	ver. 1.65
+//	- improved gui func.
+//	ver. 1.67
+//	- improved gui func.
+//	-	FIRCoef is changed to Cut Frequency: 8.1KHz
+//	ver. 1.69
+//	- SLIP yellow cursor added
+//	- minor GUI bugs fixed
+//	ver. 1.71
+//	- minor GUI bugs fixed
+//	- TRACK INFO window has been changed
+//	ver. 1.72
+//	- PADS hadler added
+//	ver. 1.73
+//	-	pads_a.h, pads_b.h added
+//	ver. 1.74
+//	-	fatfs_operations.h added
+//	-	optimizing open file commands in fatfs
+//	ver. 1.75 
+//	-	created a common LOAD_TRACK function to load the left and right decks
+//	ver. 1.76
+//	-	Rekordbox database parser update up to ver. 0.47: expanded to 1024 tracks, 2048 mentions and 40 playlists
+//	ver. 1.78
+//	-	change waveform buffer (created 5 buffers)
+//	-	exit utilities using the Back button
+//	ver. 1.81
+//	-	Rekordbox database parser ver. 0.51, playlists>20 bug fixed
+//
+//
+//
 //
 //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////	
@@ -284,7 +396,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-char FIRMWARE_VERSION[] = "1.25";	
+char FIRMWARE_VERSION[] = "1.81";	
 #define DEBUG_UART_EN				//sending work status to uart
 #include "global_variables.h"
 #include "audio.h"
@@ -295,6 +407,7 @@ char FIRMWARE_VERSION[] = "1.25";
 #include "deck_transfer.h"
 #include "rekordbox.h"
 #include "spi_mem.h"
+#include "screenshot.h"
 
 
 
@@ -302,8 +415,6 @@ char FIRMWARE_VERSION[] = "1.25";
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
-
 
 
 
@@ -337,6 +448,7 @@ static void MPU_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void GET_SD_INFO(void);								//check used and free memory on sd card
 
 /* USER CODE END 0 */
 
@@ -421,8 +533,22 @@ int main(void)
 	BSP_LCD_LayerDefaultInit(1, LCD_FRAME_BUFFER_2);
 	
 	#if defined(DEBUG_UART_EN)	
-	sprintf((char*)U_TX_DATA, "%01lu error\n\r", i);	
-	UART_TX(&huart4, U_TX_DATA, 9, 5);	
+	i = HAL_GetTick();
+	for(a=0;a<8912896;a++)
+		{
+		PCM[0][0][0][a] = a%60105;	
+		}
+	for(a=0;a<8912896;a++)
+		{
+		if(PCM[0][0][0][a]!=(a%60105))
+			{
+			sprintf((char*)U_TX_DATA, "%03lu SDRAM error\n\r", i);	
+			UART_TX(&huart4, U_TX_DATA, 17, 5);
+			HAL_Delay(50);		
+			}
+		}
+	sprintf((char*)U_TX_DATA, "SDRAM speed test: %01lu ms\n\r", HAL_GetTick() - i);	
+	UART_TX(&huart4, U_TX_DATA, 28, 5);		
 	#endif
 	
 	i = 0;
@@ -447,21 +573,24 @@ int main(void)
 		}	
 		
 	tempo_range[dkA] = UT_SET[4];		
+	tempo_range[dkB] = UT_SET[4];	
+	acceleration_UP = UT_SET[7];
+	acceleration_DOWN = UT_SET[8];	
 		
 	for(j=0;j<8;j++)
 		{
 		deckTbuf[j][0] = 24+j;	
-		deckTbuf[j][1] = 0x20;
-		deckTbuf[j][2] = 0x30;
-		deckTbuf[j][3] = 0x40;
+		deckTbuf[j][1] = 0x00;
+		deckTbuf[j][2] = 0x00;
+		deckTbuf[j][3] = 0x00;
 		deckTbuf[j][4] = 135;	//play pos
 		deckTbuf[j][5] = 85;	
 		deckTbuf[j][6] = 85;
 		deckTbuf[j][7] = 0xFF;
 		deckTbuf[j][8] = 24+j;	
-		deckTbuf[j][9] = 0x20;
-		deckTbuf[j][10] = 0x30;
-		deckTbuf[j][11] = 0x40;
+		deckTbuf[j][9] = 0x00;
+		deckTbuf[j][10] = 0x00;
+		deckTbuf[j][11] = 0x00;
 		deckTbuf[j][12] = 135;	//play pos	
 		deckTbuf[j][13] = 85;	
 		deckTbuf[j][14] = 85;
@@ -484,6 +613,9 @@ int main(void)
 		}
 	SET_JOG_COLOR(dkA, jog_work_color[dkA]);	
 	SET_JOG_COLOR(dkB, jog_work_color[dkB]);	
+		
+	HAL_GPIO_WritePin(LED_BROWSE_GPIO_Port, LED_BROWSE_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOH, LED_TAGLIST_Pin|LED_INFO_Pin|LED_MENU_Pin, GPIO_PIN_SET);		
 		
 	HAL_TIM_Base_Start_IT(&htim2);									//start deck transfer timer
 	HAL_GPIO_WritePin(GPIOH, P8EN_Pin, GPIO_PIN_SET);	
@@ -508,11 +640,12 @@ int main(void)
 	DrawLOGO();	
 	HAL_TIM_Base_Start_IT(&htim3);		
 
+	HAL_GPIO_WritePin(LED_BROWSE_GPIO_Port, LED_BROWSE_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOH, LED_TAGLIST_Pin|LED_INFO_Pin|LED_MENU_Pin, GPIO_PIN_RESET);	
+
 	res = f_mount(&FAT, "0", 1);
 	if (res!=FR_OK)
-		{
-		BSP_LCD_SelectLayer(0);
-		BSP_LCD_Clear(LCD_COLOR_BLACK);			
+		{		
 		#if defined(DEBUG_UART_EN)		
 		sprintf((char*)U_TX_DATA, "%01lu error\n\r", res);	
 		UART_TX(&huart4, U_TX_DATA, 9, 5);		
@@ -525,31 +658,33 @@ int main(void)
 		#if defined(DEBUG_UART_EN)		
 		sprintf((char*)U_TX_DATA, "Drive mounted\n\r");	
 		UART_TX(&huart4, U_TX_DATA, 15, 5);	
-		#endif		
-		res = f_open(&file, path_pic, FA_READ);
-		if (res != FR_OK)
-			{
-			#if defined(DEBUG_UART_EN)		
-			sprintf((char*)U_TX_DATA, "Picture not opened\n\r");	
-			UART_TX(&huart4, U_TX_DATA, 20, 5);	
-			#endif	
-			}		
-		else
-			{
-			#if defined(DEBUG_UART_EN)		
-			sprintf((char*)U_TX_DATA, "Picture file open\n\r", i);	
-			UART_TX(&huart4, U_TX_DATA, 19, 5);	
-			#endif		
-			HAL_Delay(500);
-			f_lseek(&file, 54);			
-			f_read(&file, fbuf, 223680, &nbytes);	
-							
-			for(i=0;i<111840;i++)	
-				{	
-				fbuf[i]|=0x8000;
-				}		
-			f_close(&file);	
-			}	
+		#endif	
+		GET_SD_INFO();
+						
+//		res = f_open(&file[dkA], path_pic, FA_READ);
+//		if (res != FR_OK)
+//			{
+//			#if defined(DEBUG_UART_EN)		
+//			sprintf((char*)U_TX_DATA, "Picture not opened\n\r");	
+//			UART_TX(&huart4, U_TX_DATA, 20, 5);	
+//			#endif	
+//			}		
+//		else
+//			{
+//			#if defined(DEBUG_UART_EN)		
+//			sprintf((char*)U_TX_DATA, "Picture file open\n\r", i);	
+//			UART_TX(&huart4, U_TX_DATA, 19, 5);	
+//			#endif		
+//			HAL_Delay(500);
+//			f_lseek(&file[dkA], 54);			
+//			f_read(&file[dkA], fbuf, 223680, &nbytes);	
+//							
+//			for(i=0;i<111840;i++)	
+//				{	
+//				fbuf[i]|=0x8000;
+//				}		
+//			f_close(&file[dkA]);	
+//			}	
 		}
 			
 	TOTAL_TRACKS = DATABASE_PARSER();
@@ -564,7 +699,7 @@ int main(void)
 	else if(TOTAL_TRACKS==0xFFFF)
 		{
 		#if defined(DEBUG_UART_EN)		
-		sprintf((char*)U_TX_DATA, "Rekordbox database has more than 512 tracks.\n\r");	
+		sprintf((char*)U_TX_DATA, "Rekordbox database has more than 1024 tracks.\n\r");	
 		UART_TX(&huart4, U_TX_DATA, 46, 5);	
 		#endif	
 		SD_STATUS = SD_NEED_REPLACE;	
@@ -596,15 +731,16 @@ int main(void)
 
 	HAL_GPIO_WritePin(GPIOA, LED_LOAD1_Pin|LED_LOAD0_Pin|LED_ENC_Pin, GPIO_PIN_SET);	
 				
-	BSP_LCD_SelectLayer(0);		
-	ShowTempo(dkA, 10000);
-	ShowTempo(dkB, 10000);	
-	ShowBPM(dkA, 0xFFFF);
-	ShowBPM(dkB, 0xFFFF);	
+	BSP_LCD_Clear(LCD_COLOR_BLACK);
+	BSP_LCD_SelectLayer(0);	
+	SwitchInformationLayer(WAVEFORM);		//Show browser	
+	ShowTempo(dkA, potenciometr_tempo[dkA]);
+	ShowTempo(dkB, potenciometr_tempo[dkB]);		
+				
 	DrawLoopMode(dkA, loop_lenght[dkA], loop_act_gui[dkA]);	
 	DrawLoopMode(dkB, loop_lenght[dkB], loop_act_gui[dkB]);		
 	DrawTempoRange(dkA, tempo_range[dkA]);
-	DrawTempoRange(dkB, tempo_range[dkB]);	
+	DrawTempoRange(dkB, tempo_range[dkB]);
 	if(UT_SET[ACUE]==8)
 		{
 		ShowACUE(2);	
@@ -613,29 +749,13 @@ int main(void)
 		{
 		ShowACUE(1);	
 		}	
+	DrawStaticWFM(dkA, 205);	//not loaded	
+	DrawStaticWFM(dkB, 205);	//not loaded	
+	DrawKey(dkA, 0, 0);	
+	DrawKey(dkB, 0, 1);	
 		
-	BSP_LCD_SetFont(&Font15P);
-	BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
-	sprintf((char*)Buf, "%s", "03");
-	BSP_LCD_DisplayStringAt(5, 124, Buf, TRANSPARENT_MODE);		
-	BSP_LCD_SetTextColor(LCD_COLOR_CUE);
-	sprintf((char*)Buf, "%s", "Bleu Clair & OOTORO");
-	BSP_LCD_DisplayStringAt(29, 124, Buf, TRANSPARENT_MODE);	
-	BSP_LCD_SetTextColor(LCD_COLOR_WHITE);	
-	sprintf((char*)Buf, "%s", "Beat Like This");	
-	BSP_LCD_DisplayStringAt(5, 141, Buf, TRANSPARENT_MODE);
-	BSP_LCD_SetTextColor(LCD_COLOR_WHITE);	
-	sprintf((char*)Buf, "%s", "04");		
-	BSP_LCD_DisplayStringAt(245, 124, Buf, TRANSPARENT_MODE);
-	BSP_LCD_SetTextColor(LCD_COLOR_DARKGREEN);	
-	sprintf((char*)Buf, "%s", "Just Kiddin");		
-	BSP_LCD_DisplayStringAt(269, 124, Buf, TRANSPARENT_MODE);
-	BSP_LCD_SetTextColor(LCD_COLOR_WHITE);	
-	sprintf((char*)Buf, "%s", "Out My Mind");	
-	BSP_LCD_DisplayStringAt(300, 141, Buf, TRANSPARENT_MODE);			
 	j = 0;
-			
-	
+				
 	#if defined(DEBUG_UART_EN)	
 	sprintf((char*)U_TX_DATA, "Main assy: ");	
 	UART_TX(&huart4, U_TX_DATA, 11, 5);	
@@ -656,7 +776,18 @@ int main(void)
 //	U_TX_DATA[1] = 0x60;
 //	U_TX_DATA[2] = 0x31;
 //	UART_TX(&huart1, U_TX_DATA, 3, 5);	
+
+	for(j=0;j<8;j++)
+		{
+		deckTbuf[j][1] = HCUEdisableCOLOR[0];
+		deckTbuf[j][2] = HCUEdisableCOLOR[1];
+		deckTbuf[j][3] = HCUEdisableCOLOR[2];
+		deckTbuf[j][9] = HCUEdisableCOLOR[0];
+		deckTbuf[j][10] = HCUEdisableCOLOR[1];
+		deckTbuf[j][11] = HCUEdisableCOLOR[2];
+		}	
 	
+	PART_CODE = 0;	
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -669,145 +800,140 @@ int main(void)
 		RedrawWaveforms(dkA, play_adr[dkA]/294);
 		RedrawWaveforms(dkB, play_adr[dkB]/294);	
 			
-		if(need_redraw_memline)
+		if(dSHOW==WAVEFORM)
 			{
-			BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
-			BSP_LCD_DrawHLine(3, 191, 203);						
-			BSP_LCD_SetTextColor(LCD_COLOR_RED);
-			BSP_LCD_DrawHLine(3+((start_adata[dkA]*5656)/all_long[dkA]), 191, ((end_adata[dkA]*5656)/all_long[dkA])-((start_adata[dkA]*5656)/all_long[dkA]));			
-			need_redraw_memline = 0;	
-			}			
-		}
-		
-	if(fat_semaphore==0)
-		{	
-		if(end_adata[dkA]<128)
-			{
-			f_read(&file, PCM[dkA][end_adata[dkA]][0], 32768, &nbytes);
-			need_redraw_memline = 1;	
-			end_adata[dkA]++;	
-			}
-		else if((end_adata[dkA]<((play_adr[dkA]>>13)+42)) && (fill_stp[dkA]==0 || fill_stp[dkA]==6) && (end_adata[dkA]<=(((all_long[dkA]*294)>>13)+1)))									//filling the buffer forward
-			{
-			if(fill_stp[dkA]==6)
-				{
-				f_lseek(&file, ((32768*end_adata[dkA])+44));	
-				fill_stp[dkA] = 0;	
-				}		
-			f_read(&file, PCM[dkA][end_adata[dkA]&0x7F][0], 32768, &nbytes);		
-			end_adata[dkA]++;
-			if((end_adata[dkA]-start_adata[dkA])>128)
-				{
-				start_adata[dkA] = end_adata[dkA]-128;	
-				}
-			need_redraw_memline = 1;	
-			}
-		else if(((end_adata[dkA]>((play_adr[dkA]>>13)+86) || ((end_adata[dkA]-start_adata[dkA])<124)) && start_adata[dkA]>3) || (fill_stp[dkA]!=0 && fill_stp[dkA]!=6))					//filling the buffer back
-			{
-			if(fill_stp[dkA]==0 || fill_stp[dkA]==6)
-				{
-				if((end_adata[dkA]-start_adata[dkA])>127)	
+			if(masterdeck<2 && play_enable[dkA] && play_enable[dkB] && ((deckTbuf[5][0]&0x10)==0) && ((deckTbuf[5][8]&0x10)==0) && (end_track[dkA]==0) && (end_track[dkB]==0))
+				{		
+				plaa = (play_adr[dkA]*10)/441;	
+				plab = (play_adr[dkB]*10)/441;
+				posa = FindCurrBar(dkA, plaa);	
+				posb = FindCurrBar(dkB, plab);
+				if(masterdeck==dkA)
+					{	
+					beat_pitch = BPMGRID[dkA][posa]*potenciometr_tempo[dkA]/10000;  //(bpm 125.00)	
+					}
+				else
 					{
-					end_adata[dkA] = start_adata[dkA]+124;	
-					}	
-				start_adata[dkA]-=4;	
-				f_lseek(&file, ((32768*(start_adata[dkA]))+44));
-				fill_stp[dkA] = 1;	
-				}
-			else if(fill_stp[dkA]==1)
-				{
-				f_read(&file, PCM[dkA][start_adata[dkA]&0x7F][0], 32768, &nbytes);
-				fill_stp[dkA] = 2;	
-				}
-			else if(fill_stp[dkA]==2)
-				{
-				f_read(&file, PCM[dkA][(start_adata[dkA]+1)&0x7F][0], 32768, &nbytes);
-				fill_stp[dkA] = 3;	
-				}
-			else if(fill_stp[dkA]==3)
-				{
-				f_read(&file, PCM[dkA][(start_adata[dkA]+2)&0x7F][0], 32768, &nbytes);
-				fill_stp[dkA] = 4;	
-				}
-			else if(fill_stp[dkA]==4)
-				{
-				f_read(&file, PCM[dkA][(start_adata[dkA]+3)&0x7F][0], 32768, &nbytes);
-				fill_stp[dkA] = 5;	
-				}
-			else if(fill_stp[dkA]==5)
-				{
-				need_redraw_memline = 1;		
-				fill_stp[dkA] = 6;		
-				}
-			}		
-		fat_semaphore = 1;	
-		}		
-	else
-		{
-		if(end_adata[dkB]<128)
-			{
-			f_read(&fileb, PCM[dkB][end_adata[dkB]][0], 32768, &nbytesb);
-			//need_redraw_memline = 1;	
-			end_adata[dkB]++;	
-			}
-		else if((end_adata[dkB]<((play_adr[dkB]>>13)+42)) && (fill_stp[dkB]==0 || fill_stp[dkB]==6) && (end_adata[dkB]<=(((all_long[dkB]*294)>>13)+1)))									//filling the buffer forward
-			{
-			if(fill_stp[dkB]==6)
-				{
-				f_lseek(&fileb, ((32768*end_adata[dkB])+44));	
-				fill_stp[dkB] = 0;	
-				}		
-			f_read(&fileb, PCM[dkB][end_adata[dkB]&0x7F][0], 32768, &nbytesb);		
-			end_adata[dkB]++;
-			if((end_adata[dkB]-start_adata[dkB])>128)
-				{
-				start_adata[dkB] = end_adata[dkB]-128;	
-				}
-			//need_redraw_memline = 1;	
-			}
-		else if(((end_adata[dkB]>((play_adr[dkB]>>13)+86) || ((end_adata[dkB]-start_adata[dkB])<124)) && start_adata[dkB]>3) || (fill_stp[dkB]!=0 && fill_stp[dkB]!=6))					//filling the buffer back
-			{
-			if(fill_stp[dkB]==0 || fill_stp[dkB]==6)
-				{
-				if((end_adata[dkB]-start_adata[dkB])>127)	
+					beat_pitch = BPMGRID[dkB][posb]*potenciometr_tempo[dkB]/10000;  //(bpm 125.00)	
+					}					
+				posa = plaa-BEATGRID[dkA][posa];			//in ms pos
+				posb = plab-BEATGRID[dkB][posb];			//in ms pos						
+				beat_pitch = 6000000/beat_pitch;			//in ms real speed	
+				posa*=10000;
+				posa/=potenciometr_tempo[dkA]; //in ms
+				posb*=10000;
+				posb/=potenciometr_tempo[dkB]; //in ms
+				if(masterdeck==dkA)
 					{
-					end_adata[dkB] = start_adata[dkB]+124;	
-					}	
-				start_adata[dkB]-=4;	
-				f_lseek(&fileb, ((32768*(start_adata[dkB]))+44));
-				fill_stp[dkB] = 1;	
-				}
-			else if(fill_stp[dkB]==1)
+					posb = posb%beat_pitch;
+					if(posb<posa)			
+						{			
+						beat_diff = posa - posb;		
+						if(beat_diff<(beat_pitch/2)) //operezhaet
+							{
+							beat_diff = ((155*beat_diff)/beat_pitch);	
+							if(beat_diff>77)
+								{
+								beat_diff = 77;	
+								}		
+							DrawPhasebar(77-beat_diff);									
+							}
+						else
+							{
+							beat_diff = ((155*beat_diff)/beat_pitch);	
+							DrawPhasebar(77+beat_diff);			
+							}
+						}	
+					else
+						{
+						beat_diff = posb - posa;
+						if(beat_diff>(beat_pitch/2)) //operezhaet
+							{
+							beat_diff = beat_pitch - beat_diff;
+							beat_diff = ((155*beat_diff)/beat_pitch);	
+							if(beat_diff>77)
+								{
+								beat_diff = 77;	
+								}		
+							DrawPhasebar(77-beat_diff);							
+							}
+						else
+							{
+							beat_diff = ((155*beat_diff)/beat_pitch);	
+							DrawPhasebar(77+beat_diff);			
+							}						
+						}	
+					}
+				else
+					{
+					posa = posa%beat_pitch;
+					if(posb<posa)			
+						{			
+						beat_diff = posa - posb;
+						if(beat_diff>(beat_pitch/2)) //operezhaet
+							{
+							beat_diff = beat_pitch - beat_diff;
+							beat_diff = ((155*beat_diff)/beat_pitch);
+							if(beat_diff>77)
+								{
+								beat_diff = 77;	
+								}		
+							DrawPhasebar(77-beat_diff);			
+							}
+						else
+							{
+							beat_diff = ((155*beat_diff)/beat_pitch);	
+							DrawPhasebar(77+beat_diff);			
+							}
+						}	
+					else
+						{
+						beat_diff = posb - posa;
+						if(beat_diff<(beat_pitch/2)) //operezhaet
+							{
+							beat_diff = ((155*beat_diff)/beat_pitch);	
+							if(beat_diff>77)
+								{
+								beat_diff = 77;	
+								}								
+							DrawPhasebar(77-beat_diff);			
+							}
+						else
+							{
+							beat_diff = ((155*beat_diff)/beat_pitch);	
+							DrawPhasebar(77+beat_diff);			
+							}						
+						}			
+					}					
+				}	
+			else
 				{
-				f_read(&fileb, PCM[dkB][start_adata[dkB]&0x7F][0], 32768, &nbytesb);
-				fill_stp[dkB] = 2;	
-				}
-			else if(fill_stp[dkB]==2)
-				{
-				f_read(&fileb, PCM[dkB][(start_adata[dkB]+1)&0x7F][0], 32768, &nbytesb);
-				fill_stp[dkB] = 3;	
-				}
-			else if(fill_stp[dkB]==3)
-				{
-				f_read(&fileb, PCM[dkB][(start_adata[dkB]+2)&0x7F][0], 32768, &nbytesb);
-				fill_stp[dkB] = 4;	
-				}
-			else if(fill_stp[dkB]==4)
-				{
-				f_read(&fileb, PCM[dkB][(start_adata[dkB]+3)&0x7F][0], 32768, &nbytesb);
-				fill_stp[dkB] = 5;	
-				}
-			else if(fill_stp[dkB]==5)
-				{
-				//need_redraw_memline = 1;		
-				fill_stp[dkB] = 6;		
-				}
+				DrawPhasebar(77);	
+				}			
+			}
+			
+		if(need_redraw_memline[dkA])
+			{
+			BSP_LCD_SelectLayer(0);					
+			if(end_adata[dkA]>start_adata[dkA])																				
+				{	
+				DrawMemBar(dkA, (start_adata[dkA]*5628)/all_long[dkA], (end_adata[dkA]*5628)/all_long[dkA]);
+				}		
+			need_redraw_memline[dkA] = 0;	
 			}	
-		fat_semaphore = 0;	
-		}	
-	
-		
-		
+		else if(need_redraw_memline[dkB])
+			{
+			BSP_LCD_SelectLayer(0);	
+			if(end_adata[dkB]>start_adata[dkB])																				
+				{
+				DrawMemBar(dkB, (start_adata[dkB]*5628)/all_long[dkB], (end_adata[dkB]*5628)/all_long[dkB]);	
+				}				
+			need_redraw_memline[dkB] = 0;	
+			}		
+		}
+
+	#include "fatfs_operations.h"	
+				
 	if(PART_CODE==0)
 		{
 		//TOUCH_SCREEN_HANDLER();
@@ -826,55 +952,7 @@ int main(void)
 		PART_CODE = 1;	
 		}	
 	else if(PART_CODE==1)
-		{				
-		//if(track_need_load[dkA]!=0 && TOTAL_TRACKS_IN_CURRENT_PLAYLIST!=0)
-		if(track_need_load[dkA]!=0)	
-			{
-			if(UT_SET[1] && end_track[dkA]==0 && play_enable[dkA])						//lock load	
-				{	
-				//message about load lock		
-				}
-			else
-				{
-				ENC_LED_BLINK[dkA] = 0;
-				load_animation_en[dkA] = 1;
-				if(track_play_now[dkA]==TOTAL_TRACKS)
-					{
-					track_play_now[dkA] = 1;	
-					}
-				else
-					{
-					track_play_now[dkA]++;	
-					}	
-				PREPARE_LOAD_TRACK(dkA, track_play_now[dkA], track_play_now[dkA]);			
-				}	
-			track_need_load[dkA] = 0;	
-			}
-			
-		//if(track_need_load[dkB]!=0 && TOTAL_TRACKS_IN_CURRENT_PLAYLIST!=0)
-		if(track_need_load[dkB]!=0)	
-			{
-			if(UT_SET[1] && end_track[dkB]==0 && play_enable[dkB])						//lock load	
-				{	
-				//message about load lock		
-				}
-			else
-				{
-				ENC_LED_BLINK[dkB] = 0;
-				load_animation_en[dkB] = 1;
-				if(track_play_now[dkB]==TOTAL_TRACKS)
-					{
-					track_play_now[dkB] = 1;	
-					}
-				else
-					{
-					track_play_now[dkB]++;	
-					}	
-				PREPARE_LOAD_TRACK(dkB, track_play_now[dkB], track_play_now[dkB]);			
-				}	
-			track_need_load[dkB] = 0;	
-			}		
-					
+		{					
 		/////deck A	
 		if(tempo_range_need_update[dkA])
 			{	
@@ -886,11 +964,17 @@ int main(void)
 			{
 			if(tempo_need_update[dkA]==1)
 				{
-				ShowTempo(dkA, potenciometr_tempo[dkA]);	
+				if(dSHOW==WAVEFORM)
+					{							
+					ShowTempo(dkA, potenciometr_tempo[dkA]);
+					}						
 				}	
 			if(originalBPM[dkA]!=0xFFFF)
 				{
-				ShowBPM(dkA, ((originalBPM[dkA]+5)*potenciometr_tempo[dkA])/100000);	
+				if(dSHOW==WAVEFORM)
+					{
+					ShowBPM(dkA, ((originalBPM[dkA]+5)*potenciometr_tempo[dkA])/100000);
+					}						
 				}
 			if(masterdeck==dkA)
 				{		
@@ -914,11 +998,17 @@ int main(void)
 			{
 			if(tempo_need_update[dkB]==1)
 				{
-				ShowTempo(dkB, potenciometr_tempo[dkB]);	
+				if(dSHOW==WAVEFORM)
+					{							
+					ShowTempo(dkB, potenciometr_tempo[dkB]);
+					}						
 				}	
 			if(originalBPM[dkB]!=0xFFFF)
 				{
-				ShowBPM(dkB, ((originalBPM[dkB]+5)*potenciometr_tempo[dkB])/100000);	
+				if(dSHOW==WAVEFORM)
+					{	
+					ShowBPM(dkB, ((originalBPM[dkB]+5)*potenciometr_tempo[dkB])/100000);
+					}						
 				}
 			if(masterdeck==dkB)
 				{				
@@ -1029,9 +1119,25 @@ int main(void)
 		//BACK BUTTON
 		// (enc button)LOAD TRACK
 			
+			
 		if(enc_need_up)							///////////ENCODER 	
 			{
-			if(dSHOW==WAVEFORM)
+			if(dSHOW==BROWSER || dSHOW==BROWSER_INFO)
+				{
+				if(BROWSE_LEVEL==0)
+					{
+					NAVIGATOR(BROWSER0_UP);	
+					}
+				else if(BROWSE_LEVEL==1)
+					{
+					NAVIGATOR(BROWSER1_UP);		
+					}
+				else if(BROWSE_LEVEL==2)
+					{
+					NAVIGATOR(BROWSER2_UP);	
+					}	
+				}		
+			else if(dSHOW==WAVEFORM)
 				{
 				if(DynamicWaveformZOOM>1)
 					{
@@ -1045,12 +1151,55 @@ int main(void)
 						forcibly_redraw[dkB] = 1;
 						}		
 					}				
-				}				
+				}
+			else if(dSHOW==TAG_LIST || dSHOW==TAG_LIST_INFO)
+				{
+				NAVIGATOR(TAGLIST_UP);	
+				}	
+			else if(dSHOW==UTILITY)
+				{
+				if(edit_parameter==0)
+					{
+					NAVIGATOR(UTILITY_UP);
+					}
+				else
+					{
+					if(UT_EEMAP[UCurrentCursorPosition+CurrentUPosition-1]==0xFE)		//speaker
+						{	
+						HAL_GPIO_WritePin(AMP_EN_GPIO_Port, AMP_EN_Pin, GPIO_PIN_SET);
+						int_U_REDRAW_ONE_LINE();
+						}
+					else
+						{
+						if(UT_SET[UT_EEMAP[UCurrentCursorPosition+CurrentUPosition-1]]<UT_SET_MAX[UT_EEMAP[UCurrentCursorPosition+CurrentUPosition-1]])	
+							{
+							UT_SET[UT_EEMAP[UCurrentCursorPosition+CurrentUPosition-1]]++;						
+							int_U_REDRAW_ONE_LINE();	
+							int_reload_parameter_realtime();					
+							}	
+						}					
+					}				
+				}
 			enc_need_up = 0;	
 			}
 		else if(enc_need_down)							///////////ENCODER 
-			{	
-			if(dSHOW==WAVEFORM)
+			{
+			if(dSHOW==BROWSER || dSHOW==BROWSER_INFO)
+				{
+				if(BROWSE_LEVEL==0)
+					{
+					NAVIGATOR(BROWSER0_DOWN);	
+					}
+				else if(BROWSE_LEVEL==1)
+					{
+					NAVIGATOR(BROWSER1_DOWN);			
+					}
+				else if(BROWSE_LEVEL==2)
+					{
+					NAVIGATOR(BROWSER2_DOWN);		
+					}	
+				}					
+			else if(dSHOW==WAVEFORM)
 				{				
 				if(DynamicWaveformZOOM<16)
 					{
@@ -1064,14 +1213,91 @@ int main(void)
 						forcibly_redraw[dkB] = 1;
 						}			
 					}
-				}				
+				}
+			else if(dSHOW==TAG_LIST || dSHOW==TAG_LIST_INFO)
+				{
+				NAVIGATOR(TAGLIST_DOWN);	
+				}
+			else if(dSHOW==UTILITY)
+				{
+				if(edit_parameter==0)
+					{
+					NAVIGATOR(UTILITY_DOWN);
+					}	
+				else
+					{				
+					if(UT_EEMAP[UCurrentCursorPosition+CurrentUPosition-1]==0xFE)		//speaker
+						{
+						HAL_GPIO_WritePin(AMP_EN_GPIO_Port, AMP_EN_Pin, GPIO_PIN_SET);	
+						int_U_REDRAW_ONE_LINE();	
+						}
+					else
+						{
+						if(UT_SET[UT_EEMAP[UCurrentCursorPosition+CurrentUPosition-1]]>0)
+							{
+							UT_SET[UT_EEMAP[UCurrentCursorPosition+CurrentUPosition-1]]--;							
+							int_U_REDRAW_ONE_LINE();		
+							int_reload_parameter_realtime();	
+							}
+						}
+					}	
+				}
 			enc_need_down = 0;	
 			}	
 			
 		if(((GPIOB->IDR&0x00000004)==0) && ENC_BUTTON_pressed==0) 							///////////ENCODER BUTTON
 			{
-
-				
+			if((HAL_GetTick() -	KEY_ENC_tim)>180)				//noise button filter
+				{	
+				KEY_ENC_tim	= HAL_GetTick();
+				if(dSHOW==WAVEFORM)
+					{
+					if(dSHOW!=BROWSER && dSHOW!=BROWSER_INFO)
+						{
+						if(BROWSE_LEVEL==0 && BROWSER_INFO_enable==0)
+							{
+							SwitchInformationLayer(BROWSER);	
+							}
+						else
+							{
+							SwitchInformationLayer(BROWSER_INFO);	
+							}
+						}
+					}
+				else if((dSHOW==BROWSER || dSHOW==BROWSER_INFO) && BROWSE_LEVEL>0)
+					{
+					if(BROWSE_LEVEL==2 && (B2CursorPos==0 || B2CursorPos==1 || B2CursorPos==3))	
+						{
+						//////////////////////////////////////	
+						}
+					else
+						{
+						PREVIOUS_BROWSE_LEVEL =	BROWSE_LEVEL; 
+						if(BROWSE_LEVEL==1)			//enter to playlist
+							{
+							TOTAL_TRACKS_IN_CURRENT_PLAYLIST = TRACKLIST_OFFSET[B1CursorPos+BPlaylistPos] - TRACKLIST_OFFSET[B1CursorPos+BPlaylistPos-1];
+							B0CursorPos = 0;
+							BTrackPos = 1;	
+							}
+						BROWSE_LEVEL-=1;
+						SwitchInformationLayer(BROWSER_NAVI);
+						}					
+					}
+				else if(dSHOW==UTILITY)
+					{
+					if(edit_parameter==0 && (UT_EEMAP[UCurrentCursorPosition+CurrentUPosition-1]<0xFF))
+						{
+						//need_rewrite_flash = 1;	
+						edit_parameter = 1;	
+						SwitchInformationLayer(UTILITY);		
+						}
+					else if(edit_parameter)
+						{
+						edit_parameter = 0;		
+						SwitchInformationLayer(UTILITY);
+						}
+					}	
+				}	
 			ENC_BUTTON_pressed = 1;	
 			}
 		else if(((GPIOB->IDR&0x00000004)!=0) && ENC_BUTTON_pressed==1)	
@@ -1080,8 +1306,29 @@ int main(void)
 			}	
 		else if(((GPIOB->IDR&0x00000001)==0) && LOAD_BUTTON_pressed[0]==0) 							///////////LOAD DECK A
 			{	
-				
-			track_need_load[dkA] = 1;	
+			if((BROWSE_LEVEL==0 && (dSHOW==BROWSER || dSHOW==BROWSER_INFO)) || ((dSHOW==TAG_LIST || dSHOW==TAG_LIST_INFO) && TOTAL_TRACKS_IN_TAGLIST>0)) //LOAD TRACK from taglist or playlist
+				{	
+				if(UT_SET[1] && end_track[dkA]==0 && play_enable[dkA])						//lock load	
+					{	
+					//message about load lock		
+					}	
+				else	
+					{
+					ENC_LED_BLINK[dkA] = 0;
+					load_animation_en[dkA] = 1;	
+					if(dSHOW==BROWSER || dSHOW==BROWSER_INFO)
+						{
+						track_play_now[dkA] = TRACKS_DATABASE[TRACKLIST_OFFSET[B1CursorPos+BPlaylistPos-1]+B0CursorPos + BTrackPos - 1];	
+						TRACK_PLAY_IN_CURRENT_PLAYLIST = B0CursorPos + BTrackPos;
+						}
+					else if(dSHOW==TAG_LIST || dSHOW==TAG_LIST_INFO)
+						{
+						track_play_now[dkA] = TAGLIST_BASE[TCursorPos + TTrackPos-1];
+						TRACK_PLAY_IN_CURRENT_PLAYLIST = TCursorPos + TTrackPos;
+						}
+					PREPARE_LOAD_TRACK(dkA, track_play_now[dkA], TRACK_PLAY_IN_CURRENT_PLAYLIST);			
+					}				
+				}				
 			LOAD_BUTTON_pressed[0] = 1;	
 			}
 		else if(((GPIOB->IDR&0x00000001)!=0) && LOAD_BUTTON_pressed[0]==1)	
@@ -1090,18 +1337,307 @@ int main(void)
 			}
 		else if(((GPIOB->IDR&0x00000002)==0) && LOAD_BUTTON_pressed[1]==0) 							///////////LOAD DECK B
 			{
-
-			track_need_load[dkB] = 1;	
+			if((BROWSE_LEVEL==0 && (dSHOW==BROWSER || dSHOW==BROWSER_INFO)) || ((dSHOW==TAG_LIST || dSHOW==TAG_LIST_INFO) && TOTAL_TRACKS_IN_TAGLIST>0)) //LOAD TRACK from taglist or playlist
+				{	
+				if(UT_SET[1] && end_track[dkB]==0 && play_enable[dkB])						//lock load	
+					{	
+					//message about load lock		
+					}	
+				else	
+					{
+					ENC_LED_BLINK[dkB] = 0;
+					load_animation_en[dkB] = 1;	
+					if(dSHOW==BROWSER || dSHOW==BROWSER_INFO)
+						{
+						track_play_now[dkB] = TRACKS_DATABASE[TRACKLIST_OFFSET[B1CursorPos+BPlaylistPos-1]+B0CursorPos + BTrackPos - 1];	
+						TRACK_PLAY_IN_CURRENT_PLAYLIST = B0CursorPos + BTrackPos;
+						}
+					else if(dSHOW==TAG_LIST || dSHOW==TAG_LIST_INFO)
+						{
+						track_play_now[dkB] = TAGLIST_BASE[TCursorPos + TTrackPos-1];
+						TRACK_PLAY_IN_CURRENT_PLAYLIST = TCursorPos + TTrackPos;
+						}
+					PREPARE_LOAD_TRACK(dkB, track_play_now[dkB], TRACK_PLAY_IN_CURRENT_PLAYLIST);			
+					}				
+				}
 			LOAD_BUTTON_pressed[1] = 1;	
 			}
 		else if(((GPIOB->IDR&0x00000002)!=0) && LOAD_BUTTON_pressed[1]==1)	
 			{
 			LOAD_BUTTON_pressed[1] = 0;	
 			}	
+		else if(((GPIOB->IDR&0x00001000)==0) && KEY_BROWSE_pressed==0)					//BROWSER-WAVEFORM BUTTON
+			{
+			if((HAL_GetTick() -	KEY_BROWSE_tim)>120)				//noise button filter
+				{	
+				KEY_BROWSE_tim	= HAL_GetTick();
+				if(dSHOW!=BROWSER && dSHOW!=BROWSER_INFO)
+					{
+					if(BROWSE_LEVEL==0 && BROWSER_INFO_enable==0)
+						{
+						SwitchInformationLayer(BROWSER);	
+						}
+					else
+						{
+						SwitchInformationLayer(BROWSER_INFO);	
+						}
+					}
+				else
+					{
+					SwitchInformationLayer(WAVEFORM);	
+					}
+				}
+			KEY_BROWSE_pressed = 1;	
+			}
+		else if(((GPIOB->IDR&0x00001000)!=0) && KEY_BROWSE_pressed==1)
+			{
+			KEY_BROWSE_pressed = 0;		
+			}		
+		else if(((GPIOH->IDR&0x00000004)==0) && KEY_TAG_TRACK_pressed==0)					//TAG TRACK/REMOVE BUTTON
+			{
+			if((HAL_GetTick() -	KEY_TAG_tim)>150)				//noise button filter
+				{	
+				KEY_TAG_tim	= HAL_GetTick();
+				if((dSHOW==BROWSER || dSHOW==BROWSER_INFO) && BROWSE_LEVEL==0)
+					{
+					if((playlist[TRACKS_DATABASE[TRACKLIST_OFFSET[B1CursorPos+BPlaylistPos-1]+BTrackPos+B0CursorPos-1]-1][54]&0x2)==0)					//////////////when track is not in tag list
+						{
+						if(TOTAL_TRACKS_IN_TAGLIST<100)
+							{
+							playlist[TRACKS_DATABASE[TRACKLIST_OFFSET[B1CursorPos+BPlaylistPos-1]+BTrackPos+B0CursorPos-1]-1][54]|=0x02;		//////////////////write add taglist mark
+							TAGLIST_BASE[TOTAL_TRACKS_IN_TAGLIST] = TRACKS_DATABASE[TRACKLIST_OFFSET[B1CursorPos+BPlaylistPos-1]+BTrackPos+B0CursorPos-1];
+							TOTAL_TRACKS_IN_TAGLIST++;
+							}
+						}
+					else																													///////////////////////Delete Track from TAG LIST
+						{
+						playlist[TRACKS_DATABASE[TRACKLIST_OFFSET[B1CursorPos+BPlaylistPos-1]+BTrackPos+B0CursorPos-1]-1][54]&=0xFD;		//write delete taglist mark	
+						s = 0;
+						while(TAGLIST_BASE[s]!=(TRACKS_DATABASE[TRACKLIST_OFFSET[B1CursorPos+BPlaylistPos-1]+BTrackPos+B0CursorPos-1]) && s<TOTAL_TRACKS_IN_TAGLIST)
+							{
+							s++;		
+							}
+						TOTAL_TRACKS_IN_TAGLIST--;	
+						while(s<TOTAL_TRACKS_IN_TAGLIST)
+							{
+							TAGLIST_BASE[s] = TAGLIST_BASE[s+1];	
+							s++;	
+							}
+						if(TOTAL_TRACKS_IN_TAGLIST<(TCursorPos + TTrackPos))
+							{
+							if(TOTAL_TRACKS_IN_TAGLIST>7)
+								{
+								TTrackPos-=1;		
+								}
+							else
+								{
+								if(TCursorPos>0)
+									{
+									TCursorPos-=1;
+									}
+								}		
+							}	
+						}
+					SwitchInformationLayer(dSHOW);
+					}
+				else if((dSHOW==TAG_LIST || dSHOW==TAG_LIST_INFO) && TOTAL_TRACKS_IN_TAGLIST>0)
+					{
+					playlist[TAGLIST_BASE[TCursorPos + TTrackPos-1]-1][54]&=0xFD;		//delete taglist mark	
+					s = TCursorPos + TTrackPos-1;
+					TOTAL_TRACKS_IN_TAGLIST--;
+					while(s<TOTAL_TRACKS_IN_TAGLIST)
+						{
+						TAGLIST_BASE[s] = TAGLIST_BASE[s+1];	
+						s++;	
+						}
+					if(TOTAL_TRACKS_IN_TAGLIST<(TCursorPos + TTrackPos))
+						{
+						if(TOTAL_TRACKS_IN_TAGLIST>7)
+							{
+							TTrackPos-=1;		
+							}
+						else
+							{
+							if(TCursorPos>0)
+								{
+								TCursorPos-=1;
+								}
+							}		
+						}
+					SwitchInformationLayer(dSHOW);			
+					}
+				}
+			KEY_TAG_TRACK_pressed = 1;	
+			}
+		else if(((GPIOH->IDR&0x00000004)!=0) && KEY_TAG_TRACK_pressed==1)	
+			{
+			KEY_TAG_TRACK_pressed = 0;	
+			}
+		else if(((GPIOI->IDR&0x00000010)==0) && KEY_TAG_LIST_pressed==0)					//TAG LIST BUTTON
+			{
+			if((HAL_GetTick() -	KEY_TAGLIST_tim)>120)				//noise button filter
+				{	
+				KEY_TAGLIST_tim	= HAL_GetTick();
+				if(dSHOW != TAG_LIST && dSHOW != TAG_LIST_INFO)
+					{
+					if(TAG_LIST_INFO_enable)
+						{
+						SwitchInformationLayer(TAG_LIST_INFO);
+						}
+					else
+						{
+						SwitchInformationLayer(TAG_LIST);	
+						}	
+					}
+				else if(dSHOW==TAG_LIST || dSHOW==TAG_LIST_INFO)
+					{
+					SwitchInformationLayer(WAVEFORM);
+					}
+				}
+			KEY_TAG_LIST_pressed = 1;	
+			}
+		else if(((GPIOI->IDR&0x00000010)!=0) && KEY_TAG_LIST_pressed==1)	
+			{
+			KEY_TAG_LIST_pressed = 0;	
+			}						
+		else if(((GPIOI->IDR&0x00000040)==0) && KEY_INFO_pressed==0)					//INFO BUTTON
+			{
+			if((HAL_GetTick() -	KEY_INFO_tim)>150)				//noise button filter
+				{	
+				KEY_INFO_tim	= HAL_GetTick();
+				if(dSHOW==TAG_LIST)
+					{
+					TAG_LIST_INFO_enable = 1;	
+					SwitchInformationLayer(TAG_LIST_INFO);
+					}	
+				else if(dSHOW==TAG_LIST_INFO)
+					{
+					TAG_LIST_INFO_enable = 0;	
+					SwitchInformationLayer(TAG_LIST);
+					}
+				else if(dSHOW==BROWSER && BROWSE_LEVEL==0)
+					{
+					BROWSER_INFO_enable = 1;	
+					SwitchInformationLayer(BROWSER_INFO);
+					}		
+				else if(dSHOW==BROWSER_INFO && BROWSE_LEVEL==0)
+					{
+					BROWSER_INFO_enable = 0;		
+					SwitchInformationLayer(BROWSER);
+					}		
+				}
+			KEY_INFO_pressed = 1;	
+			}
+		else if(((GPIOI->IDR&0x00000040)!=0) && KEY_INFO_pressed==1)
+			{
+			KEY_INFO_pressed = 0;		
+			}	
+		else if(((GPIOI->IDR&0x00000080)==0) && (KEY_MENU_pressed==0 || KEY_MENU_HOLD==1))					//MENU BUTTON
+			{
+			if((HAL_GetTick() -	KEY_MENU_tim)>200)				//noise button filter
+				{	
+				KEY_MENU_tim	= HAL_GetTick();
+				if(dSHOW!=UTILITY)
+					{	
+					if(KEY_MENU_HOLD==0)
+						{
+						KEY_MENU_HOLD_TIM = HAL_GetTick();			
+						KEY_MENU_HOLD = 1;	
+						}
+					else
+						{
+						if((HAL_GetTick()-KEY_MENU_HOLD_TIM)>900)
+							{
+							edit_parameter = 0;	
+							SwitchInformationLayer(UTILITY);
+							KEY_MENU_HOLD = 2;		
+							}						
+						}	
+					}
+				else if(dSHOW==UTILITY && edit_parameter==0)
+					{			
+		//				if(need_rw_setings_prc)
+		//					{
+		//					write_setings_prc();
+		//					need_rw_setings_prc = 0;	
+		//					}	
+		//			SwitchInformationLayer(WAVEFORM);		
+					}		
+				}
+			KEY_MENU_pressed = 1;		
+			}
+		else if(((GPIOI->IDR&0x00000080)!=0) && KEY_MENU_pressed==1)	
+			{	
+			if(KEY_MENU_HOLD==2)
+				{
+				KEY_MENU_HOLD = 0;	
+				}
+			else if(KEY_MENU_HOLD==1)
+				{
+				if(dSHOW==WAVEFORM)
+					{
+					//call WAVEFORM display menu	
+					}
+				else if(dSHOW==BROWSER)
+					{
+					//call BROWSER preset list menu		
+					}
+				KEY_MENU_HOLD = 0;		
+				}			
+			KEY_MENU_pressed = 0;	
+			}					
+		else if(((GPIOH->IDR&0x00000008)==0) && KEY_BACK_pressed==0)					//BACK BUTTON
+			{
+			if((HAL_GetTick() -	KEY_BACK_tim)>150)				//noise button filter
+				{	
+				KEY_BACK_tim	= HAL_GetTick();
+				if((dSHOW==BROWSER || dSHOW==BROWSER_INFO) && BROWSE_LEVEL<3)
+					{
+					PREVIOUS_BROWSE_LEVEL =	BROWSE_LEVEL; 	
+					BROWSE_LEVEL+=1;
+					SwitchInformationLayer(BROWSER_NAVI);		
+					}
+				else if(dSHOW==UTILITY && edit_parameter==0)
+					{
+//				if(need_rw_setings_prc)
+//					{
+//					write_setings_prc();
+//					need_rw_setings_prc = 0;	
+//					}	
+					SwitchInformationLayer(WAVEFORM);	
+					}
+				}
+			KEY_BACK_pressed = 1;		
+			}
+		else if(((GPIOH->IDR&0x00000008)!=0) && KEY_BACK_pressed==1)	
+			{	
+			KEY_BACK_pressed = 0;	
+			}		
+			
+	
+		if(need_seek[dkA]==1)
+			{
+			SEEK_AUDIOFRAME(dkA, 44100*30);
+			need_seek[dkA] = 0;	
+			}			
+		else if(need_seek[dkA]==2)
+			{
+			SEEK_AUDIOFRAME(dkA, 44100*90);		
+			need_seek[dkA] = 0;	
+			}
+		else if(need_seek[dkB]==1)
+			{
+			SEEK_AUDIOFRAME(dkB, 44100*120);		
+			need_seek[dkB] = 0;	
+			}			
+		else if(need_seek[dkB]==2)
+			{
+			SEEK_AUDIOFRAME(dkB, 44100*15);		
+			need_seek[dkB] = 0;	
+			}		
 		PART_CODE = 0;	
 		}
 	
-		
 	///from main code	
 	if(loop_active[dkA] && CUE_ADR[dkA]<LOOP_OUT[dkA] && (play_adr[dkA]/294)>=LOOP_OUT[dkA])					//return to cue for loop mode
 		{	
@@ -1132,19 +1668,18 @@ int main(void)
 			}	
 		}
 
-		
 	/////////////		deck A		///////////////////////		
 	if(CUE_OPERATION[dkA]==CUE_NEED_SET)
 		{
 		if(UT_SET[QUANTIZE]==1 && dSHOW==WAVEFORM)				//add calculate bars[dkA] in background process  /uncomment when bars[dkA] calculated
 			{
-			if(((play_adr[dkA]/294)>(BEATGRID[dkA][bars[dkA]-1]+((BEATGRID[dkA][bars[dkA]] - BEATGRID[dkA][bars[dkA]-1])/2))) || bars[dkA]==0)	
+			if((((play_adr[dkA]*10/441))>(BEATGRID[dkA][bars[dkA]-1]+((BEATGRID[dkA][bars[dkA]] - BEATGRID[dkA][bars[dkA]-1])/2))) || bars[dkA]==0)	
 				{
-				SET_CUE(dkA, BEATGRID[dkA][bars[dkA]]);	
+				SET_CUE(dkA, (BEATGRID[dkA][bars[dkA]]*3)/20);	
 				}
 			else
 				{
-				SET_CUE(dkA, BEATGRID[dkA][bars[dkA]-1]);		
+				SET_CUE(dkA, (BEATGRID[dkA][bars[dkA]-1]*3)/20);		
 				}				
 			}
 		else
@@ -1258,19 +1793,18 @@ int main(void)
 		CUE_OPERATION[dkA] = 0;
 		}	
 		
-	
 	/////////////		deck B		///////////////////////		
 	if(CUE_OPERATION[dkB]==CUE_NEED_SET)
 		{
 		if(UT_SET[QUANTIZE]==1 && dSHOW==WAVEFORM)				//add calculate bars[dkB] in background process  /uncomment when bars[dkB] calculated
 			{
-			if(((play_adr[dkB]/294)>(BEATGRID[dkB][bars[dkB]-1]+((BEATGRID[dkB][bars[dkB]] - BEATGRID[dkB][bars[dkB]-1])/2))) || bars[dkB]==0)	
+			if((((play_adr[dkB]*10)/441)>(BEATGRID[dkB][bars[dkB]-1]+((BEATGRID[dkB][bars[dkB]] - BEATGRID[dkB][bars[dkB]-1])/2))) || bars[dkB]==0)	
 				{
-				SET_CUE(dkB, BEATGRID[dkB][bars[dkB]]);	
+				SET_CUE(dkB, (BEATGRID[dkB][bars[dkB]]*3)/20);	
 				}
 			else
 				{
-				SET_CUE(dkB, BEATGRID[dkB][bars[dkB]-1]);		
+				SET_CUE(dkB, (BEATGRID[dkB][bars[dkB]-1]*3)/20);		
 				}				
 			}
 		else
@@ -1384,6 +1918,101 @@ int main(void)
 		CUE_OPERATION[dkB] = 0;
 		}		
 		
+	///////////////////////////////GUI ANIMATION//////////////////////////////////	
+	if(animation_en!=0)
+		{			
+		animation_step = 2*(HAL_GetTick() - animation_time); //0,24 sec for animation
+		if(animation_step<480 || animation_finish)				
+			{	
+			CURRENT_LAY = ActiveLayer;	
+			if(ActiveLayer!=1)
+				{
+				BSP_LCD_SelectLayer(1);
+				}	
+			if(animation_step>479 && animation_finish)
+				{
+				animation_step = 479; 	
+				animation_finish = 0;	
+				}
+			if(previous_animation_step!=animation_step)	
+				{
+				if(animation_en==1)			//forward animation   << enc push
+					{					
+					if(animation_step<271)
+						{
+						BSP_LCD_SetTextColor(LCD_COLOR_PAPER_TRANSP);					//Draw paper rectangle transparent
+						BSP_LCD_FillRect(270-animation_step, 18, animation_step-previous_animation_step, 171);	
+						}
+					BSP_LCD_SetTextColor(0x0000);					//transparent
+					BSP_LCD_FillRect(479-animation_step, 18, animation_step-previous_animation_step+1, 171);			
+					if(animation_step>60 && info_animation_enable==1)
+						{
+						BSP_LCD_SetTextColor(LCD_COLOR_PAPER_TRANSP);					//Draw paper rectangle transparent	
+						BSP_LCD_FillRect(479-((animation_step-61)/2), 18, (animation_step-previous_animation_step+1)/2, 171);	
+						}
+					else if(animation_step>123 && info_animation_enable==2)
+						{
+						BSP_LCD_SetTextColor(LCD_COLOR_PAPER_TRANSP);					//Draw paper rectangle transparent	
+						BSP_LCD_FillRect(479-((animation_step-124)/3), 18, (animation_step-previous_animation_step+2)/3, 171);	
+						}	
+					previous_animation_step = animation_step;	
+					}	
+				else if(animation_en==2  && animation_step>previous_animation_step)		// >> back push   reverse animation
+					{
+					BSP_LCD_SetTextColor(LCD_COLOR_PAPER_TRANSP);					//Draw paper rectangle transparent
+					BSP_LCD_FillRect(previous_animation_step, 18, animation_step-previous_animation_step+1, 171);
+					if(animation_step>210)
+						{
+						BSP_LCD_SetTextColor(0x0000);					//transparent	
+						if(previous_animation_step<211)
+							{
+							BSP_LCD_FillRect(0, 18, animation_step-210, 171);		
+							}
+						else
+							{
+							BSP_LCD_FillRect(previous_animation_step-211, 18, animation_step-previous_animation_step+1, 171);	
+							}
+						}
+					if(animation_step<421 && info_animation_enable==1)
+						{
+						BSP_LCD_SetTextColor(0x0000);
+						if(previous_animation_step==0)
+							{
+							BSP_LCD_FillRect(270, 18, (animation_step+4)/2, 171);		
+							}
+						else
+							{
+							BSP_LCD_FillRect(270+(previous_animation_step/2), 18, (animation_step-previous_animation_step+1)/2, 171);		
+							}
+						}
+					else if(animation_step<358 && info_animation_enable==2)
+						{
+						BSP_LCD_SetTextColor(0x0000);
+						if(previous_animation_step==0)
+							{
+							BSP_LCD_FillRect(361, 18, (animation_step+4)/3, 171);		
+							}
+						else
+							{
+							BSP_LCD_FillRect(361+(previous_animation_step/3), 18, (animation_step-previous_animation_step+2)/3, 171);		
+							}
+						}
+					previous_animation_step = animation_step;		
+					}
+				}	
+			BSP_LCD_SelectLayer(CURRENT_LAY);	
+			}
+		else
+			{
+			animation_en = 0;
+			previous_animation_step = 0;	
+			animation_step = 0;	
+			animation_time = 0;	
+			animation_finish = 1;	
+			SwitchInformationLayer(BR_NAVI_END);	
+			}
+		}	
+	
 	#include "pm_uart_handler.h"
 	#include "mixer_uart_handler.h"
 	#include "debug_uart_handler.h"
@@ -1470,14 +2099,14 @@ void PeriphCommonClock_Config(void)
   PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_FMC|RCC_PERIPHCLK_SAI1
                               |RCC_PERIPHCLK_SPI2|RCC_PERIPHCLK_SPI1;
   PeriphClkInitStruct.PLL2.PLL2M = 25;
-  PeriphClkInitStruct.PLL2.PLL2N = 271;
+  PeriphClkInitStruct.PLL2.PLL2N = 271;			//271
   PeriphClkInitStruct.PLL2.PLL2P = 2;
   PeriphClkInitStruct.PLL2.PLL2Q = 2;
-  PeriphClkInitStruct.PLL2.PLL2R = 2;
+  PeriphClkInitStruct.PLL2.PLL2R = 1;					//2	for FMC - SDRAM
   PeriphClkInitStruct.PLL2.PLL2RGE = RCC_PLL2VCIRANGE_0;
   PeriphClkInitStruct.PLL2.PLL2VCOSEL = RCC_PLL2VCOWIDE;
   PeriphClkInitStruct.PLL2.PLL2FRACN = 0;
-  PeriphClkInitStruct.FmcClockSelection = RCC_FMCCLKSOURCE_PLL2;		//
+  PeriphClkInitStruct.FmcClockSelection = RCC_FMCCLKSOURCE_PLL2;		
   PeriphClkInitStruct.Sai1ClockSelection = RCC_SAI1CLKSOURCE_PLL2;
   PeriphClkInitStruct.Spi123ClockSelection = RCC_SPI123CLKSOURCE_PLL2;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
@@ -1490,7 +2119,29 @@ void PeriphCommonClock_Config(void)
 #include "uarts_IRQs.h"
 #include "encoder_handler.h"	
 
-	
+///////////////////////////////////////////////
+//get free space and total space	
+//		
+void GET_SD_INFO(void)
+	{
+	FATFS *fs;
+	DWORD fre_clust;	
+	f_getfree("0:", &fre_clust, &fs);
+	used_mem = (fs->n_fatent - 2) * fs->csize;
+	used_mem = used_mem>>11;
+	if(used_mem>99999)
+		{
+		used_mem = 99999;	
+		}	
+	free_mem = fre_clust * (fs->csize);
+	free_mem = free_mem>>11;		
+	if(free_mem>99999)
+		{
+		free_mem = 99999;	
+		}	
+	used_mem = used_mem - free_mem;
+	return;	
+	}		
 
 /* USER CODE END 4 */
 

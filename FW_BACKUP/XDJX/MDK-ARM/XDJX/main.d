@@ -80,9 +80,13 @@ xdjx\main.o: ../Inc/gui.h
 xdjx\main.o: ../Inc/audio_handler.h
 xdjx\main.o: ../Inc/deck_transfer.h
 xdjx\main.o: ../Inc/decka_handler.h
+xdjx\main.o: ../Inc/pads_a.h
 xdjx\main.o: ../Inc/deckb_handler.h
+xdjx\main.o: ../Inc/pads_b.h
 xdjx\main.o: ../Inc/rekordbox.h
 xdjx\main.o: ../Inc/spi_mem.h
+xdjx\main.o: ../Inc/screenshot.h
+xdjx\main.o: ../Inc/fatfs_operations.h
 xdjx\main.o: ../Inc/pm_uart_handler.h
 xdjx\main.o: ../Inc/mixer_uart_handler.h
 xdjx\main.o: ../Inc/debug_uart_handler.h

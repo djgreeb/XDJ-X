@@ -1,19 +1,22 @@
 Dependencies for Project 'XDJX', Target 'XDJX': (DO NOT MODIFY !)
 CompilerVersion: 5060960::V5.06 update 7 (build 960)::.\ARMCC
-F (.\startup_stm32h743xx.s)(0x68D55668)(--cpu Cortex-M7.fp.sp -g --apcs=interwork --pd "__MICROLIB SETA 1"-I.\RTE\_XDJX-IC:\Users\Greeb\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\Greeb\AppData\Local\Arm\Packs\Keil\STM32H7xx_DFP\3.1.1\Drivers\CMSIS\Device\ST\STM32H7xx\Include--pd "__UVISION_VERSION SETA 534" --pd "_RTE_ SETA 1" --pd "STM32H743xx SETA 1" --pd "_RTE_ SETA 1"--list startup_stm32h743xx.lst --xref -o xdjx\startup_stm32h743xx.o --depend xdjx\startup_stm32h743xx.d)
-F (..\Inc\global_variables.h)(0x68DE32CC)()
-F (..\Inc\deck_transfer.h)(0x68D31097)()
-F (..\Inc\decka_handler.h)(0x68D55886)()
-F (..\Inc\deckb_handler.h)(0x68D55886)()
-F (..\Inc\pm_uart_handler.h)(0x68CEE604)()
-F (..\Inc\debug_uart_handler.h)(0x68D2FC39)()
-F (..\Inc\mixer_uart_handler.h)(0x68D539A4)()
-F (..\Inc\uarts_IRQs.h)(0x68D59A09)()
-F (..\Inc\qspi_const.h)(0x6809387E)()
-F (..\Inc\rekordbox.h)(0x68D55B31)()
-F (..\Inc\spi_mem.h)(0x683ADC78)()
+F (.\startup_stm32h743xx.s)(0x69B6E3EB)(--cpu Cortex-M7.fp.sp -g --apcs=interwork --pd "__MICROLIB SETA 1"-I.\RTE\_XDJX-IC:\Users\Greeb\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\Greeb\AppData\Local\Arm\Packs\Keil\STM32H7xx_DFP\3.1.1\Drivers\CMSIS\Device\ST\STM32H7xx\Include--pd "__UVISION_VERSION SETA 534" --pd "_RTE_ SETA 1" --pd "STM32H743xx SETA 1" --pd "_RTE_ SETA 1"--list startup_stm32h743xx.lst --xref -o xdjx\startup_stm32h743xx.o --depend xdjx\startup_stm32h743xx.d)
+F (..\Inc\global_variables.h)(0x69DB6B3A)()
+F (..\Inc\deck_transfer.h)(0x695FC60A)()
+F (..\Inc\decka_handler.h)(0x69A6F356)()
+F (..\Inc\deckb_handler.h)(0x69A6F3AC)()
+F (..\Inc\pads_a.h)(0x69A6F356)()
+F (..\Inc\pads_b.h)(0x69A6F3AC)()
 F (..\Inc\encoder_handler.h)(0x6840893A)()
-F (../Src/main.c)(0x68DE373E)(--c99 -c --cpu Cortex-M7.fp.sp -D__MICROLIB -g -W -O1 -Otime --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32H7xx/Include -I ../Drivers/CMSIS/Include -I ../Drivers/LCD/Components/Common -I ../Utilities/Fonts -I ../Drivers/QSPI -I ../Drivers/LCD -I ../Middlewares/Third_Party/FatFs/src --C99-I.\RTE\_XDJX-IC:\Users\Greeb\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\Greeb\AppData\Local\Arm\Packs\Keil\STM32H7xx_DFP\3.1.1\Drivers\CMSIS\Device\ST\STM32H7xx\Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32H743xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32H743xx-o xdjx\main.o --omf_browse xdjx\main.crf --depend xdjx\main.d)
+F (..\Inc\pm_uart_handler.h)(0x69B2E706)()
+F (..\Inc\debug_uart_handler.h)(0x69DB9F6D)()
+F (..\Inc\screenshot.h)(0x69B2E706)()
+F (..\Inc\mixer_uart_handler.h)(0x69627604)()
+F (..\Inc\uarts_IRQs.h)(0x68D59A0A)()
+F (..\Inc\qspi_const.h)(0x6941943A)()
+F (..\Inc\rekordbox.h)(0x69DBDF9C)()
+F (..\Inc\spi_mem.h)(0x683ADC78)()
+F (../Src/main.c)(0x69DBDF9C)(--c99 -c --cpu Cortex-M7.fp.sp -D__MICROLIB -g -W -O1 -Otime --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32H7xx/Include -I ../Drivers/CMSIS/Include -I ../Drivers/LCD/Components/Common -I ../Utilities/Fonts -I ../Drivers/QSPI -I ../Drivers/LCD -I ../Middlewares/Third_Party/FatFs/src --C99-I.\RTE\_XDJX-IC:\Users\Greeb\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\Greeb\AppData\Local\Arm\Packs\Keil\STM32H7xx_DFP\3.1.1\Drivers\CMSIS\Device\ST\STM32H7xx\Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32H743xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32H743xx-o xdjx\main.o --omf_browse xdjx\main.crf --depend xdjx\main.d)
 I (../Inc/main.h)(0x68558C4A)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h)(0x65F71400)
 I (../Inc/stm32h7xx_hal_conf.h)(0x68555C18)
@@ -69,7 +72,7 @@ I (../Inc/dma2d.h)(0x651AD986)
 I (../Inc/fatfs.h)(0x6634E0F4)
 I (../Middlewares/Third_Party/FatFs/src/ff.h)(0x65F71402)
 I (../Middlewares/Third_Party/FatFs/src/integer.h)(0x65F71402)
-I (../Inc/ffconf.h)(0x68558ECA)
+I (../Inc/ffconf.h)(0x69596BDE)
 I (../Inc/bsp_driver_sd.h)(0x6634E0F4)
 I (../Inc/fatfs_platform.h)(0x6634E0F4)
 I (C:\Keil_v5\ARM\ARMCC\include\stdlib.h)(0x5E8E8312)
@@ -85,22 +88,26 @@ I (../Inc/tim.h)(0x67D02B16)
 I (../Inc/usart.h)(0x67D2EAC2)
 I (../Inc/gpio.h)(0x651AD984)
 I (../Inc/fmc.h)(0x651AD986)
-I (../Inc/global_variables.h)(0x68DE32CC)
-I (../Inc/audio.h)(0x68D2D965)
-I (../Drivers/LCD/CWX3970.h)(0x68DE2E9D)
+I (../Inc/global_variables.h)(0x69DB6B3A)
+I (../Inc/audio.h)(0x69B842EF)
+I (../Drivers/LCD/CWX3970.h)(0x699D6FE6)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/../../../Utilities/Fonts/fonts.h)(0x6835C152)
-I (../Inc/qspi_const.h)(0x6809387E)
-I (../Inc/gui.h)(0x68DE33C6)
-I (../Inc/audio_handler.h)(0x68D2DEC8)
-I (../Inc/deck_transfer.h)(0x68D31097)
-I (../Inc/decka_handler.h)(0x68D55886)
-I (../Inc/deckb_handler.h)(0x68D55886)
-I (../Inc/rekordbox.h)(0x68D55B31)
+I (../Inc/qspi_const.h)(0x6941943A)
+I (../Inc/gui.h)(0x69B84516)
+I (../Inc/audio_handler.h)(0x69B2E706)
+I (../Inc/deck_transfer.h)(0x695FC60A)
+I (../Inc/decka_handler.h)(0x69A6F356)
+I (../Inc/pads_a.h)(0x69A6F356)
+I (../Inc/deckb_handler.h)(0x69A6F3AC)
+I (../Inc/pads_b.h)(0x69A6F3AC)
+I (../Inc/rekordbox.h)(0x69DBDF9C)
 I (../Inc/spi_mem.h)(0x683ADC78)
-I (../Inc/pm_uart_handler.h)(0x68CEE604)
-I (../Inc/mixer_uart_handler.h)(0x68D539A4)
-I (../Inc/debug_uart_handler.h)(0x68D2FC39)
-I (../Inc/uarts_IRQs.h)(0x68D59A09)
+I (../Inc/screenshot.h)(0x69B2E706)
+I (../Inc/fatfs_operations.h)(0x69B2E706)
+I (../Inc/pm_uart_handler.h)(0x69B2E706)
+I (../Inc/mixer_uart_handler.h)(0x69627604)
+I (../Inc/debug_uart_handler.h)(0x69DB9F6D)
+I (../Inc/uarts_IRQs.h)(0x68D59A0A)
 I (../Inc/encoder_handler.h)(0x6840893A)
 F (../Src/gpio.c)(0x68558C44)(--c99 -c --cpu Cortex-M7.fp.sp -D__MICROLIB -g -W -O1 -Otime --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32H7xx/Include -I ../Drivers/CMSIS/Include -I ../Drivers/LCD/Components/Common -I ../Utilities/Fonts -I ../Drivers/QSPI -I ../Drivers/LCD -I ../Middlewares/Third_Party/FatFs/src --C99-I.\RTE\_XDJX-IC:\Users\Greeb\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\Greeb\AppData\Local\Arm\Packs\Keil\STM32H7xx_DFP\3.1.1\Drivers\CMSIS\Device\ST\STM32H7xx\Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32H743xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32H743xx-o xdjx\gpio.o --omf_browse xdjx\gpio.crf --depend xdjx\gpio.d)
 I (../Inc/gpio.h)(0x651AD984)
@@ -315,7 +322,7 @@ I (../Middlewares/Third_Party/FatFs/src/ff_gen_drv.h)(0x65F71402)
 I (../Middlewares/Third_Party/FatFs/src/diskio.h)(0x65F71402)
 I (../Middlewares/Third_Party/FatFs/src/integer.h)(0x65F71402)
 I (../Middlewares/Third_Party/FatFs/src/ff.h)(0x65F71402)
-I (../Inc/ffconf.h)(0x68558ECA)
+I (../Inc/ffconf.h)(0x69596BDE)
 I (../Inc/main.h)(0x68558C4A)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h)(0x65F71400)
 I (../Inc/stm32h7xx_hal_conf.h)(0x68555C18)
@@ -374,7 +381,7 @@ F (../Src/fatfs.c)(0x6634E0F4)(--c99 -c --cpu Cortex-M7.fp.sp -D__MICROLIB -g -W
 I (../Inc/fatfs.h)(0x6634E0F4)
 I (../Middlewares/Third_Party/FatFs/src/ff.h)(0x65F71402)
 I (../Middlewares/Third_Party/FatFs/src/integer.h)(0x65F71402)
-I (../Inc/ffconf.h)(0x68558ECA)
+I (../Inc/ffconf.h)(0x69596BDE)
 I (../Inc/main.h)(0x68558C4A)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h)(0x65F71400)
 I (../Inc/stm32h7xx_hal_conf.h)(0x68555C18)
@@ -482,7 +489,7 @@ I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim.h)(0x65F71400)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim_ex.h)(0x65F71400)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h)(0x683F02AC)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h)(0x65F71400)
-F (../Src/fmc.c)(0x68D457C3)(--c99 -c --cpu Cortex-M7.fp.sp -D__MICROLIB -g -W -O1 -Otime --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32H7xx/Include -I ../Drivers/CMSIS/Include -I ../Drivers/LCD/Components/Common -I ../Utilities/Fonts -I ../Drivers/QSPI -I ../Drivers/LCD -I ../Middlewares/Third_Party/FatFs/src --C99-I.\RTE\_XDJX-IC:\Users\Greeb\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\Greeb\AppData\Local\Arm\Packs\Keil\STM32H7xx_DFP\3.1.1\Drivers\CMSIS\Device\ST\STM32H7xx\Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32H743xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32H743xx-o xdjx\fmc.o --omf_browse xdjx\fmc.crf --depend xdjx\fmc.d)
+F (../Src/fmc.c)(0x6946D4D2)(--c99 -c --cpu Cortex-M7.fp.sp -D__MICROLIB -g -W -O1 -Otime --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32H7xx/Include -I ../Drivers/CMSIS/Include -I ../Drivers/LCD/Components/Common -I ../Utilities/Fonts -I ../Drivers/QSPI -I ../Drivers/LCD -I ../Middlewares/Third_Party/FatFs/src --C99-I.\RTE\_XDJX-IC:\Users\Greeb\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\Greeb\AppData\Local\Arm\Packs\Keil\STM32H7xx_DFP\3.1.1\Drivers\CMSIS\Device\ST\STM32H7xx\Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32H743xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32H743xx-o xdjx\fmc.o --omf_browse xdjx\fmc.crf --depend xdjx\fmc.d)
 I (../Inc/fmc.h)(0x651AD986)
 I (../Inc/main.h)(0x68558C4A)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h)(0x65F71400)
@@ -534,7 +541,7 @@ I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim.h)(0x65F71400)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim_ex.h)(0x65F71400)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h)(0x683F02AC)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h)(0x65F71400)
-F (../Src/ltdc.c)(0x68D45A39)(--c99 -c --cpu Cortex-M7.fp.sp -D__MICROLIB -g -W -O1 -Otime --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32H7xx/Include -I ../Drivers/CMSIS/Include -I ../Drivers/LCD/Components/Common -I ../Utilities/Fonts -I ../Drivers/QSPI -I ../Drivers/LCD -I ../Middlewares/Third_Party/FatFs/src --C99-I.\RTE\_XDJX-IC:\Users\Greeb\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\Greeb\AppData\Local\Arm\Packs\Keil\STM32H7xx_DFP\3.1.1\Drivers\CMSIS\Device\ST\STM32H7xx\Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32H743xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32H743xx-o xdjx\ltdc.o --omf_browse xdjx\ltdc.crf --depend xdjx\ltdc.d)
+F (../Src/ltdc.c)(0x68D45A3A)(--c99 -c --cpu Cortex-M7.fp.sp -D__MICROLIB -g -W -O1 -Otime --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32H7xx/Include -I ../Drivers/CMSIS/Include -I ../Drivers/LCD/Components/Common -I ../Utilities/Fonts -I ../Drivers/QSPI -I ../Drivers/LCD -I ../Middlewares/Third_Party/FatFs/src --C99-I.\RTE\_XDJX-IC:\Users\Greeb\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\Greeb\AppData\Local\Arm\Packs\Keil\STM32H7xx_DFP\3.1.1\Drivers\CMSIS\Device\ST\STM32H7xx\Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32H743xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32H743xx-o xdjx\ltdc.o --omf_browse xdjx\ltdc.crf --depend xdjx\ltdc.d)
 I (../Inc/ltdc.h)(0x651AD986)
 I (../Inc/main.h)(0x68558C4A)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h)(0x65F71400)
@@ -690,7 +697,7 @@ I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim.h)(0x65F71400)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim_ex.h)(0x65F71400)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h)(0x683F02AC)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h)(0x65F71400)
-F (../Src/sdmmc.c)(0x68D52036)(--c99 -c --cpu Cortex-M7.fp.sp -D__MICROLIB -g -W -O1 -Otime --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32H7xx/Include -I ../Drivers/CMSIS/Include -I ../Drivers/LCD/Components/Common -I ../Utilities/Fonts -I ../Drivers/QSPI -I ../Drivers/LCD -I ../Middlewares/Third_Party/FatFs/src --C99-I.\RTE\_XDJX-IC:\Users\Greeb\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\Greeb\AppData\Local\Arm\Packs\Keil\STM32H7xx_DFP\3.1.1\Drivers\CMSIS\Device\ST\STM32H7xx\Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32H743xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32H743xx-o xdjx\sdmmc.o --omf_browse xdjx\sdmmc.crf --depend xdjx\sdmmc.d)
+F (../Src/sdmmc.c)(0x699F55F8)(--c99 -c --cpu Cortex-M7.fp.sp -D__MICROLIB -g -W -O1 -Otime --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32H7xx/Include -I ../Drivers/CMSIS/Include -I ../Drivers/LCD/Components/Common -I ../Utilities/Fonts -I ../Drivers/QSPI -I ../Drivers/LCD -I ../Middlewares/Third_Party/FatFs/src --C99-I.\RTE\_XDJX-IC:\Users\Greeb\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\Greeb\AppData\Local\Arm\Packs\Keil\STM32H7xx_DFP\3.1.1\Drivers\CMSIS\Device\ST\STM32H7xx\Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32H743xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32H743xx-o xdjx\sdmmc.o --omf_browse xdjx\sdmmc.crf --depend xdjx\sdmmc.d)
 I (../Inc/sdmmc.h)(0x6634E0F4)
 I (../Inc/main.h)(0x68558C4A)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h)(0x65F71400)
@@ -1001,6 +1008,7 @@ I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim.h)(0x65F71400)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim_ex.h)(0x65F71400)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h)(0x683F02AC)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h)(0x65F71400)
+F (..\Inc\fatfs_operations.h)(0x69B2E706)()
 F (../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_cortex.c)(0x65F71400)(--c99 -c --cpu Cortex-M7.fp.sp -D__MICROLIB -g -W -O1 -Otime --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32H7xx/Include -I ../Drivers/CMSIS/Include -I ../Drivers/LCD/Components/Common -I ../Utilities/Fonts -I ../Drivers/QSPI -I ../Drivers/LCD -I ../Middlewares/Third_Party/FatFs/src --C99-I.\RTE\_XDJX-IC:\Users\Greeb\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\Greeb\AppData\Local\Arm\Packs\Keil\STM32H7xx_DFP\3.1.1\Drivers\CMSIS\Device\ST\STM32H7xx\Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32H743xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32H743xx-o xdjx\stm32h7xx_hal_cortex.o --omf_browse xdjx\stm32h7xx_hal_cortex.crf --depend xdjx\stm32h7xx_hal_cortex.d)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h)(0x65F71400)
 I (../Inc/stm32h7xx_hal_conf.h)(0x68555C18)
@@ -1051,7 +1059,7 @@ I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim.h)(0x65F71400)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim_ex.h)(0x65F71400)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h)(0x683F02AC)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h)(0x65F71400)
-F (../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma2d.c)(0x67D722B6)(--c99 -c --cpu Cortex-M7.fp.sp -D__MICROLIB -g -W -O1 -Otime --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32H7xx/Include -I ../Drivers/CMSIS/Include -I ../Drivers/LCD/Components/Common -I ../Utilities/Fonts -I ../Drivers/QSPI -I ../Drivers/LCD -I ../Middlewares/Third_Party/FatFs/src --C99-I.\RTE\_XDJX-IC:\Users\Greeb\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\Greeb\AppData\Local\Arm\Packs\Keil\STM32H7xx_DFP\3.1.1\Drivers\CMSIS\Device\ST\STM32H7xx\Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32H743xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32H743xx-o xdjx\stm32h7xx_hal_dma2d.o --omf_browse xdjx\stm32h7xx_hal_dma2d.crf --depend xdjx\stm32h7xx_hal_dma2d.d)
+F (../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma2d.c)(0x694C405A)(--c99 -c --cpu Cortex-M7.fp.sp -D__MICROLIB -g -W -O1 -Otime --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32H7xx/Include -I ../Drivers/CMSIS/Include -I ../Drivers/LCD/Components/Common -I ../Utilities/Fonts -I ../Drivers/QSPI -I ../Drivers/LCD -I ../Middlewares/Third_Party/FatFs/src --C99-I.\RTE\_XDJX-IC:\Users\Greeb\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\Greeb\AppData\Local\Arm\Packs\Keil\STM32H7xx_DFP\3.1.1\Drivers\CMSIS\Device\ST\STM32H7xx\Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32H743xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32H743xx-o xdjx\stm32h7xx_hal_dma2d.o --omf_browse xdjx\stm32h7xx_hal_dma2d.crf --depend xdjx\stm32h7xx_hal_dma2d.d)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h)(0x65F71400)
 I (../Inc/stm32h7xx_hal_conf.h)(0x68555C18)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_rcc.h)(0x65F71400)
@@ -2751,8 +2759,8 @@ I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim.h)(0x65F71400)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim_ex.h)(0x65F71400)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h)(0x683F02AC)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h)(0x65F71400)
-F (..\Drivers\LCD\CWX3970.c)(0x68D46252)(--c99 -c --cpu Cortex-M7.fp.sp -D__MICROLIB -g -W -O1 -Otime --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32H7xx/Include -I ../Drivers/CMSIS/Include -I ../Drivers/LCD/Components/Common -I ../Utilities/Fonts -I ../Drivers/QSPI -I ../Drivers/LCD -I ../Middlewares/Third_Party/FatFs/src --C99-I.\RTE\_XDJX-IC:\Users\Greeb\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\Greeb\AppData\Local\Arm\Packs\Keil\STM32H7xx_DFP\3.1.1\Drivers\CMSIS\Device\ST\STM32H7xx\Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32H743xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32H743xx-o xdjx\cwx3970.o --omf_browse xdjx\cwx3970.crf --depend xdjx\cwx3970.d)
-I (..\Drivers\LCD\CWX3970.h)(0x68DE2E9D)
+F (..\Drivers\LCD\CWX3970.c)(0x699D6FE6)(--c99 -c --cpu Cortex-M7.fp.sp -D__MICROLIB -g -W -O1 -Otime --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32H7xx/Include -I ../Drivers/CMSIS/Include -I ../Drivers/LCD/Components/Common -I ../Utilities/Fonts -I ../Drivers/QSPI -I ../Drivers/LCD -I ../Middlewares/Third_Party/FatFs/src --C99-I.\RTE\_XDJX-IC:\Users\Greeb\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\Greeb\AppData\Local\Arm\Packs\Keil\STM32H7xx_DFP\3.1.1\Drivers\CMSIS\Device\ST\STM32H7xx\Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32H743xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32H743xx-o xdjx\cwx3970.o --omf_browse xdjx\cwx3970.crf --depend xdjx\cwx3970.d)
+I (..\Drivers\LCD\CWX3970.h)(0x699D6FE6)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h)(0x65F71400)
 I (../Inc/stm32h7xx_hal_conf.h)(0x68555C18)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_rcc.h)(0x65F71400)
@@ -2803,22 +2811,22 @@ I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim_ex.h)(0x65F71400)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h)(0x683F02AC)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h)(0x65F71400)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/../../../Utilities/Fonts/fonts.h)(0x6835C152)
-I (../Drivers/STM32H7xx_HAL_Driver/Inc/../../../Utilities/Fonts/font15P.c)(0x5EA2D312)
-I (../Drivers/STM32H7xx_HAL_Driver/Inc/../../../Utilities/Fonts/fontBMP.c)(0x68D55E16)
+I (../Drivers/STM32H7xx_HAL_Driver/Inc/../../../Utilities/Fonts/font15P.c)(0x695AE82C)
+I (../Drivers/STM32H7xx_HAL_Driver/Inc/../../../Utilities/Fonts/fontBMP.c)(0x68E0204A)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/../../../Utilities/Fonts/font14D.c)(0x6834BA1E)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/../../../Utilities/Fonts/font18D.c)(0x6659BB88)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/../../../Utilities/Fonts/font9D.c)(0x6834B8C6)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/../../../Utilities/Fonts/font7W.c)(0x68358A38)
 I (../Inc/main.h)(0x68558C4A)
-F (..\Inc\gui.h)(0x68DE33C6)()
-F (..\Inc\audio_handler.h)(0x68D2DEC8)()
-F (..\Inc\audio.h)(0x68D2D965)()
+F (..\Inc\gui.h)(0x69B84516)()
+F (..\Inc\audio_handler.h)(0x69B2E706)()
+F (..\Inc\audio.h)(0x69B842EF)()
 F (../Middlewares/Third_Party/FatFs/src/diskio.c)(0x65F71402)(--c99 -c --cpu Cortex-M7.fp.sp -D__MICROLIB -g -O1 -Otime --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32H7xx/Include -I ../Drivers/CMSIS/Include -I ../Drivers/LCD/Components/Common -I ../Utilities/Fonts -I ../Drivers/QSPI -I ../Drivers/LCD -I ../Middlewares/Third_Party/FatFs/src --C99-I.\RTE\_XDJX-IC:\Users\Greeb\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\Greeb\AppData\Local\Arm\Packs\Keil\STM32H7xx_DFP\3.1.1\Drivers\CMSIS\Device\ST\STM32H7xx\Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32H743xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32H743xx-o xdjx\diskio.o --omf_browse xdjx\diskio.crf --depend xdjx\diskio.d)
 I (../Middlewares/Third_Party/FatFs/src/diskio.h)(0x65F71402)
 I (../Middlewares/Third_Party/FatFs/src/integer.h)(0x65F71402)
 I (../Middlewares/Third_Party/FatFs/src/ff_gen_drv.h)(0x65F71402)
 I (../Middlewares/Third_Party/FatFs/src/ff.h)(0x65F71402)
-I (../Inc/ffconf.h)(0x68558ECA)
+I (../Inc/ffconf.h)(0x69596BDE)
 I (../Inc/main.h)(0x68558C4A)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h)(0x65F71400)
 I (../Inc/stm32h7xx_hal_conf.h)(0x68555C18)
@@ -2875,7 +2883,7 @@ I (C:\Keil_v5\ARM\ARMCC\include\stdlib.h)(0x5E8E8312)
 F (../Middlewares/Third_Party/FatFs/src/ff.c)(0x65F71402)(--c99 -c --cpu Cortex-M7.fp.sp -D__MICROLIB -g -O1 -Otime --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32H7xx/Include -I ../Drivers/CMSIS/Include -I ../Drivers/LCD/Components/Common -I ../Utilities/Fonts -I ../Drivers/QSPI -I ../Drivers/LCD -I ../Middlewares/Third_Party/FatFs/src --C99-I.\RTE\_XDJX-IC:\Users\Greeb\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\Greeb\AppData\Local\Arm\Packs\Keil\STM32H7xx_DFP\3.1.1\Drivers\CMSIS\Device\ST\STM32H7xx\Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32H743xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32H743xx-o xdjx\ff.o --omf_browse xdjx\ff.crf --depend xdjx\ff.d)
 I (../Middlewares/Third_Party/FatFs/src/ff.h)(0x65F71402)
 I (../Middlewares/Third_Party/FatFs/src/integer.h)(0x65F71402)
-I (../Inc/ffconf.h)(0x68558ECA)
+I (../Inc/ffconf.h)(0x69596BDE)
 I (../Inc/main.h)(0x68558C4A)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h)(0x65F71400)
 I (../Inc/stm32h7xx_hal_conf.h)(0x68555C18)
@@ -2936,7 +2944,7 @@ I (../Middlewares/Third_Party/FatFs/src/ff_gen_drv.h)(0x65F71402)
 I (../Middlewares/Third_Party/FatFs/src/diskio.h)(0x65F71402)
 I (../Middlewares/Third_Party/FatFs/src/integer.h)(0x65F71402)
 I (../Middlewares/Third_Party/FatFs/src/ff.h)(0x65F71402)
-I (../Inc/ffconf.h)(0x68558ECA)
+I (../Inc/ffconf.h)(0x69596BDE)
 I (../Inc/main.h)(0x68558C4A)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h)(0x65F71400)
 I (../Inc/stm32h7xx_hal_conf.h)(0x68555C18)
@@ -2993,7 +3001,7 @@ I (C:\Keil_v5\ARM\ARMCC\include\stdlib.h)(0x5E8E8312)
 F (../Middlewares/Third_Party/FatFs/src/option/syscall.c)(0x65F71402)(--c99 -c --cpu Cortex-M7.fp.sp -D__MICROLIB -g -O1 -Otime --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32H7xx/Include -I ../Drivers/CMSIS/Include -I ../Drivers/LCD/Components/Common -I ../Utilities/Fonts -I ../Drivers/QSPI -I ../Drivers/LCD -I ../Middlewares/Third_Party/FatFs/src --C99-I.\RTE\_XDJX-IC:\Users\Greeb\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\Greeb\AppData\Local\Arm\Packs\Keil\STM32H7xx_DFP\3.1.1\Drivers\CMSIS\Device\ST\STM32H7xx\Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32H743xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32H743xx-o xdjx\syscall.o --omf_browse xdjx\syscall.crf --depend xdjx\syscall.d)
 I (../Middlewares/Third_Party/FatFs/src/option/../ff.h)(0x65F71402)
 I (../Middlewares/Third_Party/FatFs/src/option/../integer.h)(0x65F71402)
-I (../Inc/ffconf.h)(0x68558ECA)
+I (../Inc/ffconf.h)(0x69596BDE)
 I (../Inc/main.h)(0x68558C4A)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h)(0x65F71400)
 I (../Inc/stm32h7xx_hal_conf.h)(0x68555C18)
@@ -3050,7 +3058,7 @@ I (C:\Keil_v5\ARM\ARMCC\include\stdlib.h)(0x5E8E8312)
 F (../Middlewares/Third_Party/FatFs/src/option/ccsbcs.c)(0x65F71402)(--c99 -c --cpu Cortex-M7.fp.sp -D__MICROLIB -g -O1 -Otime --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc -I ../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32H7xx/Include -I ../Drivers/CMSIS/Include -I ../Drivers/LCD/Components/Common -I ../Utilities/Fonts -I ../Drivers/QSPI -I ../Drivers/LCD -I ../Middlewares/Third_Party/FatFs/src --C99-I.\RTE\_XDJX-IC:\Users\Greeb\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\Greeb\AppData\Local\Arm\Packs\Keil\STM32H7xx_DFP\3.1.1\Drivers\CMSIS\Device\ST\STM32H7xx\Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32H743xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32H743xx-o xdjx\ccsbcs.o --omf_browse xdjx\ccsbcs.crf --depend xdjx\ccsbcs.d)
 I (../Middlewares/Third_Party/FatFs/src/option/../ff.h)(0x65F71402)
 I (../Middlewares/Third_Party/FatFs/src/option/../integer.h)(0x65F71402)
-I (../Inc/ffconf.h)(0x68558ECA)
+I (../Inc/ffconf.h)(0x69596BDE)
 I (../Inc/main.h)(0x68558C4A)
 I (../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h)(0x65F71400)
 I (../Inc/stm32h7xx_hal_conf.h)(0x68555C18)

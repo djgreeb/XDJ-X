@@ -135,29 +135,32 @@
 			}
 		else if((deckRbuf[9]&0x02)==0 && CUE_BTN_pressed[dkB]==1)
 			{
-			if(lock_control[dkB]==0)	
-				{	
-				if(keep_to_play[dkB]==0)		//button play not pressed	
-					{
-					play_enable[dkB] = 0;
-					pitch[dkB] = 0;		
-					slip_pl_enable[dkB] = 0;	
-					play_adr[dkB] = 294*CUE_ADR[dkB];	
-					if(SLIPEN[dkB])					//SLIP MODE ENABLE
-						{	
-						slip_pl_adr[dkB] = play_adr[dkB];	
+			if((GPIOB->IDR&0x00000200)!=0)						//SHIFT BUTTON not pressed
+				{		
+				if(lock_control[dkB]==0)	
+					{	
+					if(keep_to_play[dkB]==0)		//button play not pressed	
+						{
+						play_enable[dkB] = 0;
+						pitch[dkB] = 0;		
+						slip_pl_enable[dkB] = 0;	
+						play_adr[dkB] = 294*CUE_ADR[dkB];	
+						if(SLIPEN[dkB])					//SLIP MODE ENABLE
+							{	
+							slip_pl_adr[dkB] = play_adr[dkB];	
+							}
+			//			if((Tbuffer[19]&0x20)==0)   //CDJ mode
+			//				{
+			//				pitch = 0;	
+			//				}
 						}
-		//			if((Tbuffer[19]&0x20)==0)   //CDJ mode
-		//				{
-		//				pitch = 0;	
-		//				}
+					else
+						{
+						keep_to_play[dkB] = 0;	
+						}
+					offset_adress[dkB] = 0;																///	   temporary operation	
+					offset_adressBIG[dkB] = 0;		
 					}
-				else
-					{
-					keep_to_play[dkB] = 0;	
-					}
-				offset_adress[dkB] = 0;																///	   temporary operation	
-				offset_adressBIG[dkB] = 0;		
 				}
 			CUE_BTN_pressed[dkB] = 0;	
 			}
@@ -316,8 +319,9 @@
 		else if((deckRbuf[9]&0x40)==0 && LP8_BTN_pressed[dkB]==1)
 			{
 			LP8_BTN_pressed[dkB] = 0;	
-			}				
-			
+			}
+		#include "pads_b.h"		
+		
 		if((deckRbuf[9]&0x04) && RVRS_BTN_pressed[dkB]==0)					///////////reverse switch position
 			{
 			if(RVRSEN[dkB])
@@ -547,7 +551,8 @@
 					{
 					ptch = 1;	
 					}
-				ptch = 150000/ptch;
+					
+				ptch = 120000/ptch;				//150000
 					
 				if(ptch>4225)
 					{
@@ -564,7 +569,6 @@
 					}
 				else if(((deckRbuf[12]&0x80) && (RVRSEN[dkB]==0)) || (((deckRbuf[12]&0x80)==0) && RVRSEN[dkB]))	 //reverse rotation and reverse off OR foward rotation and reverse on(pitch bend)	
 					{
-					ptch/=2;	
 					if(ptch<potenciometr_tempo[dkB])
 						{
 						pitch[dkB] = potenciometr_tempo[dkB] - ptch;
@@ -909,8 +913,6 @@
 			
 		if(load_animation_en[dkB])
 			{
-			//Tbuffer[21] = 0;					//disable red cue marker
-			//Tbuffer[23] &= 0xDF;			//disable touch circle on display		
 			deckTbuf[TXpage][12] = 137;				//command load animation	
 			}
 		else if(track_play_now[dkB]==0)

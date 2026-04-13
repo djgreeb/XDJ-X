@@ -13,6 +13,34 @@ void SET_CUE(uint8_t dk, uint32_t nf_adr);
 
 
 /////////////////////////////////////////////	
+//seek adress in samples (44100 per second)
+//
+void SEEK_AUDIOFRAME(uint8_t dk, uint32_t seek_adr)
+	{
+	if(seek_adr>(294*all_long[dk]))
+		{
+		return;	
+		}
+	seek_adr&=0xFFFFE000;	
+	res = f_lseek(&file[dk], ((seek_adr<<2)+44));	
+	if(FR_OK==res)
+		{			
+		end_adata[dk] = (seek_adr>>13);
+		start_adata[dk] = end_adata[dk];
+		prevstrt[dk] = (start_adata[dk]*5628)/all_long[dk];		//	for update mem bar
+		prevfin[dk]	= prevstrt[dk];	
+		play_adr[dk] = seek_adr;
+		//fill_stp[dk] = 0;	
+		if(SLIPEN[dk])					//SLIP MODE ENABLE
+			{	
+			slip_pl_adr[dk] = play_adr[dk];	
+			}			
+		need_redraw_memline[dk] = 1;		
+		}			
+	return;	
+	};
+
+/////////////////////////////////////////////	
 //SET CUE,create adress CUE_ADR
 //create offset data
 //copy audiodata from main audio buffer to cue_mem buffer
@@ -33,7 +61,7 @@ void SET_CUE(uint8_t dk, uint32_t nf_adr)
 		{
 		memcpy(&PCM[dk][0][0][copy_cnt+(128<<14)], &PCM[dk][0][0][(copy_cnt+(mem_offset_adress[dk]<<14))&0x1FFFFF], 32768);	
 		}
-	cpos = 203*CUE_ADR[dk];
+	cpos = 202*CUE_ADR[dk];
 	cpos/= all_long[dk];	
 	DrawCueMarker(dk, cpos);	
 	c_adr = ((nf_adr/2)%135)+1;	
@@ -65,32 +93,19 @@ void CALL_CUE(uint8_t dk)
 		}
 	else
 		{		
-		if(dk==dkA)
+		res = f_lseek(&file[dk], ((seek_adr<<2)+44));		
+		if(res==FR_OK)
 			{
-			if(FR_OK==f_lseek(&file, ((seek_adr<<2)+44)))
-				{
-				end_adata[dk] = (seek_adr>>13);
-				start_adata[dk] = end_adata[dk]; 	
-				play_adr[dk] = 294*CUE_ADR[dk];		
-				if(SLIPEN[dk])					//SLIP MODE ENABLE
-					{	
-					slip_pl_adr[dk] = play_adr[dk];	
-					}			
-				}		
-			}			
-		else
-			{
-			if(FR_OK==f_lseek(&fileb, ((seek_adr<<2)+44)))
-				{
-				end_adata[dk] = (seek_adr>>13);
-				start_adata[dk] = end_adata[dk]; 	
-				play_adr[dk] = 294*CUE_ADR[dk];		
-				if(SLIPEN[dk])					//SLIP MODE ENABLE
-					{	
-					slip_pl_adr[dk] = play_adr[dk];	
-					}			
-				}		
-			}			
+			end_adata[dk] = (seek_adr>>13);
+			start_adata[dk] = end_adata[dk]; 	
+			prevstrt[dk] = (start_adata[dk]*5628)/all_long[dk];		//	for update mem bar
+			prevfin[dk]	= prevstrt[dk];														//					
+			play_adr[dk] = 294*CUE_ADR[dk];		
+			if(SLIPEN[dk])					//SLIP MODE ENABLE
+				{	
+				slip_pl_adr[dk] = play_adr[dk];	
+				}			
+			}
 		}
 	offset_adress[dk] = 128-mem_offset_adress[dk];	
 	offset_adressBIG[dk] = offset_adress[dk]<<13;	
@@ -116,27 +131,18 @@ void SET_MEMORY_CUE_1(uint8_t dk, uint32_t nf_adr)
 		}	
 	CUE_ADR[dk] = nf_adr;	
 	AIS = (294*CUE_ADR[dk])&0xFFFFE000;							//rounding up to 8192
-	if(dk==dkA)
-		{	
-		if(FR_OK==f_lseek(&file, ((AIS<<2)+44)))
-			{
-			end_adata[dk] = (AIS>>13);
-			start_adata[dk] = end_adata[dk]; 	
-			play_adr[dk] = 294*CUE_ADR[dk];		
-			}
-		}
-	else
+	res = f_lseek(&file[dk], ((AIS<<2)+44));
+	if(res==FR_OK)
 		{
-		if(FR_OK==f_lseek(&fileb, ((AIS<<2)+44)))
-			{
-			end_adata[dk] = (AIS>>13);
-			start_adata[dk] = end_adata[dk]; 	
-			play_adr[dk] = 294*CUE_ADR[dk];		
-			}			
-		}
+		end_adata[dk] = (AIS>>13);
+		start_adata[dk] = end_adata[dk]; 	
+		prevstrt[dk] = (start_adata[dk]*5628)/all_long[dk];		//	for update mem bar
+		prevfin[dk]	= prevstrt[dk];														//			
+		play_adr[dk] = 294*CUE_ADR[dk];	
+		}		
 	AIS-=65536;	//8192*8
 	mem_offset_adress[dk] = (AIS&0x000FFFFF)>>13;	
-	cpos = 203*CUE_ADR[dk];
+	cpos = 202*CUE_ADR[dk];
 	cpos/= all_long[dk];	
 	DrawCueMarker(dk, cpos);		
 	c_adr = ((nf_adr/2)%135)+1;	
@@ -168,9 +174,9 @@ void SET_MEMORY_CUE_2(uint8_t dk)
 //
 //			AUDIO HANDLER
 //			
-//	v.0.93				
-//	3.3-10uS	
-//	Duty: 13-29%
+//	v.1.67				
+//	5-7uS	
+//	Duty: 21-27%
 //	
 void SAI1_IRQHandler(void)
 	{	

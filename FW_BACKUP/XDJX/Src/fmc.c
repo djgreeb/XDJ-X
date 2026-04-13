@@ -97,8 +97,8 @@ void MX_FMC_Init(void)
 
 			/* Step 8: Set the refresh rate counter
 	64msec / 4096 fresh = 15.62 us 
-	refresh count= 15.62usec * 84MHz  - 20 =  1292 1386 */
-	HAL_SDRAM_ProgramRefreshRate(&hsdram1, 0x02A5);     //refresh count
+	refresh count= 15.62usec * 135.5MHz  - 20 = 2096 */
+	HAL_SDRAM_ProgramRefreshRate(&hsdram1, 0x0830);     //refresh count
 	
 	
   /* USER CODE END FMC_Init 2 */

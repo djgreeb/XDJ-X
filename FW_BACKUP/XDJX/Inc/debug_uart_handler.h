@@ -150,7 +150,86 @@
 			sprintf((char*)U_TX_DATA, "%s", "writed\n\r");
 			UART_TX(&huart4, U_TX_DATA, 8, 5);
 			}
-		dbg_new_data = 0;		
+		else if(dbg_urx_buf[0]==9)					//send keys table
+			{	
+			uint8_t n;
+			for(n=0;n<25;n++)
+				{				
+				sprintf((char*)&U_TX_DATA, "%03lu   ", KEYSmatchtable[n]);	
+				UART_TX(&huart4, U_TX_DATA, 6, 5);
+
+				UART_TX(&huart4, KEYS[n], 4, 5);
+				sprintf((char*)U_TX_DATA, "\n\r");
+				UART_TX(&huart4, U_TX_DATA, 2, 5);
+				}
+			}	
+		else if(dbg_urx_buf[0]==10)					//waveform color
+			{	
+			//COLOR_MAP[dbg_urx_buf[1]][dbg_urx_buf[2]] = 256*dbg_urx_buf[3] + dbg_urx_buf[4];
+			}	
+		else if(dbg_urx_buf[0]==11)					//create screenshot
+			{	
+			sprintf((char*)U_TX_DATA, "%s", "Prepare screen wait...\n\r");
+			UART_TX(&huart4, U_TX_DATA, 24, 5);
+			uint16_t uart_tmp;	
+			uart_tmp = CREATE_SCREEN();	
+			if(uart_tmp==0xFFFF)
+				{
+				sprintf((char*)U_TX_DATA, "%s", "Error. Screen not created.\n\r");	
+				UART_TX(&huart4, U_TX_DATA, 28, 15);		
+				}
+			else
+				{
+				sprintf((char*)U_TX_DATA, "%s", "Done!\n\r");	
+				UART_TX(&huart4, U_TX_DATA, 7, 15);
+				sprintf((char*)U_TX_DATA, "SCREEN_%03lu.bmp\n\r", uart_tmp);
+				UART_TX(&huart4, U_TX_DATA, 16, 15);
+				}
+			}	
+		else if(dbg_urx_buf[0]==0x0C && dbg_urx_buf[1]==0x00)					//playlist (tracks base)
+			{		
+			uint16_t n;
+			for(n=0;n<1024;n++)
+				{					
+				UART_TX(&huart4, &playlist[n][0], 55, 50);
+				sprintf((char*)U_TX_DATA, "\n\r");
+				UART_TX(&huart4, U_TX_DATA, 2, 5);
+				HAL_Delay(3);	
+				}
+			}
+		else if(dbg_urx_buf[0]==0x0D && dbg_urx_buf[1]==0x00)					//playlists name
+			{		
+			uint16_t n;
+			for(n=0;n<40;n++)
+				{					
+				UART_TX(&huart4, &TRACKLIST_NAME[n][0], 20, 50);
+				HAL_Delay(3);		
+				sprintf((char*)U_TX_DATA, "\n\r");
+				UART_TX(&huart4, U_TX_DATA, 2, 5);
+				HAL_Delay(5);	
+				}
+			}
+		else if(dbg_urx_buf[0]==0x0E && dbg_urx_buf[1]==0x00)					//TRACKLIST_OFFSET
+			{		
+			uint16_t n;
+			for(n=0;n<40;n++)
+				{					
+				sprintf((char*)U_TX_DATA, "%05lu\n\r", TRACKLIST_OFFSET[n]);	
+				UART_TX(&huart4, U_TX_DATA, 7, 5);
+				HAL_Delay(3);	
+				}
+			}
+		else if(dbg_urx_buf[0]==0x0F && dbg_urx_buf[1]==0x00)					//TRACKS_DATABASE
+			{		
+			uint16_t n;
+			for(n=0;n<2048;n++)
+				{					
+				sprintf((char*)U_TX_DATA, "%05lu\n\r", TRACKS_DATABASE[n]);	
+				UART_TX(&huart4, U_TX_DATA, 7, 5);
+				HAL_Delay(3);	
+				}
+			}
+		dbg_new_data = 0;	
 		};
 	
 		

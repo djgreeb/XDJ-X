@@ -28,7 +28,7 @@
 
 uint8_t TRANSPARENT_MODE_ENABLE = 0;
 
-const uint8_t width15P[95]={
+const uint8_t width15P[242]={
 4,
 2,
 5,
@@ -123,7 +123,253 @@ const uint8_t width15P[95]={
 3,
 10,
 3,
-11
+11,
+0,	//none symbol
+///////
+9,			//A rus
+9,
+9,			//B rus
+8,
+10,
+8,		//E rus
+12,
+9,
+9,
+8,
+9,		//K rus
+9,
+10,
+8,
+9,
+8,
+9,
+9,		//C rus
+8,
+8,
+10,
+9,		//X
+9,
+8,
+10,
+11,
+11,
+13,
+9,
+9,
+13,
+9,
+7,	//a rus
+7,
+7,
+6,
+9,
+7,
+10,
+7,
+7,
+7,
+7,
+7,
+8,
+7,
+7,
+7,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+7,		//p rus
+7,
+6,
+7,
+10,		//f rus
+7,
+8,
+7,
+10,
+11,
+9,
+10,
+7,
+7,
+10,
+7,
+7,
+7,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0}; 
+
+
+const uint8_t width7W[95]={
+3,
+2,
+5,
+5,		//#
+6,
+0,
+0,
+2,
+3,
+3,
+0,
+6,
+2,
+6,		//-
+2,
+4,
+7,	//0
+4,	//1
+6,
+7,
+7,
+7,
+7,
+7,
+7,
+7,
+2,	//:
+2,
+0,
+5,		//=
+0,
+0,
+0,
+6,	//A
+6,	//B
+6,
+6,
+5,
+5,	//F
+6,
+6,
+2,
+6,
+6,
+6,
+8,	//M
+8,
+7,
+6,
+8,
+6,
+7,	//S
+6,
+7,
+6,
+8,
+6,
+6,
+6,		//Z
+0,
+0,
+0,
+0,
+0,
+0,
+6,		//a
+6,		//b
+6,
+6,
+6,
+4,
+0,
+5,		//h
+2,		//i
+0,
+0,
+2,
+8,
+5,
+6,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0
 }; 
 
 #define POLY_X(Z)              ((int32_t)((Points + Z)->X))
@@ -354,7 +600,7 @@ sFONT *BSP_LCD_GetFont(void)
 uint32_t BSP_LCD_ReadPixel(uint16_t Xpos, uint16_t Ypos)
 {
   uint32_t ret = 0;
-  ret = *(__IO uint8_t*) (hLtdcHandler.LayerCfg[ActiveLayer].FBStartAdress + (2*(Ypos*BSP_LCD_GetXSize() + Xpos)));    
+  ret = *(__IO uint8_t*) (hLtdcHandler.LayerCfg[ActiveLayer].FBStartAdress + (2*(Ypos*480 + Xpos)));    
   return ret;
 }
 
@@ -366,7 +612,7 @@ uint32_t BSP_LCD_ReadPixel(uint16_t Xpos, uint16_t Ypos)
 void BSP_LCD_Clear(uint16_t Color)
 { 
   /* Clear the LCD */ 
-  LL_FillBuffer(ActiveLayer, (uint32_t *)(hLtdcHandler.LayerCfg[ActiveLayer].FBStartAdress), BSP_LCD_GetXSize(), BSP_LCD_GetYSize(), 0, Color);
+  LL_FillBuffer(ActiveLayer, (uint32_t *)(hLtdcHandler.LayerCfg[ActiveLayer].FBStartAdress), 480, BSP_LCD_GetYSize(), 0, Color);
 }
 
 /**
@@ -380,7 +626,7 @@ void BSP_LCD_ClearStringLine(uint32_t Line)
   DrawProp[ActiveLayer].TextColor = DrawProp[ActiveLayer].BackColor;
   
   /* Draw rectangle with background color */
-  BSP_LCD_FillRect(0, (Line * DrawProp[ActiveLayer].pFont->Height), BSP_LCD_GetXSize(), DrawProp[ActiveLayer].pFont->Height);
+  BSP_LCD_FillRect(0, (Line * DrawProp[ActiveLayer].pFont->Height), 480, DrawProp[ActiveLayer].pFont->Height);
   
   DrawProp[ActiveLayer].TextColor = color_backup;
   BSP_LCD_SetTextColor(DrawProp[ActiveLayer].TextColor);  
@@ -423,7 +669,7 @@ void BSP_LCD_DisplayStringAt(uint16_t Xpos, uint16_t Ypos, uint8_t *Text, Text_A
   while (*ptr++) size ++ ;
   
   /* Characters number per line */
-  xsize = (BSP_LCD_GetXSize()/DrawProp[ActiveLayer].pFont->Width);
+  xsize = (480/DrawProp[ActiveLayer].pFont->Width);
   
   switch (Mode)
   {
@@ -448,11 +694,11 @@ void BSP_LCD_DisplayStringAt(uint16_t Xpos, uint16_t Ypos, uint8_t *Text, Text_A
 			DisplayWidth = 266;
       break;	
 		}		
-	case WAVEFORM_MODE:
+	case INFOTRACK_MODE:
 		{
 		  ref_column = Xpos;
 			TRANSPARENT_MODE_ENABLE = 1;
-			DisplayWidth = 414;
+			DisplayWidth = 357;
       break;	
 		}		
   case RIGHT_MODE:
@@ -496,6 +742,10 @@ void BSP_LCD_DisplayStringAt(uint16_t Xpos, uint16_t Ypos, uint8_t *Text, Text_A
 		if(DrawProp[ActiveLayer].pFont==&Font15P)     //Dynamic width for Font15P 			
 			{
 			ref_column += (width15P[(*Text)-32]+2);	
+			}
+		else if(DrawProp[ActiveLayer].pFont==&Font7W)     //Dynamic width for Font7W 			
+			{
+			ref_column += (width7W[(*Text)-32]+1);	
 			}
 		else																					//Static width for other fonts
 			{
@@ -569,9 +819,9 @@ void ForceDrawVLine(uint16_t Xpos, uint16_t Ypos, uint16_t Length, uint32_t colo
 void BSP_LCD_DrawVLine(uint16_t Xpos, uint8_t Ypos, uint8_t Length)
 	{
   uint32_t  Xaddress = 0;
-  Xaddress = (hLtdcHandler.LayerCfg[ActiveLayer].FBStartAdress) + 2*(BSP_LCD_GetXSize()*Ypos + Xpos);
+  Xaddress = (hLtdcHandler.LayerCfg[ActiveLayer].FBStartAdress) + 2*(480*Ypos + Xpos);
   /* Write line */
-  LL_FillBuffer(ActiveLayer, (uint32_t *)Xaddress, 1, Length, (BSP_LCD_GetXSize() - 1), DrawProp[ActiveLayer].TextColor);
+  LL_FillBuffer(ActiveLayer, (uint32_t *)Xaddress, 1, Length, 479, DrawProp[ActiveLayer].TextColor);
 	}
 
 /**
@@ -688,19 +938,12 @@ void BSP_LCD_DrawCircle(uint16_t Xpos, uint16_t Ypos, uint16_t Radius)
   while (current_x <= current_y)
   {
     BSP_LCD_DrawPixel((Xpos + current_x), (Ypos - current_y), DrawProp[ActiveLayer].TextColor);
-    
     BSP_LCD_DrawPixel((Xpos - current_x), (Ypos - current_y), DrawProp[ActiveLayer].TextColor);
-    
     BSP_LCD_DrawPixel((Xpos + current_y), (Ypos - current_x), DrawProp[ActiveLayer].TextColor);
-    
     BSP_LCD_DrawPixel((Xpos - current_y), (Ypos - current_x), DrawProp[ActiveLayer].TextColor);
-    
     BSP_LCD_DrawPixel((Xpos + current_x), (Ypos + current_y), DrawProp[ActiveLayer].TextColor);
-    
     BSP_LCD_DrawPixel((Xpos - current_x), (Ypos + current_y), DrawProp[ActiveLayer].TextColor);
-    
     BSP_LCD_DrawPixel((Xpos + current_y), (Ypos + current_x), DrawProp[ActiveLayer].TextColor);
-    
     BSP_LCD_DrawPixel((Xpos - current_y), (Ypos + current_x), DrawProp[ActiveLayer].TextColor);
     
     if (decision < 0)
@@ -716,12 +959,7 @@ void BSP_LCD_DrawCircle(uint16_t Xpos, uint16_t Ypos, uint16_t Radius)
   } 
 }
 
-/**
-  * @brief  Draws an poly-line (between many points).
-  * @param  Points: Pointer to the points array
-  * @param  PointCount: Number of points
-  * @retval None
-  */
+
 void BSP_LCD_DrawPolygon(pPoint Points, uint16_t PointCount)
 {
   int16_t x = 0, y = 0;
@@ -742,14 +980,7 @@ void BSP_LCD_DrawPolygon(pPoint Points, uint16_t PointCount)
   }
 }
 
-/**
-  * @brief  Draws an ellipse on LCD.
-  * @param  Xpos: X position
-  * @param  Ypos: Y position
-  * @param  XRadius: Ellipse X radius
-  * @param  YRadius: Ellipse Y radius
-  * @retval None
-  */
+
 void BSP_LCD_DrawEllipse(int Xpos, int Ypos, int XRadius, int YRadius)
 {
   int x = 0, y = -YRadius, err = 2-2*XRadius, e2;
@@ -776,41 +1007,22 @@ void BSP_LCD_DrawEllipse(int Xpos, int Ypos, int XRadius, int YRadius)
   while (y <= 0);
 }
 
-/**
-  * @brief  Draws a pixel on LCD.
-  * @param  Xpos: X position
-  * @param  Ypos: Y position
-  * @param  RGB_Code: Pixel color in ARGB mode (8-8-8-8)
-  * @retval None
-  */
+
 void BSP_LCD_DrawPixel(uint16_t Xpos, uint16_t Ypos, uint16_t RGB_Code)
 	{
-   *(__IO uint16_t*) (hLtdcHandler.LayerCfg[ActiveLayer].FBStartAdress + (2*(Ypos*BSP_LCD_GetXSize() + Xpos))) = RGB_Code;
+   *(__IO uint16_t*) (hLtdcHandler.LayerCfg[ActiveLayer].FBStartAdress + (2*(Ypos*480 + Xpos))) = RGB_Code;
 	}
 
 
-/**
-  * @brief  Draws a full rectangle.
-  * @param  Xpos: X position
-  * @param  Ypos: Y position
-  * @param  Width: Rectangle width  
-  * @param  Height: Rectangle height
-  * @retval None
-  */
+
 void BSP_LCD_FillRect(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint16_t Height)
 	{
   uint32_t  x_address = 0;  
-  x_address = (hLtdcHandler.LayerCfg[ActiveLayer].FBStartAdress) + 2*(BSP_LCD_GetXSize()*Ypos + Xpos);
-  LL_FillBuffer(ActiveLayer, (uint32_t *)x_address, Width, Height, (BSP_LCD_GetXSize()-Width), DrawProp[ActiveLayer].TextColor);	
+  x_address = (hLtdcHandler.LayerCfg[ActiveLayer].FBStartAdress) + 2*(480*Ypos + Xpos);
+  LL_FillBuffer(ActiveLayer, (uint32_t *)x_address, Width, Height, (480-Width), DrawProp[ActiveLayer].TextColor);	
 	}
 
-/**
-  * @brief  Draws a full circle.
-  * @param  Xpos: X position
-  * @param  Ypos: Y position
-  * @param  Radius: Circle radius
-  * @retval None
-  */
+
 void BSP_LCD_FillCircle(uint16_t Xpos, uint16_t Ypos, uint16_t Radius)
 {
   int32_t  decision;     /* Decision Variable */ 
@@ -1132,10 +1344,10 @@ static void LL_FillBuffer(uint32_t LayerIndex, void *pDst, uint32_t xSize, uint3
 			{
       if (HAL_DMA2D_Start(&hDma2dHandler, ColorIndex, (uint32_t)pDst, xSize, ySize) == HAL_OK)
 				{
-        HAL_DMA2D_PollForTransfer(&hDma2dHandler, 10);
-				}
-			}	
-		} 
+				HAL_DMA2D_PollForTransfer(&hDma2dHandler, 10);					
+				}			
+			}			
+		} 		
 	}
 
     

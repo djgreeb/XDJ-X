@@ -35,8 +35,8 @@ typedef enum
   RIGHT_MODE              = 0x02,    /* Right mode  */
   LEFT_MODE               = 0x03,     /* Left mode   */
 	TRANSPARENT_MODE        = 0x04,     /* transparent mode   */
-	INFO_MODE        				= 0x05,     /* transparent+info mode*/
-	WAVEFORM_MODE        		= 0x06,     /* transparent mode+waveform mode   */
+	INFO_MODE        				= 0x05,     /* transparent+info mode DisplayWidth = 266;*/
+	INFOTRACK_MODE        	= 0x06,     /* transparent+info mode for tracks*/
 }Text_AlignModeTypdef;
 
 #define MAX_LAYER_NUMBER       ((uint32_t)2)
@@ -53,16 +53,20 @@ typedef enum
 #define LCD_COLOR_BLUE          ((uint16_t)0x801F)
 #define LCD_COLOR_GREEN         ((uint16_t)0x83E0)
 #define LCD_COLOR_DARKGREEN     ((uint16_t)0xABC1)
+#define LCD_COLOR_BGREEN 		    ((uint16_t)0x8AE2)
 #define LCD_COLOR_RED           ((uint16_t)0xFC00)
 #define LCD_COLOR_WHITE					((uint16_t)0xFFFF)
 #define LCD_COLOR_GRAY					((uint16_t)0xBDEF)
-#define LCD_COLOR_DARKGRAY			((uint16_t)0xA108)
+#define LCD_COLOR_GGRAY					((uint16_t)0xCE73)		//+15% from LCD_COLOR_GRAY
+#define LCD_COLOR_DARKGRAY			((uint16_t)0xAD6B)
+#define LCD_COLOR_DDARKGRAY			((uint16_t)0xA108)		//-9% from LCD_COLOR_DARKGRAY
 #define LCD_COLOR_BLACK         ((uint16_t)0x8000)
 #define LCD_COLOR_CUE						((uint16_t)0xFE65)
 #define LCD_COLOR_TRANSPARENT   ((uint16_t)0x0000)
 #define LOOP_ACTIVE_COLOR				((uint16_t)0xD960)
 #define LOOP_INACTIVE_COLOR 		((uint16_t)0x98C6)
 #define LOOP_INACTIVELP_COLOR 	((uint16_t)0xB9CE)
+#define LCD_COLOR_SLIP 					((uint16_t)0xFFA0)
 
 ////////////////////////////BATT colors///////////////////////
 #define BATT_GRAYR 							((uint16_t)0xD6B5) //66%
@@ -79,6 +83,12 @@ typedef enum
 #define LI_COLOR_1						((uint16_t)0x9040)
 #define LI_COLOR_2						((uint16_t)0xD163)
 #define LI_COLOR_3						((uint16_t)0xF625)
+
+////////////////////////////bars colors///////////////////////
+#define LCD_COLOR_UT					((uint16_t)0xD294)
+#define LCD_COLOR_BR          ((uint16_t)0x82BA)
+#define LCD_COLOR_TG          ((uint16_t)0x8D55)
+
 
 
 #define LCD_DEFAULT_FONT        Font15P     
@@ -133,10 +143,8 @@ void     BSP_LCD_FillEllipse(int Xpos, int Ypos, int XRadius, int YRadius);
 void     BSP_LCD_DisplayOff(void);
 void     BSP_LCD_DisplayOn(void);
 
-/* These functions can be modified in case the current settings
-   need to be changed for specific application needs */
 void     BSP_LCD_MspInit(LTDC_HandleTypeDef *hltdc, void *Params);
-//void     BSP_LCD_ClockConfig(LTDC_HandleTypeDef *hltdc, void *Params);
+
 
 
 

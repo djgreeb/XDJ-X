@@ -276,7 +276,7 @@
               <OCR_RVCT4>
                 <Type>1</Type>
                 <StartAddress>0x8000000</StartAddress>
-                <Size>0x20000</Size>
+                <Size>0x200000</Size>
               </OCR_RVCT4>
               <OCR_RVCT5>
                 <Type>1</Type>
@@ -414,6 +414,21 @@
               <FilePath>..\Inc\deckb_handler.h</FilePath>
             </File>
             <File>
+              <FileName>pads_a.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\pads_a.h</FilePath>
+            </File>
+            <File>
+              <FileName>pads_b.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\pads_b.h</FilePath>
+            </File>
+            <File>
+              <FileName>encoder_handler.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\encoder_handler.h</FilePath>
+            </File>
+            <File>
               <FileName>pm_uart_handler.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Inc\pm_uart_handler.h</FilePath>
@@ -422,6 +437,11 @@
               <FileName>debug_uart_handler.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Inc\debug_uart_handler.h</FilePath>
+            </File>
+            <File>
+              <FileName>screenshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\screenshot.h</FilePath>
             </File>
             <File>
               <FileName>mixer_uart_handler.h</FileName>
@@ -447,11 +467,6 @@
               <FileName>spi_mem.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Inc\spi_mem.h</FilePath>
-            </File>
-            <File>
-              <FileName>encoder_handler.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Inc\encoder_handler.h</FilePath>
             </File>
             <File>
               <FileName>main.c</FileName>
@@ -1052,6 +1067,11 @@
               <FileName>stm32h7xx_hal_msp.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Src/stm32h7xx_hal_msp.c</FilePath>
+            </File>
+            <File>
+              <FileName>fatfs_operations.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\fatfs_operations.h</FilePath>
             </File>
           </Files>
         </Group>

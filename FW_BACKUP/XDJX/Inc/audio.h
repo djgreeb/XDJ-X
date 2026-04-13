@@ -71,13 +71,13 @@ static float COEF[8] = {			//////optimal 32x, 4-point, 3rd-order optimal
 //Filter model: Butterworth
 //Filter order: 4
 //Sampling Frequency: 44 KHz
-//Cut Frequency: 7.900000 KHz
+//Cut Frequency: 8.100000 KHz
+
 static float FIRCoef[2] =
 	{
-	0.724370,
-	-0.275630	
+	0.71889,
+	-0.28111	
 	};
-	
 	
 static float firR[2][2]; //input samples	
 static float firL[2][2]; //input samples
