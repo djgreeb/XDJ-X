@@ -56,7 +56,7 @@ void TIM2_IRQHandler(void)
 					CFX8_prsd = 0;	
 					}	
 				}					
-			if((GPIOD->IDR & 0x00000008) != 0x00U)			//Key in 2 (BFX)
+			if((GPIOD->IDR & 0x00000008) != 0x00U)			//Key in 2 (BFX selector)
 				{
 				BFXn = 7;
 				if(BFXn_previous!=BFXn)
@@ -166,7 +166,7 @@ void TIM2_IRQHandler(void)
 					CHSEL_previous = CHSEL;	
 					}	
 				}		
-			if((GPIOD->IDR & 0x00000008) != 0x00U)			//Key in 2 (BFX)
+			if((GPIOD->IDR & 0x00000008) != 0x00U)			//Key in 2 (BFX selector)
 				{
 				BFXn = 0;
 				if(BFXn_previous!=BFXn)
@@ -255,7 +255,7 @@ void TIM2_IRQHandler(void)
 					CHSEL_previous = CHSEL;	
 					}	
 				}		
-			if((GPIOD->IDR & 0x00000008) != 0x00U)			//Key in 2 (BFX)
+			if((GPIOD->IDR & 0x00000008) != 0x00U)			//Key in 2 (BFX selector)
 				{
 				BFXn = 1;
 				if(BFXn_previous!=BFXn)
@@ -264,10 +264,11 @@ void TIM2_IRQHandler(void)
 					BFXn_previous = BFXn;	
 					}					
 				}	
-			if((GPIOB->IDR & 0x00000080) != 0x00U)			//Key in 3 (other keys)
+			if((GPIOB->IDR & 0x00000080) != 0x00U)			//Key in 3 (<<BEAT)
 				{
 				if(BEATm_prsd==0)
 					{
+					need_beat_change = 2;	
 					if(B>0)
 						{
 						B--;	
@@ -512,7 +513,7 @@ void TIM2_IRQHandler(void)
 					CHSEL_previous = CHSEL;	
 					}	
 				}		
-			if((GPIOD->IDR & 0x00000008) != 0x00U)			//Key in 2 (BFX)
+			if((GPIOD->IDR & 0x00000008) != 0x00U)			//Key in 2 (BFX selector)
 				{
 				BFXn = 2;
 				if(BFXn_previous!=BFXn)
@@ -682,7 +683,7 @@ void TIM2_IRQHandler(void)
 					eqr1.mg	= EQ_26[EQCURVE_prsd][pot_8b[MID1]];
 					}	
 				}				
-			if((GPIOD->IDR & 0x00000008) != 0x00U)			//Key in 2 (BFX)
+			if((GPIOD->IDR & 0x00000008) != 0x00U)			//Key in 2 (BFX selector)
 				{
 				BFXn = 3;
 				if(BFXn_previous!=BFXn)
@@ -691,10 +692,11 @@ void TIM2_IRQHandler(void)
 					BFXn_previous = BFXn;	
 					}					
 				}	
-			if((GPIOB->IDR & 0x00000080) != 0x00U)			//Key in 3 (other keys)
+			if((GPIOB->IDR & 0x00000080) != 0x00U)			//Key in 3 (BEAT>>)
 				{
 				if(BEATp_prsd==0)
 					{
+					need_beat_change = 1;	
 					if(B<15)
 						{
 						B++;	
@@ -785,7 +787,7 @@ void TIM2_IRQHandler(void)
 				{
 				CRSFCURVE_scan&= 0xFE;	
 				}				
-			if((GPIOD->IDR & 0x00000008) != 0x00U)			//Key in 2 (BFX)
+			if((GPIOD->IDR & 0x00000008) != 0x00U)			//Key in 2 (BFX selector)
 				{
 				BFXn = 4;
 				if(BFXn_previous!=BFXn)
@@ -872,7 +874,7 @@ void TIM2_IRQHandler(void)
 				{
 				CRSFCURVE_scan&= 0xFD;	
 				}				
-			if((GPIOD->IDR & 0x00000008) != 0x00U)			//Key in 2 (BFX)
+			if((GPIOD->IDR & 0x00000008) != 0x00U)			//Key in 2 (BFX selector)
 				{
 				BFXn = 5;
 				if(BFXn_previous!=BFXn)
@@ -881,7 +883,7 @@ void TIM2_IRQHandler(void)
 					BFXn_previous = BFXn;	
 					}					
 				}	
-			if((GPIOB->IDR & 0x00000080) != 0x00U)			//Key in 3 (other keys)
+			if((GPIOB->IDR & 0x00000080) != 0x00U)			//Key in 3 (BFX button)
 				{
 				if(BFXON_prsd==0)
 					{
@@ -974,7 +976,7 @@ void TIM2_IRQHandler(void)
 					CFX7_prsd = 0;	
 					}	
 				}				
-			if((GPIOD->IDR & 0x00000008) != 0x00U)			//Key in 2 (BFX)
+			if((GPIOD->IDR & 0x00000008) != 0x00U)			//Key in 2 (BFX selector)
 				{
 				BFXn = 6;
 				if(BFXn_previous!=BFXn)

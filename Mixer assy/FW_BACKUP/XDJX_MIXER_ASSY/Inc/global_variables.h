@@ -49,7 +49,10 @@ const static uint16_t dBConv[12]={
 
 /* TFT ---------------------------------------------------------*/
 uint8_t previous_ch = 0xFF;
-uint16_t BPM_link = 0;
+uint16_t BPM_link = 0;				//BPM*100
+uint16_t prev_BPM_link = 0;		//BPM*100
+uint8_t prev_rngdiv = 0xFF;		//for gui func
+uint8_t need_draw_ms = 0;
 
 /* BUTTONS ---------------------------------------------------------*/
 #define MUX_ADDR0		GPIOC->BSRR = 0x00070000	//000	
@@ -82,9 +85,12 @@ uint8_t BFXON_prsd = 0;
 uint8_t CUE1_prsd = 0;
 uint8_t CUE2_prsd = 0;
 uint8_t BT_bBUTT_prsd = 0; 
+uint8_t need_beat_change = 0;   //1++; 2--
+
 
 const static uint8_t CFXmask[8] = {0xFE, 0xFD, 0xFB, 0xF7, 0xEF, 0xDF, 0xBF, 0x7F};
 uint8_t CFXON = 0;				//0 - disable, 1...8 - run effect
+uint8_t prev_CFXON = 0xFF;
 uint8_t BFXON = 0;		 		//0 - disable, 1 - run effect
 uint8_t CUE1ON = 0;
 uint8_t CUE2ON = 0;
@@ -120,9 +126,10 @@ uint8_t pot_8b[16] = {0};		//potenciometer value (after conversion 4095 to 255) 
 uint8_t prev_pot_8b_CFX0;
 uint8_t prev_pot_8b_CFX1;
 uint8_t prev_pot_8b_PRMT;
+uint8_t prev_pot_8b_DEPT;
 uint32_t ADC_TMP;
 uint8_t cnt_ad = 0;
-uint16_t ADC_prev[4];
+uint16_t ADC_prev;		//temp
 #define adc_hysteresis	6			//7 stable for mediannyj filter; 7.5 for slip aver;
 #define adc_hysteresis2	12
 
@@ -148,6 +155,8 @@ uint8_t link_utx_buf[8];
 uint8_t decka_inair = 0xFF;
 uint8_t deckb_inair = 0xFF;
 uint8_t need_send_inair = 0;
+
+
 
 
 /* TEMPORARY ---------------------------------------------------------*/

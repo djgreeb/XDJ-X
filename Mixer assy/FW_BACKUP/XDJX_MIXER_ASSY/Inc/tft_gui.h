@@ -83,14 +83,14 @@ void TFT_DRAW_STATIC(void)
 		{
 		if(i==3)
 			{			
-			TFT_FillRect(19*i, 134, 13+19*i, 143, TFT_RED);	
 			TFT_FillRect(19*i, 147, 13+19*i, 150, TFT_RED);		
 			}
 		else
 			{
 			TFT_FillRect(19*i, 134, 13+19*i, 143, TFT_VFDOFF);	
 			TFT_FillRect(19*i, 147, 13+19*i, 150, TFT_WHITE);	
-			}			
+			}		
+		TFT_FillRect(19*i, 134, 13+19*i, 143, TFT_VFDOFF);		
 		}
 	for(i=0;i<26;i++)
 		{	
@@ -185,16 +185,11 @@ void TFT_DRAW_STATIC(void)
 	TFT_DrawLine(TFT_WHITE, 99, 49, 99, 55);
 	TFT_DrawLine(TFT_WHITE, 98, 53, 98, 56);
 
-	sprintf((char*)STR_BUFF, "123");	
+	
 	TFT_SetTextColor(TFT_WHITE);
 	TFT_SetFont(&FontVFD);					
-	TFT_String(38, 77, STR_BUFF);	
-	sprintf((char*)STR_BUFF, "490");
-	TFT_String(38, 106, STR_BUFF);			
-//	TFT_DrawPixel(0, 0, TFT_RED);	
-//	TFT_DrawPixel(0, 159, TFT_RED);	
-//	TFT_DrawPixel(127, 0, TFT_RED);	
-//	TFT_DrawPixel(127, 159, TFT_RED);	
+	sprintf((char*)STR_BUFF, "500");
+	TFT_String(38, 106, STR_BUFF);
 	return;
 	};
 
@@ -350,6 +345,35 @@ void TFT_DRAW_BT(uint8_t enb)
 	return;	
 	};
 
+	
+/////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// //0 - 1/16 1 - 1/8 ...
+//
+//
+void TFT_DRAW_RNGDIV(uint8_t stp)
+	{	
+	if(prev_rngdiv==stp)
+		{
+		return;	
+		}		
+	if(prev_rngdiv<8 && prev_rngdiv>0)
+		{
+		TFT_FillRect(19*(prev_rngdiv-1), 134, 13+19*(prev_rngdiv-1), 143, TFT_VFDOFF);		
+		}
+	if(stp<8 && stp>0)
+		{	
+		TFT_FillRect(19*(stp-1), 134, 13+19*(stp-1), 143, TFT_RED);
+		}
+	else if(stp==0)
+		{	
+		TFT_FillRect(0, 134, 13, 143, TFT_YELLOW);		//cnange  YELLOW to triangle
+		}		
+	prev_rngdiv = stp;
+	};
+	
+	
+	
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				
 																																									

@@ -176,8 +176,21 @@
 //	- EQ -26dB curve added (pio curve dump)
 //	-	CRSFCURVE realtime update added
 //	-	CFX FITER added
-//
-//
+//	ver. 0.53
+//	- BFX ECHO, ringbuffer added
+//	ver. 0.57
+//	- NOISE CFX added
+//	- CFX FITER curve changed
+//	ver. 0.59
+//	- CFX FITER: drop distorsion fixed
+//	- BFX TFT_DRAW_RNGDIV added
+//	- CHANGE_RNGSIZE func added
+//	ver. 0.61
+//	- EFFATT, ORIGATT added 
+//	- Delay BFX added
+//	ver. 0.63
+//	-	GUI fix
+//	-	BFX FLANGER first code
 //
 //
 //
@@ -207,7 +220,7 @@
 
 /* USER CODE BEGIN PV */
 
-uint16_t FW_VER = 51;
+uint16_t FW_VER = 63;
 
 #include "global_variables.h"
 
@@ -303,7 +316,6 @@ int main(void)
   TFT_FillScreen(TFT_BLACK);			
 	TFT_DRAW_STATIC();
 		
-		
 	TFT_SetBackColor(TFT_BLACK);	
 	TFT_SetTextColor(TFT_WHITE);
 	
@@ -344,6 +356,8 @@ int main(void)
 	
 	MAX7219_DATA[7] = 0xF0;
 	MAX7219_UPDATE(7);
+	
+	prev_pot_8b_DEPT = pot_8b[DEPT]-5;			//force update 
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -354,6 +368,18 @@ int main(void)
 	if((HAL_GetTick()-temp_time)>25)
 		{
 		#include "INAIR.h"	
+
+		if(BFXn==4)	//FLANGER
+			{
+			if(rngsize<135)
+				{
+				rngsize++;	
+				}				
+			else
+				{
+				rngsize = 30;	
+				}	
+			}		
 		
 		if(divdr<9)
 			{
@@ -384,51 +410,30 @@ int main(void)
 				lay = 0;		
 				}
 				
-			sprintf((char*)STR_BUFF, "%3lu", BPM_link);	
+			sprintf((char*)STR_BUFF, "%3lu", (BPM_link+50)/100);	
 			TFT_SetFont(&FontVFD);					
 			TFT_String(38, 77, STR_BUFF);		
 						
-			sprintf((char*)&STR_BUFF[48], "CH:%02lu", B);
+			sprintf((char*)&STR_BUFF[48], "%02lu", B);
 			TFT_SetTextColor(TFT_BLUE);
 			TFT_SetFont(&Font8);		
-			TFT_String(1, 122, &STR_BUFF[48]);				
+			TFT_String(95, 110, &STR_BUFF[48]);				
 			divdr = 0;	
 			}	
 		temp_time = HAL_GetTick();	
 		}
-
-//	if(ADC_prev[1]!=pot_out[FDR0])
-//		{			
-//		LEVEL_METER(0, pot_out[FDR0]/329, 0);
-//		ADC_prev[1] = pot_out[FDR0];	
-//		}	
-
-//	if(ADC_prev[0]!=pot_out[FDR1])
-//		{			
-//		LEVEL_METER(1, pot_out[FDR1]/329, 0);
-//		ADC_prev[0] = pot_out[FDR1];	
-//		}		
-//		
-//	if(ADC_prev[2]!=pot_out[HPHN])
-//		{			
-//		LEVEL_METER(2, pot_out[HPHN]/329, 0);
-//		ADC_prev[2] = pot_out[HPHN];	
-//		}	
-		
-		
-		
-	if(ADC_prev[3]!=pot_8b[B])
+	
+	if(ADC_prev!=pot_8b[B])
 		{			
 		sprintf((char*)&STR_BUFF[32], "%03lu", pot_8b[B]);
 		TFT_SetTextColor(TFT_WHITE);
 		TFT_SetFont(&Font8);	
-		TFT_String(1, 113, &STR_BUFF[32]);
+		TFT_String(95, 102, &STR_BUFF[32]);
 		//LEVEL_METER(3, pot_8b[B]/21, 0);
-		ADC_prev[3] = pot_8b[B];	
+		ADC_prev = pot_8b[B];	
 		}			
 
-		
-		
+
 	if(MAX7219_need_update!=0)
 		{	
 		if(MAX7219_need_update&0x01)
@@ -476,6 +481,8 @@ int main(void)
 	if(need_draw_fxsel>0)
 		{		
 		TFT_FXSELECTOR(BFXn);
+		CHANGE_RNGSIZE();	
+		TFT_DRAW_RNGDIV(rngdiv[BFXn]);		
 		need_draw_fxsel = 0;	
 		}
 	if(need_draw_chsel>0)
@@ -487,13 +494,52 @@ int main(void)
 		{
 		TFT_DRAW_BT(BT_ENABLE);		
 		need_draw_bticon = 0;	
-		}		
+		}			
+	if(need_beat_change!=0)
+		{
+		if(need_beat_change==1)		//++
+			{
+			if(BFXn<8)
+				{
+				if(rngdiv[BFXn]<7)
+					{					
+					rngdiv[BFXn]++;
+					}						
+				}
+			}
+		else					//--
+			{	
+			if(BFXn<8)
+				{
+				if(rngdiv[BFXn]>0)
+					{					
+					rngdiv[BFXn]--;
+					}						
+				}
+			}
+		CHANGE_RNGSIZE();	
+		TFT_DRAW_RNGDIV(rngdiv[BFXn]);	
+		need_beat_change = 0;	
+		}			
+	if(need_draw_ms)
+		{
+		TFT_SetTextColor(TFT_WHITE);
+		TFT_SetFont(&FontVFD);	
+		sprintf((char*)STR_BUFF, "%4lu", (10*rngsize)/441);	
+		TFT_String(19, 106, STR_BUFF);
+		need_draw_ms = 0;	
+		}	
 		
 	if(link_new_data)				//UART5 link handler
 		{	
 		if(link_urx_buf[0]==0x95 ||  link_urx_buf[0]==0x96)	//sending bpm at beats (BPM*100), 0x95-0x96 – first beat 1/4 
 			{
-			BPM_link = (0x100*link_urx_buf[1]+link_urx_buf[2]+50)/100;
+			BPM_link = 0x100*link_urx_buf[1]+link_urx_buf[2];
+			if(prev_BPM_link!=BPM_link)
+				{
+				CHANGE_RNGSIZE();
+				prev_BPM_link = BPM_link;		
+				}
 			last_bit_time = 0;	
 			}
 		else if(link_urx_buf[0]==0x91 && link_urx_buf[1]==0x60 && link_urx_buf[2]==0x31)		//firmware version request
@@ -547,23 +593,72 @@ int main(void)
 		link_new_data = 0;	
 		}
 		
-		
+				
 	if(prev_pot_8b_CFX0!=pot_8b[CFX0])		///FILTER CH1
 		{
 		prev_pot_8b_CFX0 = pot_8b[CFX0];
-		CALC_CUTF_0();		
+		if(CFXON==8)
+			{
+			CALC_CUTF_0();		
+			}	
+		else if(CFXON==6)
+			{
+			CALC_CUTF_0();		
+			}				
 		}
 	if(prev_pot_8b_CFX1!=pot_8b[CFX1])		///FILTER CH2
 		{
-		prev_pot_8b_CFX1 = pot_8b[CFX1];		
-		CALC_CUTF_1();		
+		prev_pot_8b_CFX1 = pot_8b[CFX1];	
+		if(CFXON==8)
+			{
+			CALC_CUTF_1();
+			}			
+		else if(CFXON==6)
+			{
+			CALC_CUTF_1();
+			}				
 		}
 	if(prev_pot_8b_PRMT!=pot_8b[PRMT])		/// QFAC
 		{
-		prev_pot_8b_PRMT = pot_8b[PRMT];	
-		CALC_CUTF_0();		
-		CALC_CUTF_1();	
-		}				
+		prev_pot_8b_PRMT = pot_8b[PRMT];
+		if(CFXON==8)
+			{			
+			CALC_CUTF_0();		
+			CALC_CUTF_1();
+			curr_TRIM_FILTER = TRIM_FILTER[pot_8b[PRMT]];	
+			}
+		else if(CFXON==6)
+			{
+			curr_TRIM_FILTER = TRIM_FILTER[128];	
+			}			
+		}	
+	if(prev_pot_8b_DEPT!=pot_8b[DEPT])		/// BEAT FX
+		{	
+		prev_pot_8b_DEPT = pot_8b[DEPT];
+		ORIGATT = ORIG_ATT[pot_8b[DEPT]];	
+		EFFATT = EFF_ATT[pot_8b[DEPT]];		
+		}
+
+	if(prev_CFXON!=CFXON)			//calculate parameters for a new effect
+		{
+		prev_CFXON = CFXON;
+		if(CFXON==8)
+			{			
+			CALC_CUTF_0();		
+			CALC_CUTF_1();
+			curr_TRIM_FILTER = TRIM_FILTER[pot_8b[PRMT]];		
+			}	
+		else if(CFXON==6)
+			{			
+			CALC_CUTF_0();		
+			CALC_CUTF_1();
+			curr_TRIM_FILTER = TRIM_FILTER[128];		
+			}		
+		}
+		
+		
+		
+
 		
 		
     /* USER CODE END WHILE */

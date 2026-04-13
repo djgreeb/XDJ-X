@@ -108,15 +108,24 @@ double do_3band(EQSTATE* es, double sample)
 //	
 void CALC_CUTF_0(void)
 	{
-	if(pot_8b[CFX0]<128)
+	fcutoff_0 = VR_VCFx116[pot_8b[CFX0]];		
+	if(pot_8b[CFX0]!=128)
 		{
-		fcutoff_0 = VR_VCFx116[pot_8b[CFX0]];	
-		resonanse_0 = VR_QFAC[pot_8b[PRMT]]*VR_VCF1minusKV[pot_8b[CFX0]];		
+		if(CFXON==8)
+			{	
+			resonanse_0 = VR_QFAC[pot_8b[PRMT]]*VR_VCF1minusKV[pot_8b[CFX0]];		
+			}
+		else
+			{
+			resonanse_0 = VR_QFAC[128]*VR_VCF1minusKV[pot_8b[CFX0]];			
+			}			
 		}
-	else if(pot_8b[CFX0]>128)
-		{
-		fcutoff_0h = VR_VCFx116[pot_8b[CFX0]-129];	
-		resonanse_0h = VR_QFAC[pot_8b[PRMT]]*VR_VCF1minusKV[pot_8b[CFX0]-129];		
+	else
+		{	
+		in1_0 = 0; in2_0 = 0; in3_0 = 0; in4_0 = 0; out1_0 = 0; out2_0 = 0; out3_0 = 0; out4_0 = 0;
+		in1_1 = 0; in2_1 = 0; in3_1 = 0; in4_1 = 0; out1_1 = 0; out2_1 = 0; out3_1 = 0; out4_1 = 0;	
+		in1_0h = 0; in2_0h = 0; in3_0h = 0; in4_0h = 0; out1_0h = 0; out2_0h = 0; out3_0h = 0; out4_0h = 0;
+		in1_1h = 0; in2_1h = 0; in3_1h = 0; in4_1h = 0; out1_1h = 0; out2_1h = 0; out3_1h = 0; out4_1h = 0;				
 		}		
 	};
 
@@ -126,19 +135,29 @@ void CALC_CUTF_0(void)
 //	
 void CALC_CUTF_1(void)
 	{
-	if(pot_8b[CFX1]<128)
+	fcutoff_1 = VR_VCFx116[pot_8b[CFX1]];	
+	if(pot_8b[CFX1]!=128)
 		{
-		fcutoff_1 = VR_VCFx116[pot_8b[CFX1]];
-		resonanse_1 = VR_QFAC[pot_8b[PRMT]]*VR_VCF1minusKV[pot_8b[CFX1]];
-		}	
-	else if(pot_8b[CFX1]>128)
-		{
-		fcutoff_1h = VR_VCFx116[pot_8b[CFX1]-129];	
-		resonanse_1h = VR_QFAC[pot_8b[PRMT]]*VR_VCF1minusKV[pot_8b[CFX1]-129];		
+		if(CFXON==8)
+			{	
+			resonanse_1 = VR_QFAC[pot_8b[PRMT]]*VR_VCF1minusKV[pot_8b[CFX1]];
+			}
+		else
+			{
+			resonanse_1 = VR_QFAC[128]*VR_VCF1minusKV[pot_8b[CFX1]];	
+			}		
+		}
+	else
+		{	
+		in1_2 = 0; in2_2 = 0; in3_2 = 0; in4_2 = 0; out1_2 = 0; out2_2 = 0; out3_2 = 0; out4_2 = 0;
+		in1_3 = 0; in2_3 = 0; in3_3 = 0; in4_3 = 0; out1_3 = 0; out2_3 = 0; out3_3 = 0; out4_3 = 0;	
+		in1_2h = 0; in2_2h = 0; in3_2h = 0; in4_2h = 0; out1_2h = 0; out2_2h = 0; out3_2h = 0; out4_2h = 0;
+		in1_3h = 0; in2_3h = 0; in3_3h = 0; in4_3h = 0; out1_3h = 0; out2_3h = 0; out3_3h = 0; out4_3h = 0;		
 		}		
 	};	
 	
-
+///////////////////////////////////////////////////////////////LPF FILTERS////////////////////////////////////////////////////
+	
 /////////////////////////////////	
 //
 // filter 
@@ -155,7 +174,7 @@ float MoogVCF_0(float input_0, float f_0, float fb_0)
   in3_0  = out2_0;
   out4_0 = out3_0 + 0.3 * in4_0 + (1 - f_0) * out4_0;  // Pole 4
   in4_0  = out3_0;
-	return TRIM_FILTER[pot_8b[PRMT]]*out4_0;	
+	return curr_TRIM_FILTER*out4_0;	
 	};	
 
 /////////////////////////////////	
@@ -174,7 +193,7 @@ float MoogVCF_1(float input_1, float f_1, float fb_1)
   in3_1  = out2_1;
   out4_1 = out3_1 + 0.3 * in4_1 + (1 - f_1) * out4_1;  // Pole 4
   in4_1  = out3_1;
-	return TRIM_FILTER[pot_8b[PRMT]]*out4_1;	
+	return curr_TRIM_FILTER*out4_1;	
 	};		
 
 /////////////////////////////////	
@@ -193,7 +212,7 @@ float MoogVCF_2(float input_2, float f_2, float fb_2)
   in3_2  = out2_2;
   out4_2 = out3_2 + 0.3 * in4_2 + (1 - f_2) * out4_2;  // Pole 4
   in4_2  = out3_2;
-	return TRIM_FILTER[pot_8b[PRMT]]*out4_2;	
+	return curr_TRIM_FILTER*out4_2;	
 	};			
 
 /////////////////////////////////	
@@ -212,7 +231,7 @@ float MoogVCF_3(float input_3, float f_3, float fb_3)
   in3_3  = out2_3;
   out4_3 = out3_3 + 0.3 * in4_3 + (1 - f_3) * out4_3;  // Pole 4
   in4_3  = out3_3;
-	return TRIM_FILTER[pot_8b[PRMT]]*out4_3;	
+	return curr_TRIM_FILTER*out4_3;	
 	};			
 	
 	
@@ -236,7 +255,7 @@ float MoogHVCF_0(float input_0h, float f_0h, float fb_0h)
   in3_0h  = out2_0h;
   out4_0h = out3_0h + 0.3 * in4_0h + (1 - f_0h) * out4_0h;  // Pole 4
   in4_0h  = out3_0h;
-  return tmpin_0-(TRIM_FILTER[pot_8b[PRMT]]*out4_0h);
+  return tmpin_0-(curr_TRIM_FILTER*out4_0h);
 	};	
 
 /////////////////////////////////	
@@ -256,7 +275,7 @@ float MoogHVCF_1(float input_1h, float f_1h, float fb_1h)
   in3_1h  = out2_1h;
   out4_1h = out3_1h + 0.3 * in4_1h + (1 - f_1h) * out4_1h;  // Pole 4
   in4_1h  = out3_1h;
-  return tmpin_1-(TRIM_FILTER[pot_8b[PRMT]]*out4_1h);
+  return tmpin_1-(curr_TRIM_FILTER*out4_1h);
 	};		
 
 /////////////////////////////////	
@@ -276,7 +295,7 @@ float MoogHVCF_2(float input_2h, float f_2h, float fb_2h)
   in3_2h  = out2_2h;
   out4_2h = out3_2h + 0.3 * in4_2h + (1 - f_2h) * out4_2h;  // Pole 4
   in4_2h  = out3_2h;
-  return tmpin_2-(TRIM_FILTER[pot_8b[PRMT]]*out4_2h);
+  return tmpin_2-(curr_TRIM_FILTER*out4_2h);
 	};			
 
 /////////////////////////////////	
@@ -296,7 +315,7 @@ float MoogHVCF_3(float input_3h, float f_3h, float fb_3h)
   in3_3h  = out2_3h;
   out4_3h = out3_3h + 0.3 * in4_3h + (1 - f_3h) * out4_3h;  // Pole 4
   in4_3h  = out3_3h;
-  return tmpin_3-(TRIM_FILTER[pot_8b[PRMT]]*out4_3h);
+  return tmpin_3-(curr_TRIM_FILTER*out4_3h);
 	};			
 	
 	
@@ -317,9 +336,25 @@ float CFX0r(float in)
 			}
 		else	//HPF
 			{
-			return MoogHVCF_0(in, fcutoff_0h, resonanse_0h);
+			return MoogHVCF_0(in, fcutoff_0, resonanse_0);
 			}	
 		}
+	else if(CFXON==6)
+		{
+		nsmpl++;	
+		if(pot_8b[CFX0]<128)	//LPF
+			{
+			return in + NSLV[pot_8b[CFX0]]*MoogVCF_0(noise[(nsmpl+33000)&0xFFFF]*pot_8b[PRMT], fcutoff_0, resonanse_0);
+			}	
+		else if(pot_8b[CFX0]==128)		//disable filter
+			{
+			return in;	
+			}
+		else	//HPF
+			{
+			return in + NSLV[pot_8b[CFX0]]*MoogHVCF_0(noise[(nsmpl+33000)&0xFFFF]*pot_8b[PRMT], fcutoff_0, resonanse_0);
+			}		
+		}	
 	else
 		{
 		return in;	
@@ -343,9 +378,24 @@ float CFX0l(float in)
 			}
 		else	//HPF
 			{
-			return MoogHVCF_1(in, fcutoff_0h, resonanse_0h);
+			return MoogHVCF_1(in, fcutoff_0, resonanse_0);
 			}	
 		}
+	else if(CFXON==6)
+		{
+		if(pot_8b[CFX0]<128)	//LPF
+			{
+			return in + NSLV[pot_8b[CFX0]]*MoogVCF_1(noise[nsmpl]*pot_8b[PRMT], fcutoff_0, resonanse_0);
+			}	
+		else if(pot_8b[CFX0]==128)		//disable filter
+			{
+			return in;	
+			}
+		else	//HPF
+			{
+			return in + NSLV[pot_8b[CFX0]]*MoogHVCF_1(noise[nsmpl]*pot_8b[PRMT], fcutoff_0, resonanse_0);
+			}		
+		}	
 	else
 		{
 		return in;	
@@ -369,9 +419,24 @@ float CFX1r(float in)
 			}
 		else	//HPF
 			{
-			return MoogHVCF_2(in, fcutoff_1h, resonanse_1h);
+			return MoogHVCF_2(in, fcutoff_1, resonanse_1);
 			}	
 		}
+	else if(CFXON==6)
+		{	
+		if(pot_8b[CFX1]<128)	//LPF
+			{
+			return in + NSLV[pot_8b[CFX1]]*MoogVCF_2(noise[(nsmpl+33000)&0xFFFF]*pot_8b[PRMT], fcutoff_1, resonanse_1);
+			}	
+		else if(pot_8b[CFX1]==128)		//disable filter
+			{
+			return in;	
+			}
+		else	//HPF
+			{
+			return in + NSLV[pot_8b[CFX1]]*MoogHVCF_2(noise[(nsmpl+33000)&0xFFFF]*pot_8b[PRMT], fcutoff_1, resonanse_1);
+			}		
+		}	
 	else
 		{
 		return in;	
@@ -395,9 +460,24 @@ float CFX1l(float in)
 			}
 		else	//HPF
 			{
-			return MoogHVCF_3(in, fcutoff_1h, resonanse_1h);
+			return MoogHVCF_3(in, fcutoff_1, resonanse_1);
 			}	
 		}
+	else if(CFXON==6)
+		{	
+		if(pot_8b[CFX1]<128)	//LPF
+			{
+			return in + NSLV[pot_8b[CFX1]]*MoogVCF_3(noise[nsmpl]*pot_8b[PRMT], fcutoff_1, resonanse_1);
+			}	
+		else if(pot_8b[CFX1]==128)		//disable filter
+			{
+			return in;	
+			}
+		else	//HPF
+			{
+			return in + NSLV[pot_8b[CFX1]]*MoogHVCF_3(noise[nsmpl]*pot_8b[PRMT], fcutoff_1, resonanse_1);
+			}	
+		}	
 	else
 		{
 		return in;	
@@ -415,7 +495,7 @@ void SAI1_IRQHandler(void)
 	{	
 	HAL_SAI_IRQHandler(&hsai_BlockA1);
 
-	//TRIM +EQ		
+	//TRIM+EQ		
 	POSTEQCH0[0] = do_3band(&eql0, CFX0r(CH0IN[0]*TRM0_ATT));	
 	POSTEQCH0[1] = do_3band(&eqr0, CFX0l(CH0IN[1]*TRM0_ATT));	
 	POSTEQCH1[0] = do_3band(&eql1, CFX1r(CH1IN[0]*TRM1_ATT));	
@@ -470,12 +550,9 @@ void SAI1_IRQHandler(void)
 		}
 	if(lvl_tmp>lvl_ch1)
 		{
-		lvl_ch1
-			= lvl_tmp;	
+		lvl_ch1 = lvl_tmp;	
 		}	
-		
-
-		
+				
 	if(CUE1ON)							///calc CUE1 + CUE2
 		{
 		CUESUM[0] = POSTEQCH0[0]; 
@@ -508,14 +585,66 @@ void SAI1_IRQHandler(void)
 	//summ	
 	POSTEQCH0[0]+=POSTEQCH1[0];	
 	POSTEQCH0[1]+=POSTEQCH1[1];
-	//summ	
+		
+		
+	
+	if(BFXON==1)
+		{
+		rngaddr++;	
+		if(rngaddr>=rngsize)
+			{
+			rngaddr = 0;	
+			}	
+			
+		if(BFXn==1)			/////////////////	ECHO	/////////////////////
+			{
+			BFXTMP[0] = ORIGATT*POSTEQCH0[0];
+			BFXTMP[1] = ORIGATT*POSTEQCH0[1];	
+			POSTEQCH0[0]+= 1.3*RINGBUF[0][rngaddr];	
+			POSTEQCH0[1]+= 1.3*RINGBUF[1][rngaddr];	
+			BFXTMP[0]+= EFFATT*RINGBUF[0][rngaddr];
+			BFXTMP[1]+= EFFATT*RINGBUF[1][rngaddr];		
+			RINGBUF[0][rngaddr] = ANTICLIP(POSTEQCH0[0]/2);
+			RINGBUF[1][rngaddr] = ANTICLIP(POSTEQCH0[1]/2);				
+			POSTEQCH0[0] = BFXTMP[0]; 	
+			POSTEQCH0[1] = BFXTMP[1];		
+			}			
+		else if(BFXn==0)			/////////////////	DELAY	/////////////////////
+			{
+			BFXTMP[0] = EFFATT*RINGBUF[0][rngaddr];	
+			BFXTMP[1] = EFFATT*RINGBUF[1][rngaddr];	
+			RINGBUF[0][rngaddr] = ANTICLIP(POSTEQCH0[0]/2);
+			RINGBUF[1][rngaddr] = ANTICLIP(POSTEQCH0[1]/2);		
+			POSTEQCH0[0] = ORIGATT*POSTEQCH0[0] + BFXTMP[0];
+			POSTEQCH0[1] = ORIGATT*POSTEQCH0[1] + BFXTMP[1];					
+			}
+		else if(BFXn==4)			/////////////////	FLANGER	/////////////////////
+			{	
+			BFXTMP[0] = ORIGATT*POSTEQCH0[0];
+			BFXTMP[1] = ORIGATT*POSTEQCH0[1];	
+			POSTEQCH0[0]+= 1.7*RINGBUF[0][rngaddr];	
+			POSTEQCH0[1]+= 1.7*RINGBUF[1][rngaddr];	
+			BFXTMP[0]+= EFFATT*RINGBUF[0][rngaddr];
+			BFXTMP[1]+= EFFATT*RINGBUF[1][rngaddr];		
+			RINGBUF[0][rngaddr] = ANTICLIP(POSTEQCH0[0]/2);
+			RINGBUF[1][rngaddr] = ANTICLIP(POSTEQCH0[1]/2);				
+			POSTEQCH0[0] = BFXTMP[0]; 	
+			POSTEQCH0[1] = BFXTMP[1];		
+			}		
+		else if(BFXn==3)			/////////////////	TRANS	/////////////////////
+			{
+			POSTEQCH0[0]*= ORIGATT;
+			POSTEQCH0[1]*= ORIGATT;
+			}	
+		}
+		
+		
+	//summ	cue
 	CUESUM[0]+= (MIXN0_ATT*POSTEQCH0[0]); 
 	CUESUM[1]+= (MIXN0_ATT*POSTEQCH0[1]);		
 	//headphone level
 	CUESUM[0]*= HPHN_ATT; 
 	CUESUM[1]*= HPHN_ATT;
-	
-	
 	
 	HP_BUS[0] = ANTICLIP(CUESUM[0]);
 	HP_BUS[1] = ANTICLIP(CUESUM[1]);
@@ -548,7 +677,6 @@ void SAI1_IRQHandler(void)
 		{
 		lvl_mr = lvl_tmpm;	
 		}	
-		
 	HAL_SAI_Transmit_IT(&hsai_BlockA1, HP_BUS, 2);
 	//HAL_SAI_Transmit_IT(&hsai_BlockA1, &SINED[2*rs], 2);	
 	//HAL_SAI_Transmit_IT(&hsai_BlockA1, CH1IN, 2);			
@@ -568,7 +696,6 @@ void SAI2_IRQHandler(void)
 	}	
 
 	
-	
 //////////////////////////////////////////////////////////
 //
 //					ADCs HANDLER
@@ -582,8 +709,6 @@ void SAI3_IRQHandler(void)
 	}	
 	
 	
-	
-
 //////////////////////////////////////////////////////////
 //
 //		convering float to int16 and anticlipping	
@@ -604,6 +729,31 @@ int16_t ANTICLIP(float dt)
 		}			
 	};
 	
+	
+//////////////////////////////////////////////////////////
+//
+//		calculate ring buffer size
+//	
+CHANGE_RNGSIZE(void)
+	{
+	uint32_t sz;	
+	if(BFXn==4)	//FLANGER
+		{
+		return;	
+		}	
+	sz = 2116800000/BPM_link;	
+	sz>>=(7-rngdiv[BFXn]);
+	if(sz<=rngmaxsize)
+		{
+		rngsize = sz;	
+		}		
+	else
+		{
+		rngsize = rngmaxsize;	
+		}
+	need_draw_ms = 1;	
+	return;	
+	};	
 	
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
