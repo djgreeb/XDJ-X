@@ -369,6 +369,21 @@
 //	-	exit utilities using the Back button
 //	ver. 1.81
 //	-	Rekordbox database parser ver. 0.51, playlists>20 bug fixed
+//	ver. 1.82
+//	-	Rekordbox database parser ver. 0.53
+//	- Added support for reading large audio files when the *.EXT file exceeded the WFORMDYNAMIC buffer size
+//	ver. 1.83
+//	-	WFORMDYNAMIC read scope from waveform rendering process is limited
+//	-	The function for rendering static waveform samples has been changed.
+//	ver. 1.85
+//	-	added union memory
+//	ver. 1.86
+//	- Static waveforms 2-layers now
+//	- find PWV5 pointer in *.EXT file
+//	ver. 1.89
+//	- added parcing PWV5
+//
+//
 //
 //
 //
@@ -396,8 +411,12 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-char FIRMWARE_VERSION[] = "1.81";	
+char FIRMWARE_VERSION[] = "1.89";	
 #define DEBUG_UART_EN				//sending work status to uart
+
+#include "stdio.h"
+#include "stdint.h"
+
 #include "global_variables.h"
 #include "audio.h"
 #include "CWX3970.h"
@@ -536,11 +555,11 @@ int main(void)
 	i = HAL_GetTick();
 	for(a=0;a<8912896;a++)
 		{
-		PCM[0][0][0][a] = a%60105;	
+		sdram.pcm[0][0][0][a] = a%60105;	
 		}
 	for(a=0;a<8912896;a++)
 		{
-		if(PCM[0][0][0][a]!=(a%60105))
+		if(sdram.pcm[0][0][0][a]!=(a%60105))
 			{
 			sprintf((char*)U_TX_DATA, "%03lu SDRAM error\n\r", i);	
 			UART_TX(&huart4, U_TX_DATA, 17, 5);

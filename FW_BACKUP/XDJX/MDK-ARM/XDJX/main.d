@@ -71,6 +71,7 @@ xdjx\main.o: ../Inc/tim.h
 xdjx\main.o: ../Inc/usart.h
 xdjx\main.o: ../Inc/gpio.h
 xdjx\main.o: ../Inc/fmc.h
+xdjx\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 xdjx\main.o: ../Inc/global_variables.h
 xdjx\main.o: ../Inc/audio.h
 xdjx\main.o: ../Drivers/LCD/CWX3970.h

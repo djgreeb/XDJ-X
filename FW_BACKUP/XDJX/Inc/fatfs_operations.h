@@ -22,7 +22,7 @@ else
 
 if(end_adata[dkN]<128)
 	{
-	res = f_read(&file[dkN], PCM[dkN][end_adata[dkN]][0], 32768, &nbytes[dkN]);
+	res = f_read(&file[dkN], sdram.pcm[dkN][end_adata[dkN]][0], 32768, &nbytes[dkN]);
 	if(res==FR_OK)
 		{				
 		need_redraw_memline[dkN] = 1;	
@@ -39,7 +39,7 @@ else if((end_adata[dkN]<((play_adr[dkN]>>13)+42)) && (fill_stp[dkN]==0 || fill_s
 			fill_stp[dkN] = 0;
 			}						
 		}		
-	res = f_read(&file[dkN], PCM[dkN][end_adata[dkN]&0x7F][0], 32768, &nbytes[dkN]);	
+	res = f_read(&file[dkN], sdram.pcm[dkN][end_adata[dkN]&0x7F][0], 32768, &nbytes[dkN]);	
 	if(res==FR_OK)
 		{				
 		end_adata[dkN]++;
@@ -67,7 +67,7 @@ else if(((end_adata[dkN]>((play_adr[dkN]>>13)+86) || ((end_adata[dkN]-start_adat
 		}
 	else if(fill_stp[dkN]==1)
 		{
-		res = f_read(&file[dkN], PCM[dkN][start_adata[dkN]&0x7F][0], 32768, &nbytes[dkN]);
+		res = f_read(&file[dkN], sdram.pcm[dkN][start_adata[dkN]&0x7F][0], 32768, &nbytes[dkN]);
 		if(res==FR_OK)
 			{	
 			fill_stp[dkN] = 2;
@@ -75,7 +75,7 @@ else if(((end_adata[dkN]>((play_adr[dkN]>>13)+86) || ((end_adata[dkN]-start_adat
 		}
 	else if(fill_stp[dkN]==2)
 		{
-		res = f_read(&file[dkN], PCM[dkN][(start_adata[dkN]+1)&0x7F][0], 32768, &nbytes[dkN]);
+		res = f_read(&file[dkN], sdram.pcm[dkN][(start_adata[dkN]+1)&0x7F][0], 32768, &nbytes[dkN]);
 		if(res==FR_OK)
 			{	
 			fill_stp[dkN] = 3;
@@ -83,7 +83,7 @@ else if(((end_adata[dkN]>((play_adr[dkN]>>13)+86) || ((end_adata[dkN]-start_adat
 		}
 	else if(fill_stp[dkN]==3)
 		{
-		res = f_read(&file[dkN], PCM[dkN][(start_adata[dkN]+2)&0x7F][0], 32768, &nbytes[dkN]);
+		res = f_read(&file[dkN], sdram.pcm[dkN][(start_adata[dkN]+2)&0x7F][0], 32768, &nbytes[dkN]);
 		if(res==FR_OK)
 			{
 			fill_stp[dkN] = 4;
@@ -91,7 +91,7 @@ else if(((end_adata[dkN]>((play_adr[dkN]>>13)+86) || ((end_adata[dkN]-start_adat
 		}
 	else if(fill_stp[dkN]==4)
 		{
-		res = f_read(&file[dkN], PCM[dkN][(start_adata[dkN]+3)&0x7F][0], 32768, &nbytes[dkN]);
+		res = f_read(&file[dkN], sdram.pcm[dkN][(start_adata[dkN]+3)&0x7F][0], 32768, &nbytes[dkN]);
 		if(res==FR_OK)
 			{	
 			fill_stp[dkN] = 5;

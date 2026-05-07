@@ -67,7 +67,7 @@ void intDrawLayer0_INFO_ANIMATION(uint8_t CurrentCursorPosition);
 void intDrawLayer0_NOINFO_ANIMATION(uint8_t CurrentCursorPosition);
 void intDrawAllIcons(void);																//internal function for Browser INFO and Taglist INFO
 void intClearInfoWin(void);																//internal function for Browser INFO and Taglist INFO
-
+void DrawWFMSample(uint8_t dk, uint8_t pos);					//Draw sample Size 1x19 for static waveform	
 
 ///////////////////////////////
 //	
@@ -331,7 +331,7 @@ void intDRAW_WAVEFORM_FRAME(uint8_t dk, uint32_t position)
 			}
 		else
 			{
-			if(adr<all_long[dk])
+			if((adr<all_long[dk]) && (adr<90000))
 				{	
 				if(DynamicWaveformZOOM==1)
 					{		
@@ -410,6 +410,7 @@ void RedrawWaveforms(uint8_t dk, uint32_t position)
 
 		if(forcibly_redraw[dk]==1)
 			{
+			Prev10m[dk] = 0xFF;	
 			Prev1m[dk] = 0xFF;
 			Prev10s[dk] = 0xFF;
 			Prev1s[dk] = 0xFF;
@@ -418,6 +419,20 @@ void RedrawWaveforms(uint8_t dk, uint32_t position)
 			PrevHf[dk] = 0xFF;				
 			}
 
+		if(Prev10m[dk]!=(clock_pos/90000)%10)			
+			{
+			Prev10m[dk] = (clock_pos/90000)%10;
+			if(Prev10m[dk]==0)
+				{
+				BSP_LCD_SetTextColor(LCD_COLOR_BLACK);	
+				}
+			sprintf((char *)Buf , "%0lu", Prev10m[dk]);				//10 Min
+			BSP_LCD_DisplayStringAt(22+h, 170, Buf, LEFT_MODE);				
+			if(Prev10m[dk]==0)
+				{
+				BSP_LCD_SetTextColor(LCD_COLOR_WHITE);	
+				}	
+			}
 		if(Prev1m[dk]!=(clock_pos/9000)%10)			
 			{
 			Prev1m[dk] = (clock_pos/9000)%10;	
@@ -649,6 +664,57 @@ void RedrawWaveforms(uint8_t dk, uint32_t position)
 		}	
 	return;	
 	}
+
+
+//////////////////////////////////////////////////
+//
+//	Draw sample Size 1x19 for static waveform	
+//	
+void DrawWFMSample(uint8_t dk, uint8_t pos)
+	{
+	uint16_t h, color;	
+	if(dk==dkA)
+		{
+		h = 0;	
+		}		
+	else
+		{
+		h = 272;	
+		}
+		
+	if(dk==dkB)
+		{
+		color = COLOR_MAP[UT_SET[5]][2*((4*(WFORMSTATIC[dk][pos]>>7))+((WFORMSTATIC[dk][pos]&0x1F)%4))];	
+		if((WFORMSTATIC[dk][pos]>>7)==1)
+			{
+			ForceDrawVLine(pos+3+h, 220-(WFORMSTATIC[dk][pos]&0x1F), (WFORMSTATIC[dk][pos]&0x1F)+1, color);			
+			}		
+		else
+			{
+			uint8_t len;
+			len = (WFORMSTATIC[dk][pos]&0x1F)/3;
+			ForceDrawVLine(pos+3+h, 220-len, len+1, color);			
+			color = color_dim(67, 100, color);	
+			ForceDrawVLine(pos+3+h, 220-(WFORMSTATIC[dk][pos]&0x1F), ((WFORMSTATIC[dk][pos]&0x1F)-len)+1, color);
+			}		
+		}
+	else
+		{
+		if(UT_SET[5]==0)
+			{
+			color = COLOR_MAP[0][2*(WFST_AHB[dk][pos]>>5)];
+			}
+		else
+			{
+			color = WFST_RGB[dk][pos]; 	
+			}			
+		ForceDrawVLine(pos+3+h, 220-(WFST_AHB[dk][pos]&0x1F), (WFST_AHB[dk][pos]&0x1F)+1, color_dim(67, 100, color));
+		ForceDrawVLine(pos+3+h, 220-WFST_AL[dk][pos], WFST_AL[dk][pos]+1, color);
+		}
+	return;	
+	};	
+
+		
 	
 	
 //////////////////////////////////////////////////
@@ -681,13 +747,11 @@ void DrawStaticWFM(uint8_t dk, uint8_t Tpos)
 		if(prevTpos[dk]!=Tpos)			
 			{					
 			ForceDrawVLine(prevTpos[dk]+3+h, 200, 29, LCD_COLOR_BLACK);
-			ForceDrawVLine(prevTpos[dk]+4+h, 200, 29, LCD_COLOR_BLACK);					
-			ForceDrawVLine(prevTpos[dk]+3+h, 220-(WFORMSTATIC[dk][prevTpos[dk]]&0x1F), (WFORMSTATIC[dk][prevTpos[dk]]&0x1F)+1, 
-				WS_COLOR_MAP[WFORMSTATIC[dk][prevTpos[dk]]>>7]);	
+			ForceDrawVLine(prevTpos[dk]+4+h, 200, 29, LCD_COLOR_BLACK);	
+			DrawWFMSample(dk, prevTpos[dk]);		
 			if(prevTpos[dk]<201)	
 				{
-				ForceDrawVLine(prevTpos[dk]+4+h, 220-(WFORMSTATIC[dk][prevTpos[dk]+1]&0x1F), (WFORMSTATIC[dk][prevTpos[dk]+1]&0x1F)+1, 
-					WS_COLOR_MAP[WFORMSTATIC[dk][prevTpos[dk]+1]>>7]);
+				DrawWFMSample(dk, prevTpos[dk]+1);	
 				}
 			if(prevTpos[dk]>Tpos)						//___<<||___     moving
 				{				
@@ -864,7 +928,7 @@ void DrawStaticWFM(uint8_t dk, uint8_t Tpos)
 			}	
 		for(i=0;i<202;i++)						
 			{			
-			ForceDrawVLine(i+3+h, 220-(WFORMSTATIC[dk][i]&0x1F), (WFORMSTATIC[dk][i]&0x1F)+1, WS_COLOR_MAP[WFORMSTATIC[dk][i]>>7]);			
+			DrawWFMSample(dk, i);		
 			DrawpxforBar(dk, h, i);	
 			}
 		if(REMAIN_ENABLE[dk]==0)	

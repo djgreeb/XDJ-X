@@ -17,7 +17,12 @@ uint8_t masterdeck = 0xFF;
 
 /* SDRAM linker ---------------------------------------------------------*/
 uint16_t fbuf[0x369C0] 					__attribute__((at(0xC0000000)));  //END: 0xC006D380
-uint16_t PCM[2][272][8192][2]   __attribute__((at(0xC006D380))); //SIZE:8912896  END: 0xC116D380
+
+union Data {
+	uint16_t pcm[2][272][8192][2];
+	uint8_t bf[2][8912896]; 
+	};
+union Data sdram __attribute__((at(0xC006D380))); //SIZE:8912896  END: 0xC116D380;
 
 //				   CIRCLE BUFF        CUE   HCUEA  HCUEB  HCUEC  HCUED  HCUEE  HCUEF  HCUEG  HCUEH
 //		|..........128..........|..16..|..16..|..16..|..16..|..16..|..16..|..16..|..16..|..16..|
@@ -35,6 +40,8 @@ uint16_t PCM[2][272][8192][2]   __attribute__((at(0xC006D380))); //SIZE:8912896 
 //
 //
 //
+
+
 
 /* Display and static information variables ---------------------------------------------------------*/
 #define LCD_FRAME_BUFFER    ((uint32_t)0xC0000000)
@@ -186,6 +193,7 @@ static const 	uint16_t COLOR_MAP[2][16] =
 	0xDFDE
 };
 
+uint8_t Prev10m[2] = {0xFF, 0xFF};
 uint8_t Prev1m[2] = {0xFF, 0xFF};
 uint8_t Prev10s[2] = {0xFF, 0xFF};
 uint8_t Prev1s[2] = {0xFF, 0xFF};
@@ -591,6 +599,9 @@ uint8_t number_of_memory_cue_points[2] = {0};
 /* Static Waveform variables ---------------------------------------------------------*/
 uint8_t prevTpos[2] = {0};
 uint8_t WFORMSTATIC[2][202];
+uint16_t WFST_RGB[2][202];		//1RGB 565 c color waveform
+uint8_t WFST_AHB[2][202];			//High amlitude 0...18 + 3 bits Blue color map
+uint8_t WFST_AL[2][202];			//Low amlitude 0...18
 #define DRAW_NEW_STATIC_WAVEFORM		203
 #define CLEAR_WAVEFORM_ARRAY				204
 #define MS_NOT_LOADED								205
@@ -603,17 +614,9 @@ uint8_t jog_light[2] = {1, 1};
 #define PBAR_COLOR_1				((uint16_t)0xE318)
 #define PBAR_COLOR_2				((uint16_t)0xB18D)
 #define PBAR_COLOR_3				((uint16_t)0xA109)
-
-const static uint16_t WS_COLOR_MAP[2] = 						//colors for static waveforms
-{
-0xADF4,
-0xCAFC		
-};
-
 uint16_t CURSOR_COLOR[2] = {0x8000, 0x8000};	//cursor color for waveforms
 uint8_t prevstrt[2] = {0, 0};		//for draw mem fill
 uint8_t prevfin[2] = {0, 0};		//for draw mem fill
-
 
 /* Dynamic Waveform variables ---------------------------------------------------------*/
 uint16_t bars[2] = 0;	

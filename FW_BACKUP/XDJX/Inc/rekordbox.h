@@ -19,7 +19,9 @@ uint16_t FindCurrBar(uint8_t dk, uint32_t pos);		//search current bar number
 ////////////////////////////////////////////////////////////////////////
 //
 //
-//Rekordbox database parser ver. 0.43
+//Rekordbox database parser ver. 0.53
+//
+//
 //Functions:
 //Open and read file export.pdb
 //find all tracks
@@ -37,13 +39,14 @@ uint16_t FindCurrBar(uint8_t dk, uint32_t pos);		//search current bar number
 //Expanded to 1024 tracks, 2048 mentions and 40 playlists
 //Rekordbox database parser ver. 0.51
 //Playlists>20 bug fixed
-//
+//Rekordbox database parser ver. 0.53
+//Added support for reading large audio files when the *.EXT file exceeded the WFORMDYNAMIC buffer size
 //
 ////////////////////////////////////////////////////////////////////////
 uint16_t DATABASE_PARSER(void)
 	{	
 	#if defined(DEBUG_UART_EN)		
-	sprintf((char*)U_TX_DATA, "Start Rekordbox parser ver. 0.51\n\r");	
+	sprintf((char*)U_TX_DATA, "Start Rekordbox parser ver. 0.53\n\r");	
 	UART_TX(&huart4, U_TX_DATA, 34, 55);	
 	#endif		
 	res = f_open(&file[0], path_export, FA_READ);
@@ -587,141 +590,141 @@ uint8_t PlaylistID_to_Pos(uint8_t ID)
 			return 4;	//cannot open ANLZXXXX.DAT file
 			}
 		uint32_t FILSIZE = f_size(&file[dk]);
-		if(FILSIZE>WFD_SIZE)
+		if(FILSIZE>8912896)
 			{
 			return 26;	
 			}
-		res = f_read(&file[dk], WFORMDYNAMIC[dk], FILSIZE, &nbytes[dk]);
+		res = f_read(&file[dk], sdram.bf[dk], FILSIZE, &nbytes[dk]);
 		if (res != FR_OK)
 			{
 			return 5;	//cannot read ANLZXXXX.DAT file		
 			}
 		f_close(&file[dk]);					//Close file ANLZXXXX.DAT		
 		uint32_t fsz;	
-		fsz = WFORMDYNAMIC[dk][8];			
+		fsz = sdram.bf[dk][8];			
 		fsz<<=8;	
-		fsz+=WFORMDYNAMIC[dk][9];	
+		fsz+=sdram.bf[dk][9];	
 		fsz<<=8;
-		fsz+=WFORMDYNAMIC[dk][10];	
+		fsz+=sdram.bf[dk][10];	
 		fsz<<=8;
-		fsz+=WFORMDYNAMIC[dk][11];
+		fsz+=sdram.bf[dk][11];
 		if(fsz != FILSIZE)
 			{
 			return 6;   //file ANLZXXXX.DAT is damadge!		
 			}
-		fsz = WFORMDYNAMIC[dk][4];			
+		fsz = sdram.bf[dk][4];			
 		fsz<<=8;
-		fsz+=WFORMDYNAMIC[dk][5];	
+		fsz+=sdram.bf[dk][5];	
 		fsz<<=8;
-		fsz+=WFORMDYNAMIC[dk][6];	
+		fsz+=sdram.bf[dk][6];	
 		fsz<<=8;
-		fsz+=WFORMDYNAMIC[dk][7];
+		fsz+=sdram.bf[dk][7];
 		uint32_t StPosHead = fsz;		
-		if(WFORMDYNAMIC[dk][StPosHead] != 80 ||
-			 WFORMDYNAMIC[dk][StPosHead+1] != 80 ||
-			 WFORMDYNAMIC[dk][StPosHead+2] != 84 || 
-			 WFORMDYNAMIC[dk][StPosHead+3] != 72)		//Check PPHT position in file
+		if(sdram.bf[dk][StPosHead] != 80 ||
+			 sdram.bf[dk][StPosHead+1] != 80 ||
+			 sdram.bf[dk][StPosHead+2] != 84 || 
+			 sdram.bf[dk][StPosHead+3] != 72)		//Check PPHT position in file
 			{
 			return 6;   //file ANLZXXXX.DAT is damadge!		
 			}	
-		fsz = WFORMDYNAMIC[dk][StPosHead+4];			
+		fsz = sdram.bf[dk][StPosHead+4];			
 		fsz<<=8;
-		fsz+=WFORMDYNAMIC[dk][StPosHead+5];	
+		fsz+=sdram.bf[dk][StPosHead+5];	
 		fsz<<=8;
-		fsz+=WFORMDYNAMIC[dk][StPosHead+6];	
+		fsz+=sdram.bf[dk][StPosHead+6];	
 		fsz<<=8;
-		fsz+=WFORMDYNAMIC[dk][StPosHead+7];								//head size
+		fsz+=sdram.bf[dk][StPosHead+7];								//head size
 		uint32_t SPP = fsz+StPosHead+1;	
-		fsz = WFORMDYNAMIC[dk][StPosHead+12];			
+		fsz = sdram.bf[dk][StPosHead+12];			
 		fsz<<=8;	
-		fsz+=WFORMDYNAMIC[dk][StPosHead+13];	
+		fsz+=sdram.bf[dk][StPosHead+13];	
 		fsz<<=8;
-		fsz+=WFORMDYNAMIC[dk][StPosHead+14];	
+		fsz+=sdram.bf[dk][StPosHead+14];	
 		fsz<<=8;
-		fsz+=WFORMDYNAMIC[dk][StPosHead+15];							//Path Size
+		fsz+=sdram.bf[dk][StPosHead+15];							//Path Size
 		char path_AUDIOTRACK[(fsz/2)+2];			//Create a Path for audiotrack
 		E = 0;	
 		while(E<fsz)
 			{	
-			if(WFORMDYNAMIC[dk][SPP+E-1]==0)
+			if(sdram.bf[dk][SPP+E-1]==0)
 				{
-				path_AUDIOTRACK[(E/2)+2] = WFORMDYNAMIC[dk][SPP+E];			//Fill path	
+				path_AUDIOTRACK[(E/2)+2] = sdram.bf[dk][SPP+E];			//Fill path	
 				}				
-			else if(WFORMDYNAMIC[dk][SPP+E-1]==0x04)				//Convert Unicode to CP866
+			else if(sdram.bf[dk][SPP+E-1]==0x04)				//Convert Unicode to CP866
 				{	
-				if(WFORMDYNAMIC[dk][SPP+E]<96)
+				if(sdram.bf[dk][SPP+E]<96)
 					{
-					path_AUDIOTRACK[(E/2)+2] = CYRtoCP866[WFORMDYNAMIC[dk][SPP+E]];		
+					path_AUDIOTRACK[(E/2)+2] = CYRtoCP866[sdram.bf[dk][SPP+E]];		
 					}									
 				}
 			E+=2;					
 			}
 		path_AUDIOTRACK[0] = 48;
 		path_AUDIOTRACK[1] = 58;	
-		fsz = WFORMDYNAMIC[dk][StPosHead+8];			
+		fsz = sdram.bf[dk][StPosHead+8];			
 		fsz<<=8;
-		fsz+=WFORMDYNAMIC[dk][StPosHead+9];	
+		fsz+=sdram.bf[dk][StPosHead+9];	
 		fsz<<=8;
-		fsz+=WFORMDYNAMIC[dk][StPosHead+10];
+		fsz+=sdram.bf[dk][StPosHead+10];
 		fsz<<=8;
-		fsz+=WFORMDYNAMIC[dk][StPosHead+11];	
+		fsz+=sdram.bf[dk][StPosHead+11];	
 		StPosHead = StPosHead+fsz;	//PVBR position
-		if(WFORMDYNAMIC[dk][StPosHead] != 80 ||
-			 WFORMDYNAMIC[dk][StPosHead+1] != 86 ||
-			 WFORMDYNAMIC[dk][StPosHead+2] != 66 || 
-			 WFORMDYNAMIC[dk][StPosHead+3] != 82)	//Check PVBR position in file
+		if(sdram.bf[dk][StPosHead] != 80 ||
+			 sdram.bf[dk][StPosHead+1] != 86 ||
+			 sdram.bf[dk][StPosHead+2] != 66 || 
+			 sdram.bf[dk][StPosHead+3] != 82)	//Check PVBR position in file
 			{
 			return 6;   //file ANLZXXXX.DAT is damadge!		
 			}	
-		fsz = WFORMDYNAMIC[dk][StPosHead+8];			
+		fsz = sdram.bf[dk][StPosHead+8];			
 		fsz<<=8;	
-		fsz+=WFORMDYNAMIC[dk][StPosHead+9];	
+		fsz+=sdram.bf[dk][StPosHead+9];	
 		fsz<<=8;
-		fsz+=WFORMDYNAMIC[dk][StPosHead+10];	
+		fsz+=sdram.bf[dk][StPosHead+10];	
 		fsz<<=8;
-		fsz+=WFORMDYNAMIC[dk][StPosHead+11];		
+		fsz+=sdram.bf[dk][StPosHead+11];		
 		StPosHead = StPosHead+fsz;	//PQTZ position
-		if(WFORMDYNAMIC[dk][StPosHead] != 80 ||
-			 WFORMDYNAMIC[dk][StPosHead+1] != 81 ||
-			 WFORMDYNAMIC[dk][StPosHead+2] != 84 || 
-			 WFORMDYNAMIC[dk][StPosHead+3] != 90)	//Check PQTZ position in file
+		if(sdram.bf[dk][StPosHead] != 80 ||
+			 sdram.bf[dk][StPosHead+1] != 81 ||
+			 sdram.bf[dk][StPosHead+2] != 84 || 
+			 sdram.bf[dk][StPosHead+3] != 90)	//Check PQTZ position in file
 			{
 			return 6;   //file ANLZXXXX.DAT is damadge!		
 			}	
-		fsz = WFORMDYNAMIC[dk][StPosHead+4];				
+		fsz = sdram.bf[dk][StPosHead+4];				
 		fsz<<=8;	
-		fsz+=WFORMDYNAMIC[dk][StPosHead+5];		
+		fsz+=sdram.bf[dk][StPosHead+5];		
 		fsz<<=8;
-		fsz+=WFORMDYNAMIC[dk][StPosHead+6];		
+		fsz+=sdram.bf[dk][StPosHead+6];		
 		fsz<<=8;
-		fsz+=WFORMDYNAMIC[dk][StPosHead+7];				//Head size
+		fsz+=sdram.bf[dk][StPosHead+7];				//Head size
 		uint32_t number_of_entries;
-		number_of_entries = WFORMDYNAMIC[dk][StPosHead+20];				
+		number_of_entries = sdram.bf[dk][StPosHead+20];				
 		number_of_entries<<=8;	
-		number_of_entries+=WFORMDYNAMIC[dk][StPosHead+21];		
+		number_of_entries+=sdram.bf[dk][StPosHead+21];		
 		number_of_entries<<=8;
-		number_of_entries+=WFORMDYNAMIC[dk][StPosHead+22];		
+		number_of_entries+=sdram.bf[dk][StPosHead+22];		
 		number_of_entries<<=8;
-		number_of_entries+=WFORMDYNAMIC[dk][StPosHead+23];				//calculate number_of_entries
+		number_of_entries+=sdram.bf[dk][StPosHead+23];				//calculate number_of_entries
 		if(number_of_entries>2048)
 			{
 			number_of_entries = 2048;	
 			}
 		SPP = StPosHead + fsz + 2;						//start first BPM data.
 		E = 0;
-		GRID_OFFSET[dk] = WFORMDYNAMIC[dk][SPP-1];							//find first beat 1...4
+		GRID_OFFSET[dk] = sdram.bf[dk][SPP-1];							//find first beat 1...4
 		while(E<number_of_entries)
 			{
-			BPMGRID[dk][E] = WFORMDYNAMIC[dk][SPP+(E*8)];	
+			BPMGRID[dk][E] = sdram.bf[dk][SPP+(E*8)];	
 			BPMGRID[dk][E]<<=8;
-			BPMGRID[dk][E]+= WFORMDYNAMIC[dk][SPP+1+(E*8)];		
-			BEATGRID[dk][E] = WFORMDYNAMIC[dk][SPP+2+(E*8)];	
+			BPMGRID[dk][E]+= sdram.bf[dk][SPP+1+(E*8)];		
+			BEATGRID[dk][E] = sdram.bf[dk][SPP+2+(E*8)];	
 			BEATGRID[dk][E]<<=8;
-			BEATGRID[dk][E]+= WFORMDYNAMIC[dk][SPP+3+(E*8)];	
+			BEATGRID[dk][E]+= sdram.bf[dk][SPP+3+(E*8)];	
 			BEATGRID[dk][E]<<=8;
-			BEATGRID[dk][E]+= WFORMDYNAMIC[dk][SPP+4+(E*8)];	
+			BEATGRID[dk][E]+= sdram.bf[dk][SPP+4+(E*8)];	
 			BEATGRID[dk][E]<<=8;
-			BEATGRID[dk][E]+= WFORMDYNAMIC[dk][SPP+5+(E*8)];	
+			BEATGRID[dk][E]+= sdram.bf[dk][SPP+5+(E*8)];	
 			E++;	
 			}
 		if(E==2048)
@@ -734,28 +737,28 @@ uint8_t PlaylistID_to_Pos(uint8_t ID)
 			BPMGRID[dk][E] = BPMGRID[dk][E-1];	
 			}
 		originalBPM[dk] = BPMGRID[dk][0];			//SEND ORIGINAL BPM		
-		fsz = WFORMDYNAMIC[dk][StPosHead+8];			
+		fsz = sdram.bf[dk][StPosHead+8];			
 		fsz<<=8;	
-		fsz+=WFORMDYNAMIC[dk][StPosHead+9];
+		fsz+=sdram.bf[dk][StPosHead+9];
 		fsz<<=8;
-		fsz+=WFORMDYNAMIC[dk][StPosHead+10];	
+		fsz+=sdram.bf[dk][StPosHead+10];	
 		fsz<<=8;
-		fsz+=WFORMDYNAMIC[dk][StPosHead+11];	
+		fsz+=sdram.bf[dk][StPosHead+11];	
 		StPosHead = StPosHead+fsz;	//PWAV position	
-		if(WFORMDYNAMIC[dk][StPosHead] != 80 ||
-			 WFORMDYNAMIC[dk][StPosHead+1] != 87 ||
-			 WFORMDYNAMIC[dk][StPosHead+2] != 65 || 
-			 WFORMDYNAMIC[dk][StPosHead+3] != 86)		//Check PWAV position in file
+		if(sdram.bf[dk][StPosHead] != 80   ||
+			 sdram.bf[dk][StPosHead+1] != 87 ||
+			 sdram.bf[dk][StPosHead+2] != 65 || 
+			 sdram.bf[dk][StPosHead+3] != 86)		//Check PWAV position in file
 			{
 			return 6;   //file ANLZXXXX.DAT is damadge!		
 			}
-		fsz = WFORMDYNAMIC[dk][StPosHead+4];			
+		fsz = sdram.bf[dk][StPosHead+4];			
 		fsz<<=8;
-		fsz+=WFORMDYNAMIC[dk][StPosHead+5];
+		fsz+=sdram.bf[dk][StPosHead+5];
 		fsz<<=8;
-		fsz+=WFORMDYNAMIC[dk][StPosHead+6];	
+		fsz+=sdram.bf[dk][StPosHead+6];	
 		fsz<<=8;
-		fsz+=WFORMDYNAMIC[dk][StPosHead+7];				//PWAV Header size
+		fsz+=sdram.bf[dk][StPosHead+7];				//PWAV Header size
 		fsz+=StPosHead;			
 		uint16_t ampl;
 		uint32_t y;	
@@ -764,43 +767,43 @@ uint8_t PlaylistID_to_Pos(uint8_t ID)
 			{
 			y = 509*E;
 			y>>=8;	
-			ampl = (WFORMDYNAMIC[dk][fsz+y]&0x1F)*192;	 //convert amplitude 24->18
+			ampl = (sdram.bf[dk][fsz+y]&0x1F)*192;	 //convert amplitude 24->18
 			ampl>>=8;
 			if(ampl>18)
 				{
 				ampl = 18;	
 				}
-			WFORMSTATIC[dk][E] = WFORMDYNAMIC[dk][fsz+y]&0x80;	//color	
+			WFORMSTATIC[dk][E] = sdram.bf[dk][fsz+y]&0x80;	//color	
 			WFORMSTATIC[dk][E]|= ampl;	
 			}
 
-		fsz = WFORMDYNAMIC[dk][StPosHead+8];			
+		fsz = sdram.bf[dk][StPosHead+8];			
 		fsz<<=8;	
-		fsz+=WFORMDYNAMIC[dk][StPosHead+9];
+		fsz+=sdram.bf[dk][StPosHead+9];
 		fsz<<=8;
-		fsz+=WFORMDYNAMIC[dk][StPosHead+10];	
+		fsz+=sdram.bf[dk][StPosHead+10];	
 		fsz<<=8;
-		fsz+=WFORMDYNAMIC[dk][StPosHead+11];				//PWAV TAG size
+		fsz+=sdram.bf[dk][StPosHead+11];				//PWAV TAG size
 		StPosHead+=fsz;													//PWV2 start adress
-		if(WFORMDYNAMIC[dk][StPosHead] != 80 ||
-			 WFORMDYNAMIC[dk][StPosHead+1] != 87 ||
-			 WFORMDYNAMIC[dk][StPosHead+2] != 86 || 
-			 WFORMDYNAMIC[dk][StPosHead+3] != 50)		//Check PWV2 position in file
+		if(sdram.bf[dk][StPosHead] != 80   ||
+			 sdram.bf[dk][StPosHead+1] != 87 ||
+			 sdram.bf[dk][StPosHead+2] != 86 || 
+			 sdram.bf[dk][StPosHead+3] != 50)		//Check PWV2 position in file
 			{
 			return 6;   //file ANLZXXXX.DAT is damadge!		
 			}
-		fsz = WFORMDYNAMIC[dk][StPosHead+8];			
+		fsz = sdram.bf[dk][StPosHead+8];			
 		fsz<<=8;	
-		fsz+=WFORMDYNAMIC[dk][StPosHead+9];
+		fsz+=sdram.bf[dk][StPosHead+9];
 		fsz<<=8;
-		fsz+=WFORMDYNAMIC[dk][StPosHead+10];	
+		fsz+=sdram.bf[dk][StPosHead+10];	
 		fsz<<=8;
-		fsz+=WFORMDYNAMIC[dk][StPosHead+11];				//PWV2 Tag size
+		fsz+=sdram.bf[dk][StPosHead+11];				//PWV2 Tag size
 		StPosHead = StPosHead+fsz;	//PCOB position				
-		if(WFORMDYNAMIC[dk][StPosHead] != 80 ||
-			 WFORMDYNAMIC[dk][StPosHead+1] != 67 ||
-			 WFORMDYNAMIC[dk][StPosHead+2] != 79 || 
-			 WFORMDYNAMIC[dk][StPosHead+3] != 66)		//Check PCOB position in file
+		if(sdram.bf[dk][StPosHead] != 80 	 ||
+			 sdram.bf[dk][StPosHead+1] != 67 ||
+			 sdram.bf[dk][StPosHead+2] != 79 || 
+			 sdram.bf[dk][StPosHead+3] != 66)		//Check PCOB position in file
 			{
 			return 6;   //file ANLZXXXX.DAT is damadge!		
 			}		
@@ -816,80 +819,80 @@ uint8_t PlaylistID_to_Pos(uint8_t ID)
 			HCUE32COLOR[dk][E] = 0xFFFF;	
 			}
 		
-		if(WFORMDYNAMIC[dk][StPosHead+15]==1)    //check type PCOB - for HOT CUE points
+		if(sdram.bf[dk][StPosHead+15]==1)    //check type PCOB - for HOT CUE points
 			{
-			number_of_hot_cue_points[dk] = WFORMDYNAMIC[dk][StPosHead+19]&0xF;				//number of hotcue points		
+			number_of_hot_cue_points[dk] = sdram.bf[dk][StPosHead+19]&0xF;				//number of hotcue points		
 //			if(number_of_hot_cue_points[dk]>0)
 //				{
 //				MemoryCuePyramid_ENABLE = 3;	
 //				}
-			fsz = WFORMDYNAMIC[dk][StPosHead+8];			
+			fsz = sdram.bf[dk][StPosHead+8];			
 			fsz<<=8;	
-			fsz+=WFORMDYNAMIC[dk][StPosHead+9];
+			fsz+=sdram.bf[dk][StPosHead+9];
 			fsz<<=8;
-			fsz+=WFORMDYNAMIC[dk][StPosHead+10];	
+			fsz+=sdram.bf[dk][StPosHead+10];	
 			fsz<<=8;
-			fsz+=WFORMDYNAMIC[dk][StPosHead+11];				//PCOB TAG size
+			fsz+=sdram.bf[dk][StPosHead+11];				//PCOB TAG size
 			PCOB2_adr = fsz+StPosHead;							//start adress PCOB2
-			fsz = WFORMDYNAMIC[dk][StPosHead+4];			
+			fsz = sdram.bf[dk][StPosHead+4];			
 			fsz<<=8;	
-			fsz+=WFORMDYNAMIC[dk][StPosHead+5];
+			fsz+=sdram.bf[dk][StPosHead+5];
 			fsz<<=8;
-			fsz+=WFORMDYNAMIC[dk][StPosHead+6];	
+			fsz+=sdram.bf[dk][StPosHead+6];	
 			fsz<<=8;
-			fsz+=WFORMDYNAMIC[dk][StPosHead+7];				//PCOB head size
+			fsz+=sdram.bf[dk][StPosHead+7];				//PCOB head size
 			StPosHead+= fsz;		
 			uint8_t HCUE_NAME = 0;
 			E = 0;	
 			while(E<number_of_hot_cue_points[dk])	
 				{	
-				fsz = WFORMDYNAMIC[dk][StPosHead+8];			
+				fsz = sdram.bf[dk][StPosHead+8];			
 				fsz<<=8;	
-				fsz+=WFORMDYNAMIC[dk][StPosHead+9];
+				fsz+=sdram.bf[dk][StPosHead+9];
 				fsz<<=8;
-				fsz+=WFORMDYNAMIC[dk][StPosHead+10];	
+				fsz+=sdram.bf[dk][StPosHead+10];	
 				fsz<<=8;
-				fsz+=WFORMDYNAMIC[dk][StPosHead+11];				//PCPT TAG size
+				fsz+=sdram.bf[dk][StPosHead+11];				//PCPT TAG size
 				SPP = StPosHead+fsz;										//Next PCPT adress
 
-				HCUE_NAME = WFORMDYNAMIC[dk][StPosHead+15];
-				if(WFORMDYNAMIC[dk][StPosHead+19]!=0)				//when hcue active
+				HCUE_NAME = sdram.bf[dk][StPosHead+15];
+				if(sdram.bf[dk][StPosHead+19]!=0)				//when hcue active
 					{
 					if((HCUE_NAME<4) && (HCUE_NAME>0))
 						{
 						HCUE_type[dk][HCUE_NAME-1] = 0x02;			//write 
 						}
 					}
-				fsz = WFORMDYNAMIC[dk][StPosHead+4];			
+				fsz = sdram.bf[dk][StPosHead+4];			
 				fsz<<=8;	
-				fsz+=WFORMDYNAMIC[dk][StPosHead+5];
+				fsz+=sdram.bf[dk][StPosHead+5];
 				fsz<<=8;
-				fsz+=WFORMDYNAMIC[dk][StPosHead+6];	
+				fsz+=sdram.bf[dk][StPosHead+6];	
 				fsz<<=8;
-				fsz+=WFORMDYNAMIC[dk][StPosHead+7];				//PCPT Head size
+				fsz+=sdram.bf[dk][StPosHead+7];				//PCPT Head size
 				StPosHead+= fsz;		
 		
 				if((HCUE_NAME<4) && (HCUE_NAME>0))
 					{
 					HCUE_NAME--;
-					HCUE_adr[dk][0][HCUE_NAME] = WFORMDYNAMIC[dk][StPosHead+4];
+					HCUE_adr[dk][0][HCUE_NAME] = sdram.bf[dk][StPosHead+4];
 					HCUE_adr[dk][0][HCUE_NAME] = HCUE_adr[dk][0][HCUE_NAME]<<8;
-					HCUE_adr[dk][0][HCUE_NAME]+= WFORMDYNAMIC[dk][StPosHead+5];
+					HCUE_adr[dk][0][HCUE_NAME]+= sdram.bf[dk][StPosHead+5];
 					HCUE_adr[dk][0][HCUE_NAME] = HCUE_adr[dk][0][HCUE_NAME]<<8;
-					HCUE_adr[dk][0][HCUE_NAME]+= WFORMDYNAMIC[dk][StPosHead+6];
+					HCUE_adr[dk][0][HCUE_NAME]+= sdram.bf[dk][StPosHead+6];
 					HCUE_adr[dk][0][HCUE_NAME] = HCUE_adr[dk][0][HCUE_NAME]<<8;	
-					HCUE_adr[dk][0][HCUE_NAME]+= WFORMDYNAMIC[dk][StPosHead+7];
-					if(WFORMDYNAMIC[dk][StPosHead]==2)						//when hot cue type=loop
+					HCUE_adr[dk][0][HCUE_NAME]+= sdram.bf[dk][StPosHead+7];
+					if(sdram.bf[dk][StPosHead]==2)						//when hot cue type=loop
 						{
 						HCUE_type[dk][HCUE_NAME]&= 0x03;	
 						HCUE_type[dk][HCUE_NAME] |= 0x01;		
-						HCUE_adr[dk][1][HCUE_NAME] = WFORMDYNAMIC[dk][StPosHead+8];
+						HCUE_adr[dk][1][HCUE_NAME] = sdram.bf[dk][StPosHead+8];
 						HCUE_adr[dk][1][HCUE_NAME] = HCUE_adr[dk][1][HCUE_NAME]<<8;
-						HCUE_adr[dk][1][HCUE_NAME]+= WFORMDYNAMIC[dk][StPosHead+9];
+						HCUE_adr[dk][1][HCUE_NAME]+= sdram.bf[dk][StPosHead+9];
 						HCUE_adr[dk][1][HCUE_NAME] = HCUE_adr[dk][1][HCUE_NAME]<<8;
-						HCUE_adr[dk][1][HCUE_NAME]+= WFORMDYNAMIC[dk][StPosHead+10];
+						HCUE_adr[dk][1][HCUE_NAME]+= sdram.bf[dk][StPosHead+10];
 						HCUE_adr[dk][1][HCUE_NAME] = HCUE_adr[dk][1][HCUE_NAME]<<8;	
-						HCUE_adr[dk][1][HCUE_NAME]+= WFORMDYNAMIC[dk][StPosHead+11];
+						HCUE_adr[dk][1][HCUE_NAME]+= sdram.bf[dk][StPosHead+11];
 						HCUE_adr[dk][1][HCUE_NAME] = (HCUE_adr[dk][1][HCUE_NAME]*3)/20; 	//translate ms to 1/150s frames
 						}
 					}
@@ -906,60 +909,60 @@ uint8_t PlaylistID_to_Pos(uint8_t ID)
 			MEMORY_adr[dk][1][E] = 0xFFFF;	
 			}
 		StPosHead = PCOB2_adr;	
-		if(WFORMDYNAMIC[dk][StPosHead+15]==0)    //check type PCOB - for MEMORY CUE points
+		if(sdram.bf[dk][StPosHead+15]==0)    //check type PCOB - for MEMORY CUE points
 			{
-			number_of_memory_cue_points[dk] = WFORMDYNAMIC[dk][StPosHead+19]&0xF;				//number of MEMORY points	
-			fsz = WFORMDYNAMIC[dk][StPosHead+4];			
+			number_of_memory_cue_points[dk] = sdram.bf[dk][StPosHead+19]&0xF;				//number of MEMORY points	
+			fsz = sdram.bf[dk][StPosHead+4];			
 			fsz<<=8;	
-			fsz+=WFORMDYNAMIC[dk][StPosHead+5];
+			fsz+=sdram.bf[dk][StPosHead+5];
 			fsz<<=8;
-			fsz+=WFORMDYNAMIC[dk][StPosHead+6];	
+			fsz+=sdram.bf[dk][StPosHead+6];	
 			fsz<<=8;
-			fsz+=WFORMDYNAMIC[dk][StPosHead+7];				//PCOB head size
+			fsz+=sdram.bf[dk][StPosHead+7];				//PCOB head size
 			StPosHead = StPosHead+fsz;		
 
 			E = 0;	
 			while(E<number_of_memory_cue_points[dk])	
 				{	
-				fsz = WFORMDYNAMIC[dk][StPosHead+8];			
+				fsz = sdram.bf[dk][StPosHead+8];			
 				fsz<<=8;
-				fsz+=WFORMDYNAMIC[dk][StPosHead+9];
+				fsz+=sdram.bf[dk][StPosHead+9];
 				fsz<<=8;
-				fsz+=WFORMDYNAMIC[dk][StPosHead+10];	
+				fsz+=sdram.bf[dk][StPosHead+10];	
 				fsz<<=8;
-				fsz+=WFORMDYNAMIC[dk][StPosHead+11];				//PCPT TAG size
+				fsz+=sdram.bf[dk][StPosHead+11];				//PCPT TAG size
 				SPP = StPosHead+fsz;										//Next PCPT adress
 
-				if(WFORMDYNAMIC[dk][StPosHead+19]!=0)				//when hcue active
+				if(sdram.bf[dk][StPosHead+19]!=0)				//when hcue active
 					{
 					MEMORY_type[dk][E] = 2;			//write 
 					}	
-				fsz = WFORMDYNAMIC[dk][StPosHead+4];			
+				fsz = sdram.bf[dk][StPosHead+4];			
 				fsz<<=8;	
-				fsz+=WFORMDYNAMIC[dk][StPosHead+5];
+				fsz+=sdram.bf[dk][StPosHead+5];
 				fsz<<=8;
-				fsz+=WFORMDYNAMIC[dk][StPosHead+6];	
+				fsz+=sdram.bf[dk][StPosHead+6];	
 				fsz<<=8;
-				fsz+=WFORMDYNAMIC[dk][StPosHead+7];				//PCPT Head size
+				fsz+=sdram.bf[dk][StPosHead+7];				//PCPT Head size
 				StPosHead = StPosHead+fsz;		
 		
-				MEMORY_adr[dk][0][E] = WFORMDYNAMIC[dk][StPosHead+4];
+				MEMORY_adr[dk][0][E] = sdram.bf[dk][StPosHead+4];
 				MEMORY_adr[dk][0][E] = MEMORY_adr[dk][0][E]<<8;
-				MEMORY_adr[dk][0][E]+= WFORMDYNAMIC[dk][StPosHead+5];
+				MEMORY_adr[dk][0][E]+= sdram.bf[dk][StPosHead+5];
 				MEMORY_adr[dk][0][E] = MEMORY_adr[dk][0][E]<<8;
-				MEMORY_adr[dk][0][E]+= WFORMDYNAMIC[dk][StPosHead+6];
+				MEMORY_adr[dk][0][E]+= sdram.bf[dk][StPosHead+6];
 				MEMORY_adr[dk][0][E] = MEMORY_adr[dk][0][E]<<8;	
-				MEMORY_adr[dk][0][E]+= WFORMDYNAMIC[dk][StPosHead+7];	
-				if(WFORMDYNAMIC[dk][StPosHead]==2)						//when hot cue type=loop
+				MEMORY_adr[dk][0][E]+= sdram.bf[dk][StPosHead+7];	
+				if(sdram.bf[dk][StPosHead]==2)						//when hot cue type=loop
 					{
 					MEMORY_type[dk][E] |= 0x1;		
-					MEMORY_adr[dk][1][E] = WFORMDYNAMIC[dk][StPosHead+8];
+					MEMORY_adr[dk][1][E] = sdram.bf[dk][StPosHead+8];
 					MEMORY_adr[dk][1][E] = MEMORY_adr[dk][1][E]<<8;
-					MEMORY_adr[dk][1][E]+= WFORMDYNAMIC[dk][StPosHead+9];
+					MEMORY_adr[dk][1][E]+= sdram.bf[dk][StPosHead+9];
 					MEMORY_adr[dk][1][E] = MEMORY_adr[dk][1][E]<<8;
-					MEMORY_adr[dk][1][E]+= WFORMDYNAMIC[dk][StPosHead+10];
+					MEMORY_adr[dk][1][E]+= sdram.bf[dk][StPosHead+10];
 					MEMORY_adr[dk][1][E] = MEMORY_adr[dk][1][E]<<8;	
-					MEMORY_adr[dk][1][E]+= WFORMDYNAMIC[dk][StPosHead+11];	
+					MEMORY_adr[dk][1][E]+= sdram.bf[dk][StPosHead+11];	
 					MEMORY_adr[dk][1][E] = (MEMORY_adr[dk][1][E]*3)/20; 	//translate ms to 1/150s frames
 					}
 				StPosHead = SPP;	
@@ -987,15 +990,15 @@ uint8_t PlaylistID_to_Pos(uint8_t ID)
 			{
 			FILSIZE = f_size(&file[dk]);
 			fsz = FILSIZE;
-			if(fsz>WFD_SIZE)
+			if(fsz>8912896)
 				{
-				fsz = WFD_SIZE;
+				fsz = 8912896;
 				#if defined(DEBUG_UART_EN)		
-				sprintf((char*)U_TX_DATA, "SIZE>174375 \n\r");	
-				UART_TX(&huart4, U_TX_DATA, 14, 5);		
+				sprintf((char*)U_TX_DATA, "bigfile\n\r");	
+				UART_TX(&huart4, U_TX_DATA, 9, 5);		
 				#endif						
 				}
-			res = f_read(&file[dk], WFORMDYNAMIC[dk], fsz, &nbytes[dk]);
+			res = f_read(&file[dk], sdram.bf[dk], fsz, &nbytes[dk]);
 			if(res != FR_OK)
 				{
 				ERROR = 8;	//ANLZXXXX.EXT file is damadge
@@ -1003,49 +1006,50 @@ uint8_t PlaylistID_to_Pos(uint8_t ID)
 				}
 			else
 				{
-				f_close(&file[dk]);					//Close file ANLZXXXX.EXT					
-				fsz = WFORMDYNAMIC[dk][8];			
+				f_close(&file[dk]);					//Close file ANLZXXXX.EXT			
+				fsz = sdram.bf[dk][8];			
 				fsz<<=8;	
-				fsz+=WFORMDYNAMIC[dk][9];	
+				fsz+=sdram.bf[dk][9];	
 				fsz<<=8;
-				fsz+=WFORMDYNAMIC[dk][10];	
+				fsz+=sdram.bf[dk][10];	
 				fsz<<=8;
-				fsz+=WFORMDYNAMIC[dk][11];	//file size		
+				fsz+=sdram.bf[dk][11];	//file size		
 				if(fsz != FILSIZE)
 					{
 					ERROR = 9;	//ANLZXXXX.EXT file is damadge
 					}
 				else		
 					{	
-					fsz = WFORMDYNAMIC[dk][4];			
+					fsz = sdram.bf[dk][4];			
 					fsz<<=8;	
-					fsz+=WFORMDYNAMIC[dk][5];	
+					fsz+=sdram.bf[dk][5];	
 					fsz<<=8;
-					fsz+=WFORMDYNAMIC[dk][6];	
+					fsz+=sdram.bf[dk][6];	
 					fsz<<=8;
-					fsz+=WFORMDYNAMIC[dk][7];	//Header size
+					fsz+=sdram.bf[dk][7];	//Header size
 					StPosHead = fsz;	
-					if(WFORMDYNAMIC[dk][StPosHead] != 80 | 
-						 WFORMDYNAMIC[dk][StPosHead+1] != 80 | 
-					   WFORMDYNAMIC[dk][StPosHead+2] != 84 | 
-					   WFORMDYNAMIC[dk][StPosHead+3] != 72)		//Check PPTH position in file
+					if(sdram.bf[dk][StPosHead] != 80 	 || 
+						 sdram.bf[dk][StPosHead+1] != 80 || 
+					   sdram.bf[dk][StPosHead+2] != 84 || 
+					   sdram.bf[dk][StPosHead+3] != 72)		//Check PPTH position in file
 						{
 						ERROR = 10;	//ANLZXXXX.EXT file is damadge				
 						}
 					else
 						{		
-						fsz = WFORMDYNAMIC[dk][StPosHead+8];			
+						fsz = sdram.bf[dk][StPosHead+8];			
 						fsz<<=8;	
-						fsz+=WFORMDYNAMIC[dk][StPosHead+9];	
+						fsz+=sdram.bf[dk][StPosHead+9];	
 						fsz<<=8;
-						fsz+=WFORMDYNAMIC[dk][StPosHead+10];	
+						fsz+=sdram.bf[dk][StPosHead+10];	
 						fsz<<=8;
-						fsz+=WFORMDYNAMIC[dk][StPosHead+11];	//Tag size
+						fsz+=sdram.bf[dk][StPosHead+11];	//Tag size
 						StPosHead += fsz;		
-						if(WFORMDYNAMIC[dk][StPosHead] != 80 | 
-							 WFORMDYNAMIC[dk][StPosHead+1] != 87 | 
-						   WFORMDYNAMIC[dk][StPosHead+2] != 86 | 
-						   WFORMDYNAMIC[dk][StPosHead+3] != 51)		//Check PWV3 position in file
+						uint32_t PWV4_pointer = StPosHead;			//pointer for next TAG - PWV4 
+						if(sdram.bf[dk][StPosHead] != 80   || 
+							 sdram.bf[dk][StPosHead+1] != 87 || 
+						   sdram.bf[dk][StPosHead+2] != 86 || 
+						   sdram.bf[dk][StPosHead+3] != 51)		//Check PWV3 position in file
 							{
 							#if defined(DEBUG_UART_EN)		
 							sprintf((char*)U_TX_DATA, "Check PWV3 \n\r");	
@@ -1055,36 +1059,146 @@ uint8_t PlaylistID_to_Pos(uint8_t ID)
 							}
 						else
 							{	
-							fsz = WFORMDYNAMIC[dk][StPosHead+4];			
+							fsz = sdram.bf[dk][StPosHead+4];			
 							fsz<<=8;	
-							fsz+=WFORMDYNAMIC[dk][StPosHead+5];	
+							fsz+=sdram.bf[dk][StPosHead+5];	
 							fsz<<=8;
-							fsz+=WFORMDYNAMIC[dk][StPosHead+6];	
+							fsz+=sdram.bf[dk][StPosHead+6];	
 							fsz<<=8;
-							fsz+=WFORMDYNAMIC[dk][StPosHead+7];	//Header size
+							fsz+=sdram.bf[dk][StPosHead+7];	//Header size
 							uint32_t START_POS_WF = StPosHead + fsz; //Start position waveform	 //old SPP
 									
-							fsz = WFORMDYNAMIC[dk][StPosHead+16];			
+							fsz = sdram.bf[dk][StPosHead+16];			
 							fsz<<=8;	
-							fsz+=WFORMDYNAMIC[dk][StPosHead+17];	
+							fsz+=sdram.bf[dk][StPosHead+17];	
 							fsz<<=8;
-							fsz+=WFORMDYNAMIC[dk][StPosHead+18];	
+							fsz+=sdram.bf[dk][StPosHead+18];	
 							fsz<<=8;
-							uint32_t WF_DATA_SIZE = fsz+WFORMDYNAMIC[dk][StPosHead+19];		//waveform data size	//old fsz
+							uint32_t WF_DATA_SIZE = fsz+sdram.bf[dk][StPosHead+19];		//waveform data size	//old fsz
 							uint32_t j;							//Data shift	
 								
-							fsz = WFORMDYNAMIC[dk][StPosHead+8];			
+							if(WF_DATA_SIZE>1)				//delete 2 end frames (exclude noise) 
+								{
+								WF_DATA_SIZE-=2;	
+								}
+							else
+								{
+								WF_DATA_SIZE = 0;	
+								}									
+							all_long[dk] = WF_DATA_SIZE;	
+							if(WF_DATA_SIZE>90000)
+								{
+								WF_DATA_SIZE = 90000;	
+								}	
+							for(j=0;j<WF_DATA_SIZE;j++)			//Fill dynamic waveform
+								{
+								a = sdram.bf[dk][j+START_POS_WF]&0x1F;
+								a*= 153;
+								a>>=8;											
+								WFORMDYNAMIC[dk][j] = sdram.bf[dk][j+START_POS_WF]&0xE0;
+								WFORMDYNAMIC[dk][j]|=a; 	
+								}
+							for(j=0;j<(WFD_SIZE-90000);j++)			//clear next arrays
+								{	
+								WFORMDYNAMIC[dk][90000+j] = 0xE0;			//amplitude = 0, color = 7
+								}	
+							//////////////////////////////////// fill 2-4-8-16 waveforms
+							uint8_t clr, ampl;
+							for(j=0;j<(WF_DATA_SIZE>>1);j++)			//Fill dynamic waveform x2
+								{
+								clr = WFORMDYNAMIC[dk][2*j]>>5;	
+								ampl = WFORMDYNAMIC[dk][2*j]&0x1F;	
+								for(a=1;a<2;a++)			//2-4-8-16
+									{
+									if((WFORMDYNAMIC[dk][2*j+a]&0x1F)>ampl)
+										{
+										ampl = WFORMDYNAMIC[dk][2*j+a]&0x1F;	
+										if(ampl>13)
+											{
+											clr = (WFORMDYNAMIC[dk][2*j+a]>>5);
+											}
+										}
+									}		
+								WFORMDYNAMIC[dk][90000+j] = (clr<<5) | ampl;
+								}	
+							for(j=0;j<(WF_DATA_SIZE>>2);j++)			//Fill dynamic waveform x4
+								{
+								clr = WFORMDYNAMIC[dk][4*j]>>5;	
+								ampl = WFORMDYNAMIC[dk][4*j]&0x1F;	
+								for(a=1;a<4;a++)			//2-4-8-16
+									{
+									if((WFORMDYNAMIC[dk][4*j+a]&0x1F)>ampl)
+										{
+										ampl	= WFORMDYNAMIC[dk][4*j+a]&0x1F;	
+										if(ampl>13)
+											{
+											clr = (WFORMDYNAMIC[dk][4*j+a]>>5);
+											}
+										}
+									}		
+								WFORMDYNAMIC[dk][135000+j] = (clr<<5) | ampl;	
+								}		
+							for(j=0;j<(WF_DATA_SIZE>>3);j++)			//Fill dynamic waveform x8
+								{
+								clr = WFORMDYNAMIC[dk][8*j]>>5;	
+								ampl = WFORMDYNAMIC[dk][8*j]&0x1F;	
+								for(a=1;a<8;a++)			//2-4-8-16
+									{
+									if((WFORMDYNAMIC[dk][8*j+a]&0x1F)>ampl)
+										{
+										ampl	= WFORMDYNAMIC[dk][8*j+a]&0x1F;	
+										if(ampl>13)
+											{
+											clr = (WFORMDYNAMIC[dk][8*j+a]>>5);
+											}
+										}
+									}		
+								WFORMDYNAMIC[dk][157500+j] = (clr<<5) | ampl;
+								}
+							for(j=0;j<(WF_DATA_SIZE>>4);j++)			//Fill dynamic waveform x16
+								{
+								clr = WFORMDYNAMIC[dk][16*j]>>5;	
+								ampl = WFORMDYNAMIC[dk][16*j]&0x1F;	
+								for(a=1;a<16;a++)			//2-4-8-16
+									{
+									if((WFORMDYNAMIC[dk][16*j+a]&0x1F)>ampl)
+										{
+										ampl	= WFORMDYNAMIC[dk][16*j+a]&0x1F;	
+										if(ampl>13)
+											{
+											clr = (WFORMDYNAMIC[dk][16*j+a]>>5);
+											}
+										}
+									}		
+								WFORMDYNAMIC[dk][168750+j] = (clr<<5) | ampl;
+								}		
+							for(E=0;E<number_of_memory_cue_points[dk];E++)											//Draw CUES on Display
+								{
+								if(MEMORY_adr[dk][0][E] != 0xFFFF)
+									{
+									#if defined(DEBUG_UART_EN)		
+									sprintf((char*)U_TX_DATA, "MEMORY in %06lu ms\n\r", MEMORY_adr[dk][0][E]);											
+									UART_TX(&huart4, U_TX_DATA, 21, 15);	
+									#endif		
+									mem_pos	= 605*MEMORY_adr[dk][0][E];
+									mem_pos/= (20*all_long[dk]);
+									DrawMemoryMarker(dk, mem_pos, MEMORY_MARK, LCD_COLOR_RED);
+									MEMORY_adr[dk][0][E] = (MEMORY_adr[dk][0][E]*3)/20;				//translate ms to 1/150s frames
+									}	
+								}		
+																
+							fsz = sdram.bf[dk][StPosHead+8];			
 							fsz<<=8;	
-							fsz+=WFORMDYNAMIC[dk][StPosHead+9];	
+							fsz+=sdram.bf[dk][StPosHead+9];	
 							fsz<<=8;
-							fsz+=WFORMDYNAMIC[dk][StPosHead+10];	
+							fsz+=sdram.bf[dk][StPosHead+10];	
 							fsz<<=8;
-							fsz+=WFORMDYNAMIC[dk][StPosHead+11];	//Tag size
+							fsz+=sdram.bf[dk][StPosHead+11];	//Tag size
 							StPosHead += fsz;		
-							if(WFORMDYNAMIC[dk][StPosHead] != 80 | 
-								 WFORMDYNAMIC[dk][StPosHead+1] != 67 | 
-								 WFORMDYNAMIC[dk][StPosHead+2] != 79 | 
-								 WFORMDYNAMIC[dk][StPosHead+3] != 66)		//Check PCOB position in file
+							if(sdram.bf[dk][StPosHead] != 80 	 || 
+								 sdram.bf[dk][StPosHead+1] != 67 || 
+								 sdram.bf[dk][StPosHead+2] != 79 || 
+								 sdram.bf[dk][StPosHead+3] != 66)		//Check PCOB position in file
 								{
 								#if defined(DEBUG_UART_EN)		
 								sprintf((char*)U_TX_DATA, "Check PCOB \n\r");	
@@ -1094,35 +1208,35 @@ uint8_t PlaylistID_to_Pos(uint8_t ID)
 								}
 							else
 								{
-								fsz = WFORMDYNAMIC[dk][StPosHead+8];			
+								fsz = sdram.bf[dk][StPosHead+8];			
 								fsz<<=8;	
-								fsz+=WFORMDYNAMIC[dk][StPosHead+9];	
+								fsz+=sdram.bf[dk][StPosHead+9];	
 								fsz<<=8;
-								fsz+=WFORMDYNAMIC[dk][StPosHead+10];	
+								fsz+=sdram.bf[dk][StPosHead+10];	
 								fsz<<=8;
-								fsz+=WFORMDYNAMIC[dk][StPosHead+11];	//Tag size
+								fsz+=sdram.bf[dk][StPosHead+11];	//Tag size
 								StPosHead += fsz;		
-								if(WFORMDYNAMIC[dk][StPosHead] != 80 | 
-								 WFORMDYNAMIC[dk][StPosHead+1] != 67 | 
-								 WFORMDYNAMIC[dk][StPosHead+2] != 79 | 
-								 WFORMDYNAMIC[dk][StPosHead+3] != 66)		//Check PCO2 position in file
+								if(sdram.bf[dk][StPosHead] != 80 || 
+								 sdram.bf[dk][StPosHead+1] != 67 || 
+								 sdram.bf[dk][StPosHead+2] != 79 || 
+								 sdram.bf[dk][StPosHead+3] != 66)		//Check PCO2 position in file
 									{
 									return 11;	//ANLZXXXX.EXT file is damadge			
 									}	
 								else
 									{
-									fsz = WFORMDYNAMIC[dk][StPosHead+8];			
+									fsz = sdram.bf[dk][StPosHead+8];			
 									fsz<<=8;	
-									fsz+=WFORMDYNAMIC[dk][StPosHead+9];	
+									fsz+=sdram.bf[dk][StPosHead+9];	
 									fsz<<=8;
-									fsz+=WFORMDYNAMIC[dk][StPosHead+10];	
+									fsz+=sdram.bf[dk][StPosHead+10];	
 									fsz<<=8;
-									fsz+=WFORMDYNAMIC[dk][StPosHead+11];	//Tag size
+									fsz+=sdram.bf[dk][StPosHead+11];	//Tag size
 									StPosHead += fsz;		
-									if(WFORMDYNAMIC[dk][StPosHead] != 80 | 
-									 WFORMDYNAMIC[dk][StPosHead+1] != 67 | 
-									 WFORMDYNAMIC[dk][StPosHead+2] != 79 | 
-									 WFORMDYNAMIC[dk][StPosHead+3] != 50)		//Check PCO2 position in file
+									if(sdram.bf[dk][StPosHead] != 80 || 
+									 sdram.bf[dk][StPosHead+1] != 67 || 
+									 sdram.bf[dk][StPosHead+2] != 79 || 
+									 sdram.bf[dk][StPosHead+3] != 50)		//Check PCO2 position in file
 										{
 										return 11;	//ANLZXXXX.EXT file is damadge			
 										}	
@@ -1131,202 +1245,79 @@ uint8_t PlaylistID_to_Pos(uint8_t ID)
 										#if defined(DEBUG_UART_EN)		
 										sprintf((char*)U_TX_DATA, "Enter PCO2\n\r");	
 										UART_TX(&huart4, U_TX_DATA, 12, 5);	
-										#endif		
-											
-										if(WFORMDYNAMIC[dk][StPosHead+15]==1)				//HOT CUE TYPE
+										#endif
+										if(sdram.bf[dk][StPosHead+15]==1)				//HOT CUE TYPE
 											{
-											number_of_hot_cue_points[dk] = WFORMDYNAMIC[dk][StPosHead+17];
-											fsz = WFORMDYNAMIC[dk][StPosHead+4];			
+											number_of_hot_cue_points[dk] = sdram.bf[dk][StPosHead+17];
+											fsz = sdram.bf[dk][StPosHead+4];			
 											fsz<<=8;	
-											fsz+=WFORMDYNAMIC[dk][StPosHead+5];	
+											fsz+=sdram.bf[dk][StPosHead+5];	
 											fsz<<=8;
-											fsz+=WFORMDYNAMIC[dk][StPosHead+6];	
+											fsz+=sdram.bf[dk][StPosHead+6];	
 											fsz<<=8;
-											fsz+=WFORMDYNAMIC[dk][StPosHead+7];	//header size
+											fsz+=sdram.bf[dk][StPosHead+7];	//header size
 											StPosHead += fsz;	
-											
 											for(j=0;j<number_of_hot_cue_points[dk];j++)			
 												{	
-												if(WFORMDYNAMIC[dk][StPosHead] != 80 | 
-													 WFORMDYNAMIC[dk][StPosHead+1] != 67 | 
-													 WFORMDYNAMIC[dk][StPosHead+2] != 80 | 
-													 WFORMDYNAMIC[dk][StPosHead+3] != 50)		//Check PCP2 position in file
-														{
-														j = 100;	
-															
-														#if defined(DEBUG_UART_EN)		
-														sprintf((char*)U_TX_DATA, "J100\n\r");	
-														UART_TX(&huart4, U_TX_DATA, 6, 5);		
-														#endif			
-														return 11;	//ANLZXXXX.EXT file is damadge			
-														}
+												if(sdram.bf[dk][StPosHead] != 80 || 
+													 sdram.bf[dk][StPosHead+1] != 67 || 
+													 sdram.bf[dk][StPosHead+2] != 80 || 
+													 sdram.bf[dk][StPosHead+3] != 50)		//Check PCP2 position in file
+													{
+													j = 100;	
+													#if defined(DEBUG_UART_EN)		
+													sprintf((char*)U_TX_DATA, "J100\n\r");	
+													UART_TX(&huart4, U_TX_DATA, 6, 5);		
+													#endif			
+													return 11;	//ANLZXXXX.EXT file is damadge			
+													}
 												else
 													{
 													#if defined(DEBUG_UART_EN)		
 													sprintf((char*)U_TX_DATA, "Extract HOT CUE\n\r");	
 													UART_TX(&huart4, U_TX_DATA, 17, 5);	
 													#endif		
-													if(WFORMDYNAMIC[dk][StPosHead+15]>0)
+													if(sdram.bf[dk][StPosHead+15]>0)
 														{
-														HCUE_adr[dk][0][WFORMDYNAMIC[dk][StPosHead+15]-1] = WFORMDYNAMIC[dk][StPosHead+20]; 		
-														HCUE_adr[dk][0][WFORMDYNAMIC[dk][StPosHead+15]-1]<<=8;	
-														HCUE_adr[dk][0][WFORMDYNAMIC[dk][StPosHead+15]-1]+=WFORMDYNAMIC[dk][StPosHead+21];
-														HCUE_adr[dk][0][WFORMDYNAMIC[dk][StPosHead+15]-1]<<=8;	
-														HCUE_adr[dk][0][WFORMDYNAMIC[dk][StPosHead+15]-1]+=WFORMDYNAMIC[dk][StPosHead+22];	
-														HCUE_adr[dk][0][WFORMDYNAMIC[dk][StPosHead+15]-1]<<=8;	
-														HCUE_adr[dk][0][WFORMDYNAMIC[dk][StPosHead+15]-1]+=WFORMDYNAMIC[dk][StPosHead+23];
-														if(WFORMDYNAMIC[dk][StPosHead+16]==2)						//when hot cue type=loop
+														HCUE_adr[dk][0][sdram.bf[dk][StPosHead+15]-1] = sdram.bf[dk][StPosHead+20]; 		
+														HCUE_adr[dk][0][sdram.bf[dk][StPosHead+15]-1]<<=8;	
+														HCUE_adr[dk][0][sdram.bf[dk][StPosHead+15]-1]+=sdram.bf[dk][StPosHead+21];
+														HCUE_adr[dk][0][sdram.bf[dk][StPosHead+15]-1]<<=8;	
+														HCUE_adr[dk][0][sdram.bf[dk][StPosHead+15]-1]+=sdram.bf[dk][StPosHead+22];	
+														HCUE_adr[dk][0][sdram.bf[dk][StPosHead+15]-1]<<=8;	
+														HCUE_adr[dk][0][sdram.bf[dk][StPosHead+15]-1]+=sdram.bf[dk][StPosHead+23];
+														if(sdram.bf[dk][StPosHead+16]==2)						//when hot cue type=loop
 															{
-															HCUE_adr[dk][1][WFORMDYNAMIC[dk][StPosHead+15]-1] = WFORMDYNAMIC[dk][StPosHead+24]; 		
-															HCUE_adr[dk][1][WFORMDYNAMIC[dk][StPosHead+15]-1]<<=8;	
-															HCUE_adr[dk][1][WFORMDYNAMIC[dk][StPosHead+15]-1]+=WFORMDYNAMIC[dk][StPosHead+25];
-															HCUE_adr[dk][1][WFORMDYNAMIC[dk][StPosHead+15]-1]<<=8;	
-															HCUE_adr[dk][1][WFORMDYNAMIC[dk][StPosHead+15]-1]+=WFORMDYNAMIC[dk][StPosHead+26];	
-															HCUE_adr[dk][1][WFORMDYNAMIC[dk][StPosHead+15]-1]<<=8;	
-															HCUE_adr[dk][1][WFORMDYNAMIC[dk][StPosHead+15]-1]+=WFORMDYNAMIC[dk][StPosHead+27];	
+															HCUE_adr[dk][1][sdram.bf[dk][StPosHead+15]-1] = sdram.bf[dk][StPosHead+24]; 		
+															HCUE_adr[dk][1][sdram.bf[dk][StPosHead+15]-1]<<=8;	
+															HCUE_adr[dk][1][sdram.bf[dk][StPosHead+15]-1]+=sdram.bf[dk][StPosHead+25];
+															HCUE_adr[dk][1][sdram.bf[dk][StPosHead+15]-1]<<=8;	
+															HCUE_adr[dk][1][sdram.bf[dk][StPosHead+15]-1]+=sdram.bf[dk][StPosHead+26];	
+															HCUE_adr[dk][1][sdram.bf[dk][StPosHead+15]-1]<<=8;	
+															HCUE_adr[dk][1][sdram.bf[dk][StPosHead+15]-1]+=sdram.bf[dk][StPosHead+27];	
 															}
-														E=WFORMDYNAMIC[dk][StPosHead+42];	
+														E=sdram.bf[dk][StPosHead+42];	
 														E<<=8;
-														E+=WFORMDYNAMIC[dk][StPosHead+43];	//len_comment	
-														HCUE32COLOR[dk][WFORMDYNAMIC[dk][StPosHead+15]-1] = WFORMDYNAMIC[dk][StPosHead+45+E];																
-														HCUE32COLOR[dk][WFORMDYNAMIC[dk][StPosHead+15]-1]<<=8;	
-														HCUE32COLOR[dk][WFORMDYNAMIC[dk][StPosHead+15]-1]+= WFORMDYNAMIC[dk][StPosHead+46+E];		
-														HCUE32COLOR[dk][WFORMDYNAMIC[dk][StPosHead+15]-1]<<=8;		
-														HCUE32COLOR[dk][WFORMDYNAMIC[dk][StPosHead+15]-1]+= WFORMDYNAMIC[dk][StPosHead+47+E];	
+														E+=sdram.bf[dk][StPosHead+43];	//len_comment	
+														HCUE32COLOR[dk][sdram.bf[dk][StPosHead+15]-1] = sdram.bf[dk][StPosHead+45+E];																
+														HCUE32COLOR[dk][sdram.bf[dk][StPosHead+15]-1]<<=8;	
+														HCUE32COLOR[dk][sdram.bf[dk][StPosHead+15]-1]+= sdram.bf[dk][StPosHead+46+E];		
+														HCUE32COLOR[dk][sdram.bf[dk][StPosHead+15]-1]<<=8;		
+														HCUE32COLOR[dk][sdram.bf[dk][StPosHead+15]-1]+= sdram.bf[dk][StPosHead+47+E];	
 														}														
-													fsz = WFORMDYNAMIC[dk][StPosHead+8];			
+													fsz = sdram.bf[dk][StPosHead+8];			
 													fsz<<=8;	
-													fsz+=WFORMDYNAMIC[dk][StPosHead+9];	
+													fsz+=sdram.bf[dk][StPosHead+9];	
 													fsz<<=8;
-													fsz+=WFORMDYNAMIC[dk][StPosHead+10];	
+													fsz+=sdram.bf[dk][StPosHead+10];	
 													fsz<<=8;
-													fsz+=WFORMDYNAMIC[dk][StPosHead+11];	//len_entry
-													StPosHead += fsz;		
+													fsz+=sdram.bf[dk][StPosHead+11];	//len_entry
+													StPosHead+=fsz;		
 													}													
 												}												
 											}
-									///////add memory cues reading
-									if(WF_DATA_SIZE>1)				//delete 2 end frames (exclude noise) 
-											{
-											WF_DATA_SIZE-=2;	
-											}
-										else
-											{
-											WF_DATA_SIZE = 0;	
-											}									
-										all_long[dk] = WF_DATA_SIZE;
-//										if(all_long[dk]>57009)		//crop all long data for sldz
-//											{
-//											all_long[dk] = 57009;	
-//											}
+										///////add memory cues reading
 											
-										if(WF_DATA_SIZE>(WFD_SIZE-START_POS_WF))
-											{
-											WF_DATA_SIZE = WFD_SIZE-START_POS_WF;	
-											}
-
-//										if(WF_DATA_SIZE>57008)		//crop data for sldz		
-//											{
-//											WF_DATA_SIZE = 57008;	//max audio lenght 	
-//											}								
-											
-										for(j=0;j<WF_DATA_SIZE;j++)			//Fill dynamic waveform
-											{
-											a = WFORMDYNAMIC[dk][j+START_POS_WF]&0x1F;
-											a*= 153;
-											a>>=8;											
-											WFORMDYNAMIC[dk][j] = WFORMDYNAMIC[dk][j+START_POS_WF]&0xE0;
-											WFORMDYNAMIC[dk][j]|=a; 	
-											}
-										for(j=0;j<(WFD_SIZE-90000);j++)			//clear next arrays
-											{	
-											WFORMDYNAMIC[dk][90000+j] = 0xE0;			//amplitude = 0, color = 7
-											}	
-										//////////////////////////////////// fill 2-4-8-16 waveforms
-										uint8_t clr, ampl;
-										for(j=0;j<(WF_DATA_SIZE>>1);j++)			//Fill dynamic waveform x2
-											{
-											clr = WFORMDYNAMIC[dk][2*j]>>5;	
-											ampl = WFORMDYNAMIC[dk][2*j]&0x1F;	
-											for(a=1;a<2;a++)			//2-4-8-16
-												{
-												if((WFORMDYNAMIC[dk][2*j+a]&0x1F)>ampl)
-													{
-													ampl = WFORMDYNAMIC[dk][2*j+a]&0x1F;	
-													if(ampl>13)
-														{
-														clr = (WFORMDYNAMIC[dk][2*j+a]>>5);
-														}
-													}
-												}		
-											WFORMDYNAMIC[dk][90000+j] = (clr<<5) | ampl;
-											}	
-										for(j=0;j<(WF_DATA_SIZE>>2);j++)			//Fill dynamic waveform x4
-											{
-											clr = WFORMDYNAMIC[dk][4*j]>>5;	
-											ampl = WFORMDYNAMIC[dk][4*j]&0x1F;	
-											for(a=1;a<4;a++)			//2-4-8-16
-												{
-												if((WFORMDYNAMIC[dk][4*j+a]&0x1F)>ampl)
-													{
-													ampl	= WFORMDYNAMIC[dk][4*j+a]&0x1F;	
-													if(ampl>13)
-														{
-														clr = (WFORMDYNAMIC[dk][4*j+a]>>5);
-														}
-													}
-												}		
-											WFORMDYNAMIC[dk][135000+j] = (clr<<5) | ampl;	
-											}		
-										for(j=0;j<(WF_DATA_SIZE>>3);j++)			//Fill dynamic waveform x8
-											{
-											clr = WFORMDYNAMIC[dk][8*j]>>5;	
-											ampl = WFORMDYNAMIC[dk][8*j]&0x1F;	
-											for(a=1;a<8;a++)			//2-4-8-16
-												{
-												if((WFORMDYNAMIC[dk][8*j+a]&0x1F)>ampl)
-													{
-													ampl	= WFORMDYNAMIC[dk][8*j+a]&0x1F;	
-													if(ampl>13)
-														{
-														clr = (WFORMDYNAMIC[dk][8*j+a]>>5);
-														}
-													}
-												}		
-											WFORMDYNAMIC[dk][157500+j] = (clr<<5) | ampl;
-											}
-										for(j=0;j<(WF_DATA_SIZE>>4);j++)			//Fill dynamic waveform x16
-											{
-											clr = WFORMDYNAMIC[dk][16*j]>>5;	
-											ampl = WFORMDYNAMIC[dk][16*j]&0x1F;	
-											for(a=1;a<16;a++)			//2-4-8-16
-												{
-												if((WFORMDYNAMIC[dk][16*j+a]&0x1F)>ampl)
-													{
-													ampl	= WFORMDYNAMIC[dk][16*j+a]&0x1F;	
-													if(ampl>13)
-														{
-														clr = (WFORMDYNAMIC[dk][16*j+a]>>5);
-														}
-													}
-												}		
-											WFORMDYNAMIC[dk][168750+j] = (clr<<5) | ampl;
-											}		
-										for(E=0;E<number_of_memory_cue_points[dk];E++)											//Draw CUES on Display
-											{
-											if(MEMORY_adr[dk][0][E] != 0xFFFF)
-												{
-												#if defined(DEBUG_UART_EN)		
-												sprintf((char*)U_TX_DATA, "MEMORY in %06lu ms\n\r", MEMORY_adr[dk][0][E]);											
-												UART_TX(&huart4, U_TX_DATA, 21, 15);	
-												#endif		
-												mem_pos	= 605*MEMORY_adr[dk][0][E];
-												mem_pos/= (20*all_long[dk]);
-												DrawMemoryMarker(dk, mem_pos, MEMORY_MARK, LCD_COLOR_RED);
-												MEMORY_adr[dk][0][E] = (MEMORY_adr[dk][0][E]*3)/20;				//translate ms to 1/150s frames
-												}	
-											}	
-
 										////////////////////////////////////sorting algoritm	
 										uint8_t MINM, ii;
 															
@@ -1416,8 +1407,197 @@ uint8_t PlaylistID_to_Pos(uint8_t ID)
 												HCUEPCOLOR[dk][E][0] = HCUEdisableCOLOR[0];	
 												HCUEPCOLOR[dk][E][1] =	HCUEdisableCOLOR[1];
 												HCUEPCOLOR[dk][E][2] = HCUEdisableCOLOR[2];
-												}									
+												}
+											}	
+
+										StPosHead = PWV4_pointer;			//pointer for next TAG - PWV5 
+										uint16_t als;	
+										for(E=0;E<11;E++)											//Search PWV5 
+											{	
+											#if defined(DEBUG_UART_EN)		
+											UART_TX(&huart4, &sdram.bf[dk][StPosHead], 4, 5);		
+											sprintf((char*)U_TX_DATA, "\n\r");	
+											UART_TX(&huart4, U_TX_DATA, 2, 5);
+											#endif		
+											if(sdram.bf[dk][StPosHead] != 80)
+												{
+												E = 100;	
+												ERROR = 10;	//ANLZXXXX.EXT file is damadge		
+												}
+											else
+												{
+												if(sdram.bf[dk][StPosHead+1]==87 && 
+													sdram.bf[dk][StPosHead+2]==86  && 
+													sdram.bf[dk][StPosHead+3]== 52)		//Check PWV4 position in file
+													{
+													E = 50;	
+													}
+												else
+													{
+													fsz = sdram.bf[dk][StPosHead+8];			
+													fsz<<=8;	
+													fsz+=sdram.bf[dk][StPosHead+9];	
+													fsz<<=8;
+													fsz+=sdram.bf[dk][StPosHead+10];	
+													fsz<<=8;
+													fsz+=sdram.bf[dk][StPosHead+11];	//Tag size
+													StPosHead += fsz;		
+													}													
+												}							
+											}	
+											
+										fsz = sdram.bf[dk][StPosHead+4];	//pointer to start 7200 data		
+										fsz<<=8;	
+										fsz+=sdram.bf[dk][StPosHead+5];	
+										fsz<<=8;
+										fsz+=sdram.bf[dk][StPosHead+6];	
+										fsz<<=8;
+										fsz+=sdram.bf[dk][StPosHead+7];	//header size
+										StPosHead += fsz;	
+											
+										for(E=0;E<202;E++)					//Fill Static Waveform 1200->202
+											{
+											y = 1521*E;
+											y>>=8;
+
+												
+											//
+											//
+											//
+											//
+											//
+											//
+											//
+											//
+											//
+											//
+											//				add 5 samples for average RGB
+											//
+											//
+											//
+											//			add average for blue color map
+											//
+											//												
+												
+												
+												
+												
+												
+											als = sdram.bf[dk][StPosHead+y*6+3] + sdram.bf[dk][StPosHead+(y+1)*6+3] + sdram.bf[dk][StPosHead+(y+2)*6+3] + sdram.bf[dk][StPosHead+(y+3)*6+3] + 2; 
+											r = als>>2;
+											als = sdram.bf[dk][StPosHead+y*6+4] + sdram.bf[dk][StPosHead+(y+1)*6+4] + sdram.bf[dk][StPosHead+(y+2)*6+4] + sdram.bf[dk][StPosHead+(y+3)*6+4] + 2; 
+											g = als>>2;
+											als = sdram.bf[dk][StPosHead+y*6+5] + sdram.bf[dk][StPosHead+(y+1)*6+5] + sdram.bf[dk][StPosHead+(y+2)*6+5] + sdram.bf[dk][StPosHead+(y+3)*6+5] + 2; 
+											b = als>>2;
+
+												
+//											r = sdram.bf[dk][StPosHead+y*6+3];	
+//											g = sdram.bf[dk][StPosHead+y*6+4];		
+//											b = sdram.bf[dk][StPosHead+y*6+5];
+
+
+												
+											if(r>127)
+												{
+												r = 0;	
+												}												
+											if(g>127)
+												{
+												g = 0;	
+												}
+											if(b>127)
+												{
+												b = 0;	
+												}	
+
+											WFST_AHB[dk][E] = r;			//Find Max color = amplitude
+											if(WFST_AHB[dk][E]<g)
+												{
+												WFST_AHB[dk][E] = g;	
+												}												
+											if(WFST_AHB[dk][E]<b)
+												{
+												WFST_AHB[dk][E] = b;	
+												}		
+
+											WFST_AL[dk][E] = b;			//blue color = amplitude
+											
+											als = 127*r;						//colors normalization
+											als/=WFST_AHB[dk][E];	
+											r = als;
+											als = 127*g;
+											als/=WFST_AHB[dk][E];	
+											g = als;
+											als = 127*b;
+											als/=WFST_AHB[dk][E];	
+											b = als;
+											WFST_RGB[dk][E] = 0x8000 | ((r>>2)<<10) | ((g>>2)<<5) | (b>>2); 		//sample color
 											}
+											
+										r = 0;	
+										for(E=0;E<202;E++)					//amplitude normalization (find max)
+											{	
+											if(r<WFST_AHB[dk][E])
+												{
+												r = WFST_AHB[dk][E];	
+												}
+											if(r<WFST_AL[dk][E])
+												{
+												r = WFST_AL[dk][E];	
+												}
+											}	
+
+										for(E=0;E<202;E++)					//amplitude normalization 
+											{
+											y = 1520*E;
+											y>>=8;
+										  als = WFST_AHB[dk][E]*20;	//convert amplitude 127->18	
+											als/=r;
+											if(als>18)
+												{
+												als = 18;	
+												}								
+											WFST_AHB[dk][E] = als;	
+											als = WFST_AL[dk][E]*20;	 //convert amplitude 127->18
+											als/=r;
+											if(als>18)
+												{
+												als = 18;	
+												}								
+											WFST_AL[dk][E] = als;			
+											if(sdram.bf[dk][StPosHead+y*6+2]<16)
+												{
+												WFST_AHB[dk][E]|= 192;		//ampl+color map	
+												}												
+											else if(sdram.bf[dk][StPosHead+y*6+2]<48)
+												{
+												WFST_AHB[dk][E]|= 160;		//ampl+color map	
+												}	
+											else if(sdram.bf[dk][StPosHead+y*6+2]<64)
+												{
+												WFST_AHB[dk][E]|= 128;		//ampl+color map	
+												}	
+											else if(sdram.bf[dk][StPosHead+y*6+2]<80)
+												{
+												WFST_AHB[dk][E]|= 96;		//ampl+color map	
+												}	
+											else if(sdram.bf[dk][StPosHead+y*6+2]<96)
+												{
+												WFST_AHB[dk][E]|= 64;		//ampl+color map	
+												}
+											else if(sdram.bf[dk][StPosHead+y*6+2]<112)
+												{
+												WFST_AHB[dk][E]|= 32;		//ampl+color map	
+												}
+											else if(sdram.bf[dk][StPosHead+y*6+2]<128)
+												{
+												//ampl+color map (null)
+												}
+											else
+												{
+												WFST_AHB[dk][E]|= 192;		//ampl+color map													
+												}
+											}	
 										}									
 									}									
 								}
@@ -1438,7 +1618,7 @@ uint8_t PlaylistID_to_Pos(uint8_t ID)
 			{
 			return 13;	//cannot open AUDIOTRACK
 			}
-		res = f_read(&file[dk], PCM[dk], 512, &nbytes[dk]);
+		res = f_read(&file[dk], sdram.pcm[dk], 512, &nbytes[dk]);
 		if(res != FR_OK)
 			{
 			ERROR = 14;	//cannot read AUDIOTRACK
@@ -1446,11 +1626,11 @@ uint8_t PlaylistID_to_Pos(uint8_t ID)
 		#if defined(DEBUG_UART_EN)	
 		sprintf((char*)U_TX_DATA, "\n\r");	
 		UART_TX(&huart4, U_TX_DATA, 2, 5);				
-		UART_TX(&huart4, (uint8_t *)PCM, 50, 45);	
+		UART_TX(&huart4, (uint8_t *)sdram.pcm, 50, 45);	
 		UART_TX(&huart4, U_TX_DATA, 2, 5);	
 		#endif		
 			
-		if(PCM[dk][0][5][0] != 1 || PCM[dk][0][5][1] != 2 || PCM[dk][0][6][0] != 44100 || PCM[dk][0][8][1] != 16)	//Check audio format
+		if(sdram.pcm[dk][0][5][0] != 1 || sdram.pcm[dk][0][5][1] != 2 || sdram.pcm[dk][0][6][0] != 44100 || sdram.pcm[dk][0][8][1] != 16)	//Check audio format
 			{
 			ERROR = 15;	//unsupported audio format	
 			}
@@ -1578,14 +1758,14 @@ void PREPARE_LOAD_TRACK(uint8_t dk, uint16_t TRACK_NUMBER, uint16_t TRACK_IN_PLA
 			uint16_t M = 0;	
 			while(have_a_cue==0 && all_long[dk]>28*c)
 				{
-				f_read(&file[dk], PCM[dk][0][0], 32768, &nbytes[dk]);	
+				f_read(&file[dk], sdram.pcm[dk][0][0], 32768, &nbytes[dk]);	
 				for(M=0;M<8192;M++)
 					{
-					if(PCM[dk][0][M][0]&0x8000)		//negative 65535...32768
+					if(sdram.pcm[dk][0][M][0]&0x8000)		//negative 65535...32768
 						{
-						PCM[dk][0][M][0] = 0xFFFF - PCM[dk][0][M][0];	
+						sdram.pcm[dk][0][M][0] = 0xFFFF - sdram.pcm[dk][0][M][0];	
 						}
-					if(((PCM[dk][0][M][0]>>(9-UT_SET[ACUE]))>0) && have_a_cue==0)
+					if(((sdram.pcm[dk][0][M][0]>>(9-UT_SET[ACUE]))>0) && have_a_cue==0)
 						{
 						have_a_cue = 1;
 						CUE_ADR[dk] = (c*8192+M)/294;
@@ -1593,11 +1773,11 @@ void PREPARE_LOAD_TRACK(uint8_t dk, uint16_t TRACK_NUMBER, uint16_t TRACK_IN_PLA
 						slip_pl_adr[dk] = play_adr[dk];
 						M = 0xFFFF;
 						}
-					if(PCM[dk][0][M][1]&0x8000)		//negative 65535...32768
+					if(sdram.pcm[dk][0][M][1]&0x8000)		//negative 65535...32768
 						{
-						PCM[dk][0][M][1] = 0xFFFF - PCM[dk][0][M][1];	
+						sdram.pcm[dk][0][M][1] = 0xFFFF - sdram.pcm[dk][0][M][1];	
 						}
-					if(((PCM[dk][0][M][1]>>(9-UT_SET[ACUE]))>0) && have_a_cue==0)
+					if(((sdram.pcm[dk][0][M][1]>>(9-UT_SET[ACUE]))>0) && have_a_cue==0)
 						{
 						have_a_cue = 1;
 						CUE_ADR[dk] = (c*8192+M)/294;

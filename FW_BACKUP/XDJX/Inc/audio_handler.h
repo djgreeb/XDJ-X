@@ -59,7 +59,7 @@ void SET_CUE(uint8_t dk, uint32_t nf_adr)
 	//audio buffer=>cue_mem buffer	(110ms copy process)		
 	for(copy_cnt=0;copy_cnt<262144;copy_cnt+=16384)			//3,715 sec CUE buff
 		{
-		memcpy(&PCM[dk][0][0][copy_cnt+(128<<14)], &PCM[dk][0][0][(copy_cnt+(mem_offset_adress[dk]<<14))&0x1FFFFF], 32768);	
+		memcpy(&sdram.pcm[dk][0][0][copy_cnt+(128<<14)], &sdram.pcm[dk][0][0][(copy_cnt+(mem_offset_adress[dk]<<14))&0x1FFFFF], 32768);	
 		}
 	cpos = 202*CUE_ADR[dk];
 	cpos/= all_long[dk];	
@@ -162,7 +162,7 @@ void SET_MEMORY_CUE_2(uint8_t dk)
 	//audio buffer=>cue_mem buffer	(110ms copy process)	
 	for(copy_cnt=0;copy_cnt<262144;copy_cnt+=16384)			//3,715 sec CUE buff
 		{
-		memcpy(&PCM[dk][0][0][copy_cnt+(128<<14)], &PCM[dk][0][0][(copy_cnt+(mem_offset_adress[dk]<<14))&0x1FFFFF], 32768);	
+		memcpy(&sdram.pcm[dk][0][0][copy_cnt+(128<<14)], &sdram.pcm[dk][0][0][(copy_cnt+(mem_offset_adress[dk]<<14))&0x1FFFFF], 32768);	
 		}
 	offset_adress[dk] = 128-mem_offset_adress[dk];	
 	offset_adressBIG[dk] = offset_adress[dk]<<13;	
@@ -239,21 +239,21 @@ void SAI1_IRQHandler(void)
 				{	
 				sdram_adr[dkA] = play_adr[dkA]&0xFFFFF;	
 				sdram_adr[dkA]+= offset_adressBIG[dkA];
-				LR[dkA][0][0] = PCM[dkA][0][sdram_adr[dkA]][0];							
-				LR[dkA][1][0] = PCM[dkA][0][sdram_adr[dkA]][1];
+				LR[dkA][0][0] = sdram.pcm[dkA][0][sdram_adr[dkA]][0];							
+				LR[dkA][1][0] = sdram.pcm[dkA][0][sdram_adr[dkA]][1];
 				sdram_adr[dkA] = (play_adr[dkA]+1)&0xFFFFF;
 				sdram_adr[dkA]+= offset_adressBIG[dkA];	
-				LR[dkA][0][1] = PCM[dkA][0][sdram_adr[dkA]][0];							
-				LR[dkA][1][1] = PCM[dkA][0][sdram_adr[dkA]][1];	
+				LR[dkA][0][1] = sdram.pcm[dkA][0][sdram_adr[dkA]][0];							
+				LR[dkA][1][1] = sdram.pcm[dkA][0][sdram_adr[dkA]][1];	
 				sdram_adr[dkA] = (play_adr[dkA]+2)&0xFFFFF;
 				sdram_adr[dkA]+= offset_adressBIG[dkA];	
-				LR[dkA][0][2] = PCM[dkA][0][sdram_adr[dkA]][0];									
-				LR[dkA][1][2] = PCM[dkA][0][sdram_adr[dkA]][1];
+				LR[dkA][0][2] = sdram.pcm[dkA][0][sdram_adr[dkA]][0];									
+				LR[dkA][1][2] = sdram.pcm[dkA][0][sdram_adr[dkA]][1];
 				}
 			sdram_adr[dkA] = (play_adr[dkA]+3)&0xFFFFF;	
 			sdram_adr[dkA]+=	offset_adressBIG[dkA];	
-			LR[dkA][0][3] = PCM[dkA][0][sdram_adr[dkA]][0];							
-			LR[dkA][1][3] = PCM[dkA][0][sdram_adr[dkA]][1];		
+			LR[dkA][0][3] = sdram.pcm[dkA][0][sdram_adr[dkA]][0];							
+			LR[dkA][1][3] = sdram.pcm[dkA][0][sdram_adr[dkA]][1];		
 			}
 		else if(rvrs[dkA]==1 && play_adr[dkA]>=step_postn[dkA])
 			{
@@ -268,27 +268,27 @@ void SAI1_IRQHandler(void)
 				LR[dkA][1][2] = LR[dkA][1][3];
 				sdram_adr[dkA] = (play_adr[dkA])&0xFFFFF;	
 				sdram_adr[dkA]+=	offset_adressBIG[dkA];		
-				LR[dkA][0][3] = PCM[dkA][0][sdram_adr[dkA]][0];							
-				LR[dkA][1][3] = PCM[dkA][0][sdram_adr[dkA]][1];		
+				LR[dkA][0][3] = sdram.pcm[dkA][0][sdram_adr[dkA]][0];							
+				LR[dkA][1][3] = sdram.pcm[dkA][0][sdram_adr[dkA]][1];		
 				}
 			else
 				{
 				sdram_adr[dkA] = play_adr[dkA]&0xFFFFF;	
 				sdram_adr[dkA]+=	offset_adressBIG[dkA];		
-				LR[dkA][0][3] = PCM[dkA][0][sdram_adr[dkA]][0];							
-				LR[dkA][1][3] = PCM[dkA][0][sdram_adr[dkA]][1];
+				LR[dkA][0][3] = sdram.pcm[dkA][0][sdram_adr[dkA]][0];							
+				LR[dkA][1][3] = sdram.pcm[dkA][0][sdram_adr[dkA]][1];
 				sdram_adr[dkA] = (play_adr[dkA]+1)&0xFFFFF;
 				sdram_adr[dkA]+=	offset_adressBIG[dkA];	
-				LR[dkA][0][2] = PCM[dkA][0][sdram_adr[dkA]][0];								
-				LR[dkA][1][2] = PCM[dkA][0][sdram_adr[dkA]][1];		
+				LR[dkA][0][2] = sdram.pcm[dkA][0][sdram_adr[dkA]][0];								
+				LR[dkA][1][2] = sdram.pcm[dkA][0][sdram_adr[dkA]][1];		
 				sdram_adr[dkA] = (play_adr[dkA]+2)&0xFFFFF;
 				sdram_adr[dkA]+=	offset_adressBIG[dkA];
-				LR[dkA][0][1] = PCM[dkA][0][sdram_adr[dkA]][0];									
-				LR[dkA][1][1] = PCM[dkA][0][sdram_adr[dkA]][1];
+				LR[dkA][0][1] = sdram.pcm[dkA][0][sdram_adr[dkA]][0];									
+				LR[dkA][1][1] = sdram.pcm[dkA][0][sdram_adr[dkA]][1];
 				sdram_adr[dkA] = (play_adr[dkA]+3)&0xFFFFF;
 				sdram_adr[dkA]+=	offset_adressBIG[dkA];
-				LR[dkA][0][0] = PCM[dkA][0][sdram_adr[dkA]][0];							
-				LR[dkA][1][0] = PCM[dkA][0][sdram_adr[dkA]][1];			
+				LR[dkA][0][0] = sdram.pcm[dkA][0][sdram_adr[dkA]][0];							
+				LR[dkA][1][0] = sdram.pcm[dkA][0][sdram_adr[dkA]][1];			
 				}	
 			}	
 		postn[dkA]%=10000;	
@@ -400,21 +400,21 @@ void SAI1_IRQHandler(void)
 				{	
 				sdram_adr[dkB] = play_adr[dkB]&0xFFFFF;	
 				sdram_adr[dkB]+= offset_adressBIG[dkB];
-				LR[dkB][0][0] = PCM[dkB][0][sdram_adr[dkB]][0];							
-				LR[dkB][1][0] = PCM[dkB][0][sdram_adr[dkB]][1];
+				LR[dkB][0][0] = sdram.pcm[dkB][0][sdram_adr[dkB]][0];							
+				LR[dkB][1][0] = sdram.pcm[dkB][0][sdram_adr[dkB]][1];
 				sdram_adr[dkB] = (play_adr[dkB]+1)&0xFFFFF;
 				sdram_adr[dkB]+= offset_adressBIG[dkB];	
-				LR[dkB][0][1] = PCM[dkB][0][sdram_adr[dkB]][0];							
-				LR[dkB][1][1] = PCM[dkB][0][sdram_adr[dkB]][1];	
+				LR[dkB][0][1] = sdram.pcm[dkB][0][sdram_adr[dkB]][0];							
+				LR[dkB][1][1] = sdram.pcm[dkB][0][sdram_adr[dkB]][1];	
 				sdram_adr[dkB] = (play_adr[dkB]+2)&0xFFFFF;
 				sdram_adr[dkB]+= offset_adressBIG[dkB];	
-				LR[dkB][0][2] = PCM[dkB][0][sdram_adr[dkB]][0];									
-				LR[dkB][1][2] = PCM[dkB][0][sdram_adr[dkB]][1];
+				LR[dkB][0][2] = sdram.pcm[dkB][0][sdram_adr[dkB]][0];									
+				LR[dkB][1][2] = sdram.pcm[dkB][0][sdram_adr[dkB]][1];
 				}
 			sdram_adr[dkB] = (play_adr[dkB]+3)&0xFFFFF;	
 			sdram_adr[dkB]+=	offset_adressBIG[dkB];	
-			LR[dkB][0][3] = PCM[dkB][0][sdram_adr[dkB]][0];							
-			LR[dkB][1][3] = PCM[dkB][0][sdram_adr[dkB]][1];		
+			LR[dkB][0][3] = sdram.pcm[dkB][0][sdram_adr[dkB]][0];							
+			LR[dkB][1][3] = sdram.pcm[dkB][0][sdram_adr[dkB]][1];		
 			}
 		else if(rvrs[dkB]==1 && play_adr[dkB]>=step_postn[dkB])
 			{
@@ -429,27 +429,27 @@ void SAI1_IRQHandler(void)
 				LR[dkB][1][2] = LR[dkB][1][3];
 				sdram_adr[dkB] = (play_adr[dkB])&0xFFFFF;	
 				sdram_adr[dkB]+=	offset_adressBIG[dkB];		
-				LR[dkB][0][3] = PCM[dkB][0][sdram_adr[dkB]][0];							
-				LR[dkB][1][3] = PCM[dkB][0][sdram_adr[dkB]][1];		
+				LR[dkB][0][3] = sdram.pcm[dkB][0][sdram_adr[dkB]][0];							
+				LR[dkB][1][3] = sdram.pcm[dkB][0][sdram_adr[dkB]][1];		
 				}
 			else
 				{
 				sdram_adr[dkB] = play_adr[dkB]&0xFFFFF;	
 				sdram_adr[dkB]+=	offset_adressBIG[dkB];		
-				LR[dkB][0][3] = PCM[dkB][0][sdram_adr[dkB]][0];							
-				LR[dkB][1][3] = PCM[dkB][0][sdram_adr[dkB]][1];
+				LR[dkB][0][3] = sdram.pcm[dkB][0][sdram_adr[dkB]][0];							
+				LR[dkB][1][3] = sdram.pcm[dkB][0][sdram_adr[dkB]][1];
 				sdram_adr[dkB] = (play_adr[dkB]+1)&0xFFFFF;
 				sdram_adr[dkB]+=	offset_adressBIG[dkB];	
-				LR[dkB][0][2] = PCM[dkB][0][sdram_adr[dkB]][0];								
-				LR[dkB][1][2] = PCM[dkB][0][sdram_adr[dkB]][1];		
+				LR[dkB][0][2] = sdram.pcm[dkB][0][sdram_adr[dkB]][0];								
+				LR[dkB][1][2] = sdram.pcm[dkB][0][sdram_adr[dkB]][1];		
 				sdram_adr[dkB] = (play_adr[dkB]+2)&0xFFFFF;
 				sdram_adr[dkB]+=	offset_adressBIG[dkB];
-				LR[dkB][0][1] = PCM[dkB][0][sdram_adr[dkB]][0];									
-				LR[dkB][1][1] = PCM[dkB][0][sdram_adr[dkB]][1];
+				LR[dkB][0][1] = sdram.pcm[dkB][0][sdram_adr[dkB]][0];									
+				LR[dkB][1][1] = sdram.pcm[dkB][0][sdram_adr[dkB]][1];
 				sdram_adr[dkB] = (play_adr[dkB]+3)&0xFFFFF;
 				sdram_adr[dkB]+=	offset_adressBIG[dkB];
-				LR[dkB][0][0] = PCM[dkB][0][sdram_adr[dkB]][0];							
-				LR[dkB][1][0] = PCM[dkB][0][sdram_adr[dkB]][1];			
+				LR[dkB][0][0] = sdram.pcm[dkB][0][sdram_adr[dkB]][0];							
+				LR[dkB][1][0] = sdram.pcm[dkB][0][sdram_adr[dkB]][1];			
 				}	
 			}	
 		postn[dkB]%=10000;	
