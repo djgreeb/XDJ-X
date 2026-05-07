@@ -38,11 +38,11 @@ uint16_t CREATE_SCREEN(void)
 	path_rec[11] = (RND%100)/10 + 48;
 	path_rec[12] = RND%10 + 48; 				
 		
-	res = f_open(&file, path_rec, FA_CREATE_NEW | FA_WRITE);
+	res = f_open(&file[0], path_rec, FA_CREATE_NEW | FA_WRITE);
 			
 	if(res==FR_OK)
 		{
-		f_write(&file, bmp_header, 70, &nbytes);	//write header
+		f_write(&file[0], bmp_header, 70, &nbytes[0]);	//write header
 		HAL_Delay(10);
 		uint16_t F;
 		uint16_t IMG_BFR[32];	
@@ -74,16 +74,16 @@ uint16_t CREATE_SCREEN(void)
 					IMG_BFR[2*q] = px;
 					}
 				}
-			res = f_write(&file, IMG_BFR, 64, &nbytes);	
+			res = f_write(&file[0], IMG_BFR, 64, &nbytes[0]);	
 			HAL_Delay(8);		
 			}
 		if(res==FR_OK)				//write end header	
 			{
-			f_write(&file, &bmp_header[68], 2, &nbytes);
+			f_write(&file[0], &bmp_header[68], 2, &nbytes[0]);
 			}			
 		if(res==FR_OK)
 			{
-			res = f_close(&file);	
+			res = f_close(&file[0]);	
 			if(res==FR_OK)
 				{
 				return RND%1000;		
@@ -95,7 +95,7 @@ uint16_t CREATE_SCREEN(void)
 			}
 		else
 			{
-			f_close(&file);
+			f_close(&file[0]);
 			return 0xFFFF;
 			}	
 		}	

@@ -409,14 +409,24 @@
               <FilePath>..\Inc\decka_handler.h</FilePath>
             </File>
             <File>
-              <FileName>encoder_handler.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Inc\encoder_handler.h</FilePath>
-            </File>
-            <File>
               <FileName>deckb_handler.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Inc\deckb_handler.h</FilePath>
+            </File>
+            <File>
+              <FileName>pads_a.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\pads_a.h</FilePath>
+            </File>
+            <File>
+              <FileName>pads_b.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\pads_b.h</FilePath>
+            </File>
+            <File>
+              <FileName>encoder_handler.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\encoder_handler.h</FilePath>
             </File>
             <File>
               <FileName>pm_uart_handler.h</FileName>
@@ -1057,6 +1067,11 @@
               <FileName>stm32h7xx_hal_msp.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Src/stm32h7xx_hal_msp.c</FilePath>
+            </File>
+            <File>
+              <FileName>fatfs_operations.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Inc\fatfs_operations.h</FilePath>
             </File>
           </Files>
         </Group>

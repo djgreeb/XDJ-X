@@ -35,8 +35,8 @@ typedef enum
   RIGHT_MODE              = 0x02,    /* Right mode  */
   LEFT_MODE               = 0x03,     /* Left mode   */
 	TRANSPARENT_MODE        = 0x04,     /* transparent mode   */
-	INFO_MODE        				= 0x05,     /* transparent+info mode*/
-	WAVEFORM_MODE        		= 0x06,     /* transparent mode+waveform mode   */
+	INFO_MODE        				= 0x05,     /* transparent+info mode DisplayWidth = 266;*/
+	INFOTRACK_MODE        	= 0x06,     /* transparent+info mode for tracks*/
 }Text_AlignModeTypdef;
 
 #define MAX_LAYER_NUMBER       ((uint32_t)2)
@@ -66,6 +66,7 @@ typedef enum
 #define LOOP_ACTIVE_COLOR				((uint16_t)0xD960)
 #define LOOP_INACTIVE_COLOR 		((uint16_t)0x98C6)
 #define LOOP_INACTIVELP_COLOR 	((uint16_t)0xB9CE)
+#define LCD_COLOR_SLIP 					((uint16_t)0xFFA0)
 
 ////////////////////////////BATT colors///////////////////////
 #define BATT_GRAYR 							((uint16_t)0xD6B5) //66%
@@ -142,10 +143,8 @@ void     BSP_LCD_FillEllipse(int Xpos, int Ypos, int XRadius, int YRadius);
 void     BSP_LCD_DisplayOff(void);
 void     BSP_LCD_DisplayOn(void);
 
-/* These functions can be modified in case the current settings
-   need to be changed for specific application needs */
 void     BSP_LCD_MspInit(LTDC_HandleTypeDef *hltdc, void *Params);
-//void     BSP_LCD_ClockConfig(LTDC_HandleTypeDef *hltdc, void *Params);
+
 
 
 

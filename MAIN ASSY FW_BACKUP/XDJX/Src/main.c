@@ -340,6 +340,51 @@
 //	ver. 1.62
 //	-	Rekordbox database parser update up to ver. 0.44
 //	-	Cyrillic Pioneer font added
+//	ver. 1.64
+//	-	Rekordbox database parser ver. 0.45, KEYSmatchtable bug fixed
+//	ver. 1.65
+//	- improved gui func.
+//	ver. 1.67
+//	- improved gui func.
+//	-	FIRCoef is changed to Cut Frequency: 8.1KHz
+//	ver. 1.69
+//	- SLIP yellow cursor added
+//	- minor GUI bugs fixed
+//	ver. 1.71
+//	- minor GUI bugs fixed
+//	- TRACK INFO window has been changed
+//	ver. 1.72
+//	- PADS hadler added
+//	ver. 1.73
+//	-	pads_a.h, pads_b.h added
+//	ver. 1.74
+//	-	fatfs_operations.h added
+//	-	optimizing open file commands in fatfs
+//	ver. 1.75 
+//	-	created a common LOAD_TRACK function to load the left and right decks
+//	ver. 1.76
+//	-	Rekordbox database parser update up to ver. 0.47: expanded to 1024 tracks, 2048 mentions and 40 playlists
+//	ver. 1.78
+//	-	change waveform buffer (created 5 buffers)
+//	-	exit utilities using the Back button
+//	ver. 1.81
+//	-	Rekordbox database parser ver. 0.51, playlists>20 bug fixed
+//	ver. 1.82
+//	-	Rekordbox database parser ver. 0.53
+//	- Added support for reading large audio files when the *.EXT file exceeded the WFORMDYNAMIC buffer size
+//	ver. 1.83
+//	-	WFORMDYNAMIC read scope from waveform rendering process is limited
+//	-	The function for rendering static waveform samples has been changed.
+//	ver. 1.85
+//	-	added union memory
+//	ver. 1.86
+//	- Static waveforms 2-layers now
+//	- find PWV5 pointer in *.EXT file
+//	ver. 1.89
+//	- added parcing PWV5
+//
+//
+//
 //
 //
 //
@@ -366,8 +411,12 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-char FIRMWARE_VERSION[] = "1.62";	
+char FIRMWARE_VERSION[] = "1.89";	
 #define DEBUG_UART_EN				//sending work status to uart
+
+#include "stdio.h"
+#include "stdint.h"
+
 #include "global_variables.h"
 #include "audio.h"
 #include "CWX3970.h"
@@ -385,8 +434,6 @@ char FIRMWARE_VERSION[] = "1.62";
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
-
 
 
 
@@ -487,7 +534,6 @@ int main(void)
 	CSP_QUADSPI_Init();
 	CSP_QSPI_EnableMemoryMappedMode();
 
-
 	BSP_SD_Init();
 	USART1->CR1 |= USART_CR1_RXNEIE_RXFNEIE; //interrupt ON for a RX enable	
 	USART1->CR1 |= USART_CR1_PEIE;
@@ -509,14 +555,14 @@ int main(void)
 	i = HAL_GetTick();
 	for(a=0;a<8912896;a++)
 		{
-		PCM[0][0][0][a] = a%60105;	
+		sdram.pcm[0][0][0][a] = a%60105;	
 		}
 	for(a=0;a<8912896;a++)
 		{
-		if(PCM[0][0][0][a]!=(a%60105))
+		if(sdram.pcm[0][0][0][a]!=(a%60105))
 			{
-			sprintf((char*)U_TX_DATA, "%SDRAM error\n\r", i);	
-			UART_TX(&huart4, U_TX_DATA, 13, 5);
+			sprintf((char*)U_TX_DATA, "%03lu SDRAM error\n\r", i);	
+			UART_TX(&huart4, U_TX_DATA, 17, 5);
 			HAL_Delay(50);		
 			}
 		}
@@ -633,42 +679,8 @@ int main(void)
 		UART_TX(&huart4, U_TX_DATA, 15, 5);	
 		#endif	
 		GET_SD_INFO();
-			
-			
-//		char pth[]="0:/";
-
-//		res = f_opendir(&dir, pth);                       /* Open the directory */
-//		if (res == FR_OK) 
-//			{
-//			res = f_findfirst(&dir, &finfo, pth, "*.wav");  /* Start to search for audio files */
-//			while (res == FR_OK && finfo.fname[0]) 				/* Repeat while an item is found */
-//				{         
-//				//printf("%s\n", finfo.fname);                /* Display the object name */
-//				sprintf((char*)U_TX_DATA, "%s\n\r", finfo.fname);	
-//				UART_TX(&huart4, U_TX_DATA, strlen(U_TX_DATA), 5);		
-//				res = f_findnext(&dir, &finfo);               /* Search for next item */
-//				}		
-//			f_closedir(&dir);			
-//			}
-//			
-//			
-//			
-//		//char pathex[]={'0', ':', '/', 0x8C, 0x8E, 0x92, 0x2E, 0x57, 0x41, 0x56}; 			//MOT CP866
-//		char pathex[]={'0', ':', '/', 0x8C, 0xAE, 0xE2, 0x2E, 0x77, 0x61, 0x76};			//Mot CP866
-
-//		res = f_open(&file, pathex, FA_READ);
-//		if (res != FR_OK)
-//			{
-//			sprintf((char*)U_TX_DATA, "not open\n\r", res);	
-//			UART_TX(&huart4, U_TX_DATA, 10, 5);	
-//			}	
-//		else
-//			{
-//			sprintf((char*)U_TX_DATA, "open\n\r", res);	
-//			UART_TX(&huart4, U_TX_DATA, 6, 5);		
-//			}			
-			
-//		res = f_open(&file, path_pic, FA_READ);
+						
+//		res = f_open(&file[dkA], path_pic, FA_READ);
 //		if (res != FR_OK)
 //			{
 //			#if defined(DEBUG_UART_EN)		
@@ -683,14 +695,14 @@ int main(void)
 //			UART_TX(&huart4, U_TX_DATA, 19, 5);	
 //			#endif		
 //			HAL_Delay(500);
-//			f_lseek(&file, 54);			
-//			f_read(&file, fbuf, 223680, &nbytes);	
+//			f_lseek(&file[dkA], 54);			
+//			f_read(&file[dkA], fbuf, 223680, &nbytes);	
 //							
 //			for(i=0;i<111840;i++)	
 //				{	
 //				fbuf[i]|=0x8000;
 //				}		
-//			f_close(&file);	
+//			f_close(&file[dkA]);	
 //			}	
 		}
 			
@@ -706,7 +718,7 @@ int main(void)
 	else if(TOTAL_TRACKS==0xFFFF)
 		{
 		#if defined(DEBUG_UART_EN)		
-		sprintf((char*)U_TX_DATA, "Rekordbox database has more than 512 tracks.\n\r");	
+		sprintf((char*)U_TX_DATA, "Rekordbox database has more than 1024 tracks.\n\r");	
 		UART_TX(&huart4, U_TX_DATA, 46, 5);	
 		#endif	
 		SD_STATUS = SD_NEED_REPLACE;	
@@ -793,7 +805,8 @@ int main(void)
 		deckTbuf[j][10] = HCUEdisableCOLOR[1];
 		deckTbuf[j][11] = HCUEdisableCOLOR[2];
 		}	
-		
+	
+	PART_CODE = 0;	
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -920,13 +933,9 @@ int main(void)
 			
 		if(need_redraw_memline[dkA])
 			{
-			BSP_LCD_SelectLayer(0);	
-			//BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
-			//BSP_LCD_DrawHLine(3, 191, 204);					
+			BSP_LCD_SelectLayer(0);					
 			if(end_adata[dkA]>start_adata[dkA])																				
-				{
-				//BSP_LCD_SetTextColor(LCD_COLOR_RED);					
-				//BSP_LCD_DrawHLine(3+((start_adata[dkA]*5628)/all_long[dkA]), 191, ((end_adata[dkA]*5628)/all_long[dkA])-((start_adata[dkA]*5628)/all_long[dkA]));		
+				{	
 				DrawMemBar(dkA, (start_adata[dkA]*5628)/all_long[dkA], (end_adata[dkA]*5628)/all_long[dkA]);
 				}		
 			need_redraw_memline[dkA] = 0;	
@@ -934,146 +943,16 @@ int main(void)
 		else if(need_redraw_memline[dkB])
 			{
 			BSP_LCD_SelectLayer(0);	
-			//BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
-			//BSP_LCD_DrawHLine(275, 191, 204);
 			if(end_adata[dkB]>start_adata[dkB])																				
 				{
-				//BSP_LCD_SetTextColor(LCD_COLOR_RED);
-				//BSP_LCD_DrawHLine(275+((start_adata[dkB]*5628)/all_long[dkB]), 191, ((end_adata[dkB]*5628)/all_long[dkB])-((start_adata[dkB]*5628)/all_long[dkB]));	
 				DrawMemBar(dkB, (start_adata[dkB]*5628)/all_long[dkB], (end_adata[dkB]*5628)/all_long[dkB]);	
 				}				
 			need_redraw_memline[dkB] = 0;	
 			}		
 		}
-		
-	if(fat_semaphore==0)
-		{	
-		if(end_adata[dkA]<128)
-			{
-			f_read(&file, PCM[dkA][end_adata[dkA]][0], 32768, &nbytes);
-			need_redraw_memline[dkA] = 1;	
-			end_adata[dkA]++;	
-			}
-		else if((end_adata[dkA]<((play_adr[dkA]>>13)+42)) && (fill_stp[dkA]==0 || fill_stp[dkA]==6) && (end_adata[dkA]<=(((all_long[dkA]*294)>>13)+1)))									//filling the buffer forward
-			{
-			if(fill_stp[dkA]==6)
-				{
-				f_lseek(&file, ((32768*end_adata[dkA])+44));	
-				fill_stp[dkA] = 0;	
-				}		
-			f_read(&file, PCM[dkA][end_adata[dkA]&0x7F][0], 32768, &nbytes);		
-			end_adata[dkA]++;
-			if((end_adata[dkA]-start_adata[dkA])>128)
-				{
-				start_adata[dkA] = end_adata[dkA]-128;	
-				}
-			need_redraw_memline[dkA] = 1;	
-			}
-		else if(((end_adata[dkA]>((play_adr[dkA]>>13)+86) || ((end_adata[dkA]-start_adata[dkA])<124)) && start_adata[dkA]>3) || (fill_stp[dkA]!=0 && fill_stp[dkA]!=6))					//filling the buffer back
-			{
-			if(fill_stp[dkA]==0 || fill_stp[dkA]==6)
-				{
-				if((end_adata[dkA]-start_adata[dkA])>127)	
-					{
-					end_adata[dkA] = start_adata[dkA]+124;	
-					}	
-				start_adata[dkA]-=4;	
-				f_lseek(&file, ((32768*(start_adata[dkA]))+44));
-				fill_stp[dkA] = 1;	
-				}
-			else if(fill_stp[dkA]==1)
-				{
-				f_read(&file, PCM[dkA][start_adata[dkA]&0x7F][0], 32768, &nbytes);
-				fill_stp[dkA] = 2;	
-				}
-			else if(fill_stp[dkA]==2)
-				{
-				f_read(&file, PCM[dkA][(start_adata[dkA]+1)&0x7F][0], 32768, &nbytes);
-				fill_stp[dkA] = 3;	
-				}
-			else if(fill_stp[dkA]==3)
-				{
-				f_read(&file, PCM[dkA][(start_adata[dkA]+2)&0x7F][0], 32768, &nbytes);
-				fill_stp[dkA] = 4;	
-				}
-			else if(fill_stp[dkA]==4)
-				{
-				f_read(&file, PCM[dkA][(start_adata[dkA]+3)&0x7F][0], 32768, &nbytes);
-				fill_stp[dkA] = 5;	
-				}
-			else if(fill_stp[dkA]==5)
-				{
-				need_redraw_memline[dkA] = 1;		
-				fill_stp[dkA] = 6;		
-				}
-			}		
-		fat_semaphore = 1;	
-		}		
-	else
-		{
-		if(end_adata[dkB]<128)
-			{
-			f_read(&fileb, PCM[dkB][end_adata[dkB]][0], 32768, &nbytesb);
-			need_redraw_memline[dkB] = 1;	
-			end_adata[dkB]++;	
-			}
-		else if((end_adata[dkB]<((play_adr[dkB]>>13)+42)) && (fill_stp[dkB]==0 || fill_stp[dkB]==6) && (end_adata[dkB]<=(((all_long[dkB]*294)>>13)+1)))									//filling the buffer forward
-			{
-			if(fill_stp[dkB]==6)
-				{
-				f_lseek(&fileb, ((32768*end_adata[dkB])+44));	
-				fill_stp[dkB] = 0;	
-				}		
-			f_read(&fileb, PCM[dkB][end_adata[dkB]&0x7F][0], 32768, &nbytesb);		
-			end_adata[dkB]++;
-			if((end_adata[dkB]-start_adata[dkB])>128)
-				{
-				start_adata[dkB] = end_adata[dkB]-128;	
-				}
-			need_redraw_memline[dkB] = 1;	
-			}
-		else if(((end_adata[dkB]>((play_adr[dkB]>>13)+86) || ((end_adata[dkB]-start_adata[dkB])<124)) && start_adata[dkB]>3) || (fill_stp[dkB]!=0 && fill_stp[dkB]!=6))					//filling the buffer back
-			{
-			if(fill_stp[dkB]==0 || fill_stp[dkB]==6)
-				{
-				if((end_adata[dkB]-start_adata[dkB])>127)	
-					{
-					end_adata[dkB] = start_adata[dkB]+124;	
-					}	
-				start_adata[dkB]-=4;	
-				f_lseek(&fileb, ((32768*(start_adata[dkB]))+44));
-				fill_stp[dkB] = 1;	
-				}
-			else if(fill_stp[dkB]==1)
-				{
-				f_read(&fileb, PCM[dkB][start_adata[dkB]&0x7F][0], 32768, &nbytesb);
-				fill_stp[dkB] = 2;	
-				}
-			else if(fill_stp[dkB]==2)
-				{
-				f_read(&fileb, PCM[dkB][(start_adata[dkB]+1)&0x7F][0], 32768, &nbytesb);
-				fill_stp[dkB] = 3;	
-				}
-			else if(fill_stp[dkB]==3)
-				{
-				f_read(&fileb, PCM[dkB][(start_adata[dkB]+2)&0x7F][0], 32768, &nbytesb);
-				fill_stp[dkB] = 4;	
-				}
-			else if(fill_stp[dkB]==4)
-				{
-				f_read(&fileb, PCM[dkB][(start_adata[dkB]+3)&0x7F][0], 32768, &nbytesb);
-				fill_stp[dkB] = 5;	
-				}
-			else if(fill_stp[dkB]==5)
-				{
-				need_redraw_memline[dkB] = 1;		
-				fill_stp[dkB] = 6;		
-				}
-			}	
-		fat_semaphore = 0;	
-		}	
-	
-		
+
+	#include "fatfs_operations.h"	
+				
 	if(PART_CODE==0)
 		{
 		//TOUCH_SCREEN_HANDLER();
@@ -1259,6 +1138,7 @@ int main(void)
 		//BACK BUTTON
 		// (enc button)LOAD TRACK
 			
+			
 		if(enc_need_up)							///////////ENCODER 	
 			{
 			if(dSHOW==BROWSER || dSHOW==BROWSER_INFO)
@@ -1405,7 +1285,7 @@ int main(void)
 					}
 				else if((dSHOW==BROWSER || dSHOW==BROWSER_INFO) && BROWSE_LEVEL>0)
 					{
-					if(BROWSE_LEVEL==2 && (B2CurrentCursorPosition==0 || B2CurrentCursorPosition==1 || B2CurrentCursorPosition==3))	
+					if(BROWSE_LEVEL==2 && (B2CursorPos==0 || B2CursorPos==1 || B2CursorPos==3))	
 						{
 						//////////////////////////////////////	
 						}
@@ -1414,9 +1294,9 @@ int main(void)
 						PREVIOUS_BROWSE_LEVEL =	BROWSE_LEVEL; 
 						if(BROWSE_LEVEL==1)			//enter to playlist
 							{
-							TOTAL_TRACKS_IN_CURRENT_PLAYLIST = TRACKLIST_OFFSET[B1CurrentCursorPosition+BCurrentPlaylistPosition] - TRACKLIST_OFFSET[B1CurrentCursorPosition+BCurrentPlaylistPosition-1];
-							B0CurrentCursorPosition = 0;
-							BCurrentTrackPosition = 1;	
+							TOTAL_TRACKS_IN_CURRENT_PLAYLIST = TRACKLIST_OFFSET[B1CursorPos+BPlaylistPos] - TRACKLIST_OFFSET[B1CursorPos+BPlaylistPos-1];
+							B0CursorPos = 0;
+							BTrackPos = 1;	
 							}
 						BROWSE_LEVEL-=1;
 						SwitchInformationLayer(BROWSER_NAVI);
@@ -1445,7 +1325,7 @@ int main(void)
 			}	
 		else if(((GPIOB->IDR&0x00000001)==0) && LOAD_BUTTON_pressed[0]==0) 							///////////LOAD DECK A
 			{	
-			if((BROWSE_LEVEL==0 && (dSHOW==BROWSER || dSHOW==BROWSER_INFO)) || ((dSHOW==TAG_LIST || dSHOW==TAG_LIST_INFO) && TOTAL_TRACKS_IN_TAG_LIST>0)) //LOAD TRACK from taglist or playlist
+			if((BROWSE_LEVEL==0 && (dSHOW==BROWSER || dSHOW==BROWSER_INFO)) || ((dSHOW==TAG_LIST || dSHOW==TAG_LIST_INFO) && TOTAL_TRACKS_IN_TAGLIST>0)) //LOAD TRACK from taglist or playlist
 				{	
 				if(UT_SET[1] && end_track[dkA]==0 && play_enable[dkA])						//lock load	
 					{	
@@ -1457,13 +1337,13 @@ int main(void)
 					load_animation_en[dkA] = 1;	
 					if(dSHOW==BROWSER || dSHOW==BROWSER_INFO)
 						{
-						track_play_now[dkA] = TRACKS_DATABASE[TRACKLIST_OFFSET[B1CurrentCursorPosition+BCurrentPlaylistPosition-1]+B0CurrentCursorPosition + BCurrentTrackPosition - 1];	
-						TRACK_PLAY_IN_CURRENT_PLAYLIST = B0CurrentCursorPosition + BCurrentTrackPosition;
+						track_play_now[dkA] = TRACKS_DATABASE[TRACKLIST_OFFSET[B1CursorPos+BPlaylistPos-1]+B0CursorPos + BTrackPos - 1];	
+						TRACK_PLAY_IN_CURRENT_PLAYLIST = B0CursorPos + BTrackPos;
 						}
 					else if(dSHOW==TAG_LIST || dSHOW==TAG_LIST_INFO)
 						{
-						track_play_now[dkA] = TAG_LIST_BASE[TCurrentCursorPosition + TCurrentTrackPosition-1];
-						TRACK_PLAY_IN_CURRENT_PLAYLIST = TCurrentCursorPosition + TCurrentTrackPosition;
+						track_play_now[dkA] = TAGLIST_BASE[TCursorPos + TTrackPos-1];
+						TRACK_PLAY_IN_CURRENT_PLAYLIST = TCursorPos + TTrackPos;
 						}
 					PREPARE_LOAD_TRACK(dkA, track_play_now[dkA], TRACK_PLAY_IN_CURRENT_PLAYLIST);			
 					}				
@@ -1476,7 +1356,7 @@ int main(void)
 			}
 		else if(((GPIOB->IDR&0x00000002)==0) && LOAD_BUTTON_pressed[1]==0) 							///////////LOAD DECK B
 			{
-			if((BROWSE_LEVEL==0 && (dSHOW==BROWSER || dSHOW==BROWSER_INFO)) || ((dSHOW==TAG_LIST || dSHOW==TAG_LIST_INFO) && TOTAL_TRACKS_IN_TAG_LIST>0)) //LOAD TRACK from taglist or playlist
+			if((BROWSE_LEVEL==0 && (dSHOW==BROWSER || dSHOW==BROWSER_INFO)) || ((dSHOW==TAG_LIST || dSHOW==TAG_LIST_INFO) && TOTAL_TRACKS_IN_TAGLIST>0)) //LOAD TRACK from taglist or playlist
 				{	
 				if(UT_SET[1] && end_track[dkB]==0 && play_enable[dkB])						//lock load	
 					{	
@@ -1488,13 +1368,13 @@ int main(void)
 					load_animation_en[dkB] = 1;	
 					if(dSHOW==BROWSER || dSHOW==BROWSER_INFO)
 						{
-						track_play_now[dkB] = TRACKS_DATABASE[TRACKLIST_OFFSET[B1CurrentCursorPosition+BCurrentPlaylistPosition-1]+B0CurrentCursorPosition + BCurrentTrackPosition - 1];	
-						TRACK_PLAY_IN_CURRENT_PLAYLIST = B0CurrentCursorPosition + BCurrentTrackPosition;
+						track_play_now[dkB] = TRACKS_DATABASE[TRACKLIST_OFFSET[B1CursorPos+BPlaylistPos-1]+B0CursorPos + BTrackPos - 1];	
+						TRACK_PLAY_IN_CURRENT_PLAYLIST = B0CursorPos + BTrackPos;
 						}
 					else if(dSHOW==TAG_LIST || dSHOW==TAG_LIST_INFO)
 						{
-						track_play_now[dkB] = TAG_LIST_BASE[TCurrentCursorPosition + TCurrentTrackPosition-1];
-						TRACK_PLAY_IN_CURRENT_PLAYLIST = TCurrentCursorPosition + TCurrentTrackPosition;
+						track_play_now[dkB] = TAGLIST_BASE[TCursorPos + TTrackPos-1];
+						TRACK_PLAY_IN_CURRENT_PLAYLIST = TCursorPos + TTrackPos;
 						}
 					PREPARE_LOAD_TRACK(dkB, track_play_now[dkB], TRACK_PLAY_IN_CURRENT_PLAYLIST);			
 					}				
@@ -1539,67 +1419,67 @@ int main(void)
 				KEY_TAG_tim	= HAL_GetTick();
 				if((dSHOW==BROWSER || dSHOW==BROWSER_INFO) && BROWSE_LEVEL==0)
 					{
-					if((playlist[TRACKS_DATABASE[TRACKLIST_OFFSET[B1CurrentCursorPosition+BCurrentPlaylistPosition-1]+BCurrentTrackPosition+B0CurrentCursorPosition-1]-1][54]&0x2)==0)					//////////////when track is not in tag list
+					if((playlist[TRACKS_DATABASE[TRACKLIST_OFFSET[B1CursorPos+BPlaylistPos-1]+BTrackPos+B0CursorPos-1]-1][54]&0x2)==0)					//////////////when track is not in tag list
 						{
-						if(TOTAL_TRACKS_IN_TAG_LIST<100)
+						if(TOTAL_TRACKS_IN_TAGLIST<100)
 							{
-							playlist[TRACKS_DATABASE[TRACKLIST_OFFSET[B1CurrentCursorPosition+BCurrentPlaylistPosition-1]+BCurrentTrackPosition+B0CurrentCursorPosition-1]-1][54]|=0x02;		//////////////////write add taglist mark
-							TAG_LIST_BASE[TOTAL_TRACKS_IN_TAG_LIST] = TRACKS_DATABASE[TRACKLIST_OFFSET[B1CurrentCursorPosition+BCurrentPlaylistPosition-1]+BCurrentTrackPosition+B0CurrentCursorPosition-1];
-							TOTAL_TRACKS_IN_TAG_LIST++;
+							playlist[TRACKS_DATABASE[TRACKLIST_OFFSET[B1CursorPos+BPlaylistPos-1]+BTrackPos+B0CursorPos-1]-1][54]|=0x02;		//////////////////write add taglist mark
+							TAGLIST_BASE[TOTAL_TRACKS_IN_TAGLIST] = TRACKS_DATABASE[TRACKLIST_OFFSET[B1CursorPos+BPlaylistPos-1]+BTrackPos+B0CursorPos-1];
+							TOTAL_TRACKS_IN_TAGLIST++;
 							}
 						}
 					else																													///////////////////////Delete Track from TAG LIST
 						{
-						playlist[TRACKS_DATABASE[TRACKLIST_OFFSET[B1CurrentCursorPosition+BCurrentPlaylistPosition-1]+BCurrentTrackPosition+B0CurrentCursorPosition-1]-1][54]&=0xFD;		//write delete taglist mark	
+						playlist[TRACKS_DATABASE[TRACKLIST_OFFSET[B1CursorPos+BPlaylistPos-1]+BTrackPos+B0CursorPos-1]-1][54]&=0xFD;		//write delete taglist mark	
 						s = 0;
-						while(TAG_LIST_BASE[s]!=(TRACKS_DATABASE[TRACKLIST_OFFSET[B1CurrentCursorPosition+BCurrentPlaylistPosition-1]+BCurrentTrackPosition+B0CurrentCursorPosition-1]) && s<TOTAL_TRACKS_IN_TAG_LIST)
+						while(TAGLIST_BASE[s]!=(TRACKS_DATABASE[TRACKLIST_OFFSET[B1CursorPos+BPlaylistPos-1]+BTrackPos+B0CursorPos-1]) && s<TOTAL_TRACKS_IN_TAGLIST)
 							{
 							s++;		
 							}
-						TOTAL_TRACKS_IN_TAG_LIST--;	
-						while(s<TOTAL_TRACKS_IN_TAG_LIST)
+						TOTAL_TRACKS_IN_TAGLIST--;	
+						while(s<TOTAL_TRACKS_IN_TAGLIST)
 							{
-							TAG_LIST_BASE[s] = TAG_LIST_BASE[s+1];	
+							TAGLIST_BASE[s] = TAGLIST_BASE[s+1];	
 							s++;	
 							}
-						if(TOTAL_TRACKS_IN_TAG_LIST<(TCurrentCursorPosition + TCurrentTrackPosition))
+						if(TOTAL_TRACKS_IN_TAGLIST<(TCursorPos + TTrackPos))
 							{
-							if(TOTAL_TRACKS_IN_TAG_LIST>7)
+							if(TOTAL_TRACKS_IN_TAGLIST>7)
 								{
-								TCurrentTrackPosition-=1;		
+								TTrackPos-=1;		
 								}
 							else
 								{
-								if(TCurrentCursorPosition>0)
+								if(TCursorPos>0)
 									{
-									TCurrentCursorPosition-=1;
+									TCursorPos-=1;
 									}
 								}		
 							}	
 						}
 					SwitchInformationLayer(dSHOW);
 					}
-				else if((dSHOW==TAG_LIST || dSHOW==TAG_LIST_INFO) && TOTAL_TRACKS_IN_TAG_LIST>0)
+				else if((dSHOW==TAG_LIST || dSHOW==TAG_LIST_INFO) && TOTAL_TRACKS_IN_TAGLIST>0)
 					{
-					playlist[TAG_LIST_BASE[TCurrentCursorPosition + TCurrentTrackPosition-1]-1][54]&=0xFD;		//delete taglist mark	
-					s = TCurrentCursorPosition + TCurrentTrackPosition-1;
-					TOTAL_TRACKS_IN_TAG_LIST--;
-					while(s<TOTAL_TRACKS_IN_TAG_LIST)
+					playlist[TAGLIST_BASE[TCursorPos + TTrackPos-1]-1][54]&=0xFD;		//delete taglist mark	
+					s = TCursorPos + TTrackPos-1;
+					TOTAL_TRACKS_IN_TAGLIST--;
+					while(s<TOTAL_TRACKS_IN_TAGLIST)
 						{
-						TAG_LIST_BASE[s] = TAG_LIST_BASE[s+1];	
+						TAGLIST_BASE[s] = TAGLIST_BASE[s+1];	
 						s++;	
 						}
-					if(TOTAL_TRACKS_IN_TAG_LIST<(TCurrentCursorPosition + TCurrentTrackPosition))
+					if(TOTAL_TRACKS_IN_TAGLIST<(TCursorPos + TTrackPos))
 						{
-						if(TOTAL_TRACKS_IN_TAG_LIST>7)
+						if(TOTAL_TRACKS_IN_TAGLIST>7)
 							{
-							TCurrentTrackPosition-=1;		
+							TTrackPos-=1;		
 							}
 						else
 							{
-							if(TCurrentCursorPosition>0)
+							if(TCursorPos>0)
 								{
-								TCurrentCursorPosition-=1;
+								TCursorPos-=1;
 								}
 							}		
 						}
@@ -1736,12 +1616,43 @@ int main(void)
 					BROWSE_LEVEL+=1;
 					SwitchInformationLayer(BROWSER_NAVI);		
 					}
+				else if(dSHOW==UTILITY && edit_parameter==0)
+					{
+//				if(need_rw_setings_prc)
+//					{
+//					write_setings_prc();
+//					need_rw_setings_prc = 0;	
+//					}	
+					SwitchInformationLayer(WAVEFORM);	
+					}
 				}
 			KEY_BACK_pressed = 1;		
 			}
 		else if(((GPIOH->IDR&0x00000008)!=0) && KEY_BACK_pressed==1)	
 			{	
 			KEY_BACK_pressed = 0;	
+			}		
+			
+	
+		if(need_seek[dkA]==1)
+			{
+			SEEK_AUDIOFRAME(dkA, 44100*30);
+			need_seek[dkA] = 0;	
+			}			
+		else if(need_seek[dkA]==2)
+			{
+			SEEK_AUDIOFRAME(dkA, 44100*90);		
+			need_seek[dkA] = 0;	
+			}
+		else if(need_seek[dkB]==1)
+			{
+			SEEK_AUDIOFRAME(dkB, 44100*120);		
+			need_seek[dkB] = 0;	
+			}			
+		else if(need_seek[dkB]==2)
+			{
+			SEEK_AUDIOFRAME(dkB, 44100*15);		
+			need_seek[dkB] = 0;	
 			}		
 		PART_CODE = 0;	
 		}
@@ -2029,7 +1940,7 @@ int main(void)
 	///////////////////////////////GUI ANIMATION//////////////////////////////////	
 	if(animation_en!=0)
 		{			
-		animation_step = 2*(HAL_GetTick() - animation_time); //0,24 sec for animation	
+		animation_step = 2*(HAL_GetTick() - animation_time); //0,24 sec for animation
 		if(animation_step<480 || animation_finish)				
 			{	
 			CURRENT_LAY = ActiveLayer;	
@@ -2042,9 +1953,9 @@ int main(void)
 				animation_step = 479; 	
 				animation_finish = 0;	
 				}
-			if(previous_animation_step != animation_step)	
+			if(previous_animation_step!=animation_step)	
 				{
-				if(animation_en==1)			//forward animation
+				if(animation_en==1)			//forward animation   << enc push
 					{					
 					if(animation_step<271)
 						{
@@ -2053,14 +1964,19 @@ int main(void)
 						}
 					BSP_LCD_SetTextColor(0x0000);					//transparent
 					BSP_LCD_FillRect(479-animation_step, 18, animation_step-previous_animation_step+1, 171);			
-					if(animation_step>60 && info_animation_enable)
+					if(animation_step>60 && info_animation_enable==1)
 						{
 						BSP_LCD_SetTextColor(LCD_COLOR_PAPER_TRANSP);					//Draw paper rectangle transparent	
 						BSP_LCD_FillRect(479-((animation_step-61)/2), 18, (animation_step-previous_animation_step+1)/2, 171);	
 						}
+					else if(animation_step>123 && info_animation_enable==2)
+						{
+						BSP_LCD_SetTextColor(LCD_COLOR_PAPER_TRANSP);					//Draw paper rectangle transparent	
+						BSP_LCD_FillRect(479-((animation_step-124)/3), 18, (animation_step-previous_animation_step+2)/3, 171);	
+						}	
 					previous_animation_step = animation_step;	
 					}	
-				else if(animation_en==2  && animation_step>previous_animation_step)		//back/reverse animation
+				else if(animation_en==2  && animation_step>previous_animation_step)		// >> back push   reverse animation
 					{
 					BSP_LCD_SetTextColor(LCD_COLOR_PAPER_TRANSP);					//Draw paper rectangle transparent
 					BSP_LCD_FillRect(previous_animation_step, 18, animation_step-previous_animation_step+1, 171);
@@ -2076,7 +1992,7 @@ int main(void)
 							BSP_LCD_FillRect(previous_animation_step-211, 18, animation_step-previous_animation_step+1, 171);	
 							}
 						}
-					if(animation_step<421 && info_animation_enable)
+					if(animation_step<421 && info_animation_enable==1)
 						{
 						BSP_LCD_SetTextColor(0x0000);
 						if(previous_animation_step==0)
@@ -2086,6 +2002,18 @@ int main(void)
 						else
 							{
 							BSP_LCD_FillRect(270+(previous_animation_step/2), 18, (animation_step-previous_animation_step+1)/2, 171);		
+							}
+						}
+					else if(animation_step<358 && info_animation_enable==2)
+						{
+						BSP_LCD_SetTextColor(0x0000);
+						if(previous_animation_step==0)
+							{
+							BSP_LCD_FillRect(361, 18, (animation_step+4)/3, 171);		
+							}
+						else
+							{
+							BSP_LCD_FillRect(361+(previous_animation_step/3), 18, (animation_step-previous_animation_step+2)/3, 171);		
 							}
 						}
 					previous_animation_step = animation_step;		

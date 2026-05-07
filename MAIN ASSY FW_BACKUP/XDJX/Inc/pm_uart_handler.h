@@ -28,8 +28,8 @@
 				}
 			else if(pm_urx_buf[1]==0xFC)			//need turn off 
 				{
-				f_close(&file);
-				f_close(&fileb);	
+				f_close(&file[dkA]);
+				f_close(&file[dkB]);	
 				uint16_t i;				
 				for(j=0;j<19;j++)		//write to eeprom
 					{		

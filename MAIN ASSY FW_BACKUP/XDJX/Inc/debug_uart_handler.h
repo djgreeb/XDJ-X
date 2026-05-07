@@ -185,8 +185,51 @@
 				sprintf((char*)U_TX_DATA, "SCREEN_%03lu.bmp\n\r", uart_tmp);
 				UART_TX(&huart4, U_TX_DATA, 16, 15);
 				}
+			}	
+		else if(dbg_urx_buf[0]==0x0C && dbg_urx_buf[1]==0x00)					//playlist (tracks base)
+			{		
+			uint16_t n;
+			for(n=0;n<1024;n++)
+				{					
+				UART_TX(&huart4, &playlist[n][0], 55, 50);
+				sprintf((char*)U_TX_DATA, "\n\r");
+				UART_TX(&huart4, U_TX_DATA, 2, 5);
+				HAL_Delay(3);	
+				}
 			}
-		dbg_new_data = 0;		
+		else if(dbg_urx_buf[0]==0x0D && dbg_urx_buf[1]==0x00)					//playlists name
+			{		
+			uint16_t n;
+			for(n=0;n<40;n++)
+				{					
+				UART_TX(&huart4, &TRACKLIST_NAME[n][0], 20, 50);
+				HAL_Delay(3);		
+				sprintf((char*)U_TX_DATA, "\n\r");
+				UART_TX(&huart4, U_TX_DATA, 2, 5);
+				HAL_Delay(5);	
+				}
+			}
+		else if(dbg_urx_buf[0]==0x0E && dbg_urx_buf[1]==0x00)					//TRACKLIST_OFFSET
+			{		
+			uint16_t n;
+			for(n=0;n<40;n++)
+				{					
+				sprintf((char*)U_TX_DATA, "%05lu\n\r", TRACKLIST_OFFSET[n]);	
+				UART_TX(&huart4, U_TX_DATA, 7, 5);
+				HAL_Delay(3);	
+				}
+			}
+		else if(dbg_urx_buf[0]==0x0F && dbg_urx_buf[1]==0x00)					//TRACKS_DATABASE
+			{		
+			uint16_t n;
+			for(n=0;n<2048;n++)
+				{					
+				sprintf((char*)U_TX_DATA, "%05lu\n\r", TRACKS_DATABASE[n]);	
+				UART_TX(&huart4, U_TX_DATA, 7, 5);
+				HAL_Delay(3);	
+				}
+			}
+		dbg_new_data = 0;	
 		};
 	
 		

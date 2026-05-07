@@ -318,6 +318,7 @@
 			{
 			LP8_BTN_pressed[dkA] = 0;	
 			}				
+		#include "pads_a.h"	
 			
 		if((deckRbuf[1]&0x04) && RVRS_BTN_pressed[dkA]==0)					///////////reverse switch position
 			{
@@ -909,8 +910,6 @@
 			
 		if(load_animation_en[dkA])
 			{
-			//Tbuffer[21] = 0;					//disable red cue marker
-			//Tbuffer[23] &= 0xDF;			//disable touch circle on display		
 			deckTbuf[TXpage][4] = 137;				//command load animation	
 			}
 		else if(track_play_now[dkA]==0)

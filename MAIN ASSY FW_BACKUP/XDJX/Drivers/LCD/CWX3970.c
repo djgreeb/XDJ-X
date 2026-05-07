@@ -694,11 +694,11 @@ void BSP_LCD_DisplayStringAt(uint16_t Xpos, uint16_t Ypos, uint8_t *Text, Text_A
 			DisplayWidth = 266;
       break;	
 		}		
-	case WAVEFORM_MODE:
+	case INFOTRACK_MODE:
 		{
 		  ref_column = Xpos;
 			TRANSPARENT_MODE_ENABLE = 1;
-			DisplayWidth = 414;
+			DisplayWidth = 357;
       break;	
 		}		
   case RIGHT_MODE:
@@ -938,19 +938,12 @@ void BSP_LCD_DrawCircle(uint16_t Xpos, uint16_t Ypos, uint16_t Radius)
   while (current_x <= current_y)
   {
     BSP_LCD_DrawPixel((Xpos + current_x), (Ypos - current_y), DrawProp[ActiveLayer].TextColor);
-    
     BSP_LCD_DrawPixel((Xpos - current_x), (Ypos - current_y), DrawProp[ActiveLayer].TextColor);
-    
     BSP_LCD_DrawPixel((Xpos + current_y), (Ypos - current_x), DrawProp[ActiveLayer].TextColor);
-    
     BSP_LCD_DrawPixel((Xpos - current_y), (Ypos - current_x), DrawProp[ActiveLayer].TextColor);
-    
     BSP_LCD_DrawPixel((Xpos + current_x), (Ypos + current_y), DrawProp[ActiveLayer].TextColor);
-    
     BSP_LCD_DrawPixel((Xpos - current_x), (Ypos + current_y), DrawProp[ActiveLayer].TextColor);
-    
     BSP_LCD_DrawPixel((Xpos + current_y), (Ypos + current_x), DrawProp[ActiveLayer].TextColor);
-    
     BSP_LCD_DrawPixel((Xpos - current_y), (Ypos + current_x), DrawProp[ActiveLayer].TextColor);
     
     if (decision < 0)
@@ -966,12 +959,7 @@ void BSP_LCD_DrawCircle(uint16_t Xpos, uint16_t Ypos, uint16_t Radius)
   } 
 }
 
-/**
-  * @brief  Draws an poly-line (between many points).
-  * @param  Points: Pointer to the points array
-  * @param  PointCount: Number of points
-  * @retval None
-  */
+
 void BSP_LCD_DrawPolygon(pPoint Points, uint16_t PointCount)
 {
   int16_t x = 0, y = 0;
@@ -992,14 +980,7 @@ void BSP_LCD_DrawPolygon(pPoint Points, uint16_t PointCount)
   }
 }
 
-/**
-  * @brief  Draws an ellipse on LCD.
-  * @param  Xpos: X position
-  * @param  Ypos: Y position
-  * @param  XRadius: Ellipse X radius
-  * @param  YRadius: Ellipse Y radius
-  * @retval None
-  */
+
 void BSP_LCD_DrawEllipse(int Xpos, int Ypos, int XRadius, int YRadius)
 {
   int x = 0, y = -YRadius, err = 2-2*XRadius, e2;
@@ -1026,27 +1007,14 @@ void BSP_LCD_DrawEllipse(int Xpos, int Ypos, int XRadius, int YRadius)
   while (y <= 0);
 }
 
-/**
-  * @brief  Draws a pixel on LCD.
-  * @param  Xpos: X position
-  * @param  Ypos: Y position
-  * @param  RGB_Code: Pixel color in ARGB mode (8-8-8-8)
-  * @retval None
-  */
+
 void BSP_LCD_DrawPixel(uint16_t Xpos, uint16_t Ypos, uint16_t RGB_Code)
 	{
    *(__IO uint16_t*) (hLtdcHandler.LayerCfg[ActiveLayer].FBStartAdress + (2*(Ypos*480 + Xpos))) = RGB_Code;
 	}
 
 
-/**
-  * @brief  Draws a full rectangle.
-  * @param  Xpos: X position
-  * @param  Ypos: Y position
-  * @param  Width: Rectangle width  
-  * @param  Height: Rectangle height
-  * @retval None
-  */
+
 void BSP_LCD_FillRect(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint16_t Height)
 	{
   uint32_t  x_address = 0;  
@@ -1054,13 +1022,7 @@ void BSP_LCD_FillRect(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint16_t Hei
   LL_FillBuffer(ActiveLayer, (uint32_t *)x_address, Width, Height, (480-Width), DrawProp[ActiveLayer].TextColor);	
 	}
 
-/**
-  * @brief  Draws a full circle.
-  * @param  Xpos: X position
-  * @param  Ypos: Y position
-  * @param  Radius: Circle radius
-  * @retval None
-  */
+
 void BSP_LCD_FillCircle(uint16_t Xpos, uint16_t Ypos, uint16_t Radius)
 {
   int32_t  decision;     /* Decision Variable */ 
