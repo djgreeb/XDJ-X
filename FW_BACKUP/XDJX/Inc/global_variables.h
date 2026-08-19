@@ -282,7 +282,7 @@ static char UTILITY_BASE[35][20] = { "DECKS              \0",
 																		 "DEVICE UID         \0",
 																		 "DEVELOPER          \0"};	
 uint8_t u_battery_level;
-																		 
+uint8_t spk_on = 0; 		//speaker status																		 
 																		 
 /* Buttons variables ---------------------------------------------------------*/
 uint8_t LOAD_BUTTON_pressed[2] = {0};
@@ -331,7 +331,6 @@ uint8_t LP4_BTN_pressed[2] = {0};
 uint8_t LP8_BTN_pressed[2] = {0};
 uint8_t PAD_pressed[2][8] = {0};
 
-
 uint8_t keep_to_play[2] = {0};
 uint8_t inertial_rotation[2] = {0};				//inertial rotation for jog
 uint8_t change_speed[2] = {0};							//flag for RELEASE/START or TOUCH/BREAKE 
@@ -373,7 +372,9 @@ uint8_t quantize_mode_need_update = 1;
 #define ROTDISdkA 	((deckRbuf[2]&0x08)==0)
 #define ROTENdkB 	((deckRbuf[10]&0x08)!=0)
 #define ROTDISdkB 	((deckRbuf[10]&0x08)==0)
-uint8_t need_seek[2] = {0};
+uint8_t need_seek[2] = {0};		//0: none, 1: play_adr+seek_pos 2: play_adr-seek_pos 3: seek_pos 
+uint32_t seek_pos[2];
+
 
 
 /* jog ring ---------------------------------------------------------*/
@@ -594,7 +595,6 @@ uint8_t	HCUE_type[2][8] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
 uint8_t	MEMORY_type[2][10] = {0};		//b0 (0=cue / 1=loop); b1 (0=inactive / 1=active); 
 uint8_t number_of_hot_cue_points[2] = {0};
 uint8_t number_of_memory_cue_points[2] = {0};
-
 
 /* Static Waveform variables ---------------------------------------------------------*/
 uint8_t prevTpos[2] = {0};

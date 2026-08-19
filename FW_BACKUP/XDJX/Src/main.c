@@ -381,11 +381,19 @@
 //	- Static waveforms 2-layers now
 //	- find PWV5 pointer in *.EXT file
 //	ver. 1.89
-//	- added parcing PWV5
-//
-//
-//
-//
+//	- added parcing PWV4
+//	ver. 1.92
+//	-	Rekordbox database parser ver. 0.55
+//	-	static waveforms 2-layers improved
+//	- adaptive code from Pioneer waveform changer utility	added
+//	ver. 1.93
+//	- minor GUI bugs fixed
+//	ver. 1.94
+//	- speaker on/off added in utility
+//	ver. 1.97
+//	- SEEK_AUDIOFRAME func. bug fixed
+//	- JOG SEEK added
+//	-	HOT CUEs call added
 //
 //
 //
@@ -411,7 +419,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-char FIRMWARE_VERSION[] = "1.89";	
+char FIRMWARE_VERSION[] = "1.97";	
 #define DEBUG_UART_EN				//sending work status to uart
 
 #include "stdio.h"
@@ -537,9 +545,9 @@ int main(void)
 	BSP_SD_Init();
 	USART1->CR1 |= USART_CR1_RXNEIE_RXFNEIE; //interrupt ON for a RX enable	
 	USART1->CR1 |= USART_CR1_PEIE;
-	UART4->CR1 |= USART_CR1_RXNEIE_RXFNEIE; //interrupt ON for a RX enable	
+	UART4->CR1 |= USART_CR1_RXNEIE_RXFNEIE;  //interrupt ON for a RX enable	
 	UART4->CR1 |= USART_CR1_PEIE;
-	UART7->CR1 |= USART_CR1_RXNEIE_RXFNEIE; //interrupt ON for a RX enable	
+	UART7->CR1 |= USART_CR1_RXNEIE_RXFNEIE;  //interrupt ON for a RX enable	
 	UART7->CR1 |= USART_CR1_PEIE;	
 	
 	HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_1);	
@@ -955,7 +963,6 @@ int main(void)
 				
 	if(PART_CODE==0)
 		{
-		//TOUCH_SCREEN_HANDLER();
 		if(batt_need_update>0)
 			{
 			if(batt_need_update&0x0F)
@@ -1185,7 +1192,8 @@ int main(void)
 					{
 					if(UT_EEMAP[UCurrentCursorPosition+CurrentUPosition-1]==0xFE)		//speaker
 						{	
-						HAL_GPIO_WritePin(AMP_EN_GPIO_Port, AMP_EN_Pin, GPIO_PIN_SET);
+						spk_on = 1;	
+						HAL_GPIO_WritePin(AMP_EN_GPIO_Port, AMP_EN_Pin, GPIO_PIN_SET);		
 						int_U_REDRAW_ONE_LINE();
 						}
 					else
@@ -1247,7 +1255,8 @@ int main(void)
 					{				
 					if(UT_EEMAP[UCurrentCursorPosition+CurrentUPosition-1]==0xFE)		//speaker
 						{
-						HAL_GPIO_WritePin(AMP_EN_GPIO_Port, AMP_EN_Pin, GPIO_PIN_SET);	
+						spk_on = 0;	
+						HAL_GPIO_WritePin(AMP_EN_GPIO_Port, AMP_EN_Pin, GPIO_PIN_RESET);	
 						int_U_REDRAW_ONE_LINE();	
 						}
 					else
@@ -1631,28 +1640,6 @@ int main(void)
 		else if(((GPIOH->IDR&0x00000008)!=0) && KEY_BACK_pressed==1)	
 			{	
 			KEY_BACK_pressed = 0;	
-			}		
-			
-	
-		if(need_seek[dkA]==1)
-			{
-			SEEK_AUDIOFRAME(dkA, 44100*30);
-			need_seek[dkA] = 0;	
-			}			
-		else if(need_seek[dkA]==2)
-			{
-			SEEK_AUDIOFRAME(dkA, 44100*90);		
-			need_seek[dkA] = 0;	
-			}
-		else if(need_seek[dkB]==1)
-			{
-			SEEK_AUDIOFRAME(dkB, 44100*120);		
-			need_seek[dkB] = 0;	
-			}			
-		else if(need_seek[dkB]==2)
-			{
-			SEEK_AUDIOFRAME(dkB, 44100*15);		
-			need_seek[dkB] = 0;	
 			}		
 		PART_CODE = 0;	
 		}

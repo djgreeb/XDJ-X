@@ -14,6 +14,8 @@ uint8_t CheckRXAcrc(void);
 uint8_t CheckRXBcrc(void);
 void SET_JOG_COLOR(uint8_t dk, uint32_t col);
 void CalcTXCRC(uint8_t txp);
+void PADSA(uint8_t pd);
+void PADSB(uint8_t pd);
 
 
 //////////////////////////////////////////////////////////
@@ -371,10 +373,64 @@ void SET_JOG_COLOR(uint8_t dk, uint32_t col)
 	};	
 	
 	
-	
-	
+////////////////////////////////////////////////////////
+//
+//
+//	
+void PADSA(uint8_t pd)
+	{	
+	if(lock_control[dkA]==0)	
+		{	
+		if(HCUE_adr[dkA][0][pd]!=0xFFFF)
+			{
+			seek_pos[dkA]	= 294*HCUE_adr[dkA][0][pd];
+			need_seek[dkA] = 3;
+			}
+		if(play_enable[dkA]==0)
+			{
+			change_speed[dkA] = NO_CHANGE;	
+			play_enable[dkA] = 1;
+			//change masterdeck	
+			if(play_enable[dkB]==0 && masterdeck!=dkA)
+				{
+				masterdeck = dkA;
+				tempo_need_update[dkA] = 2;
+				tempo_need_update[dkB] = 2;	
+				}		
+			}	
+		}
+	return;	
+	};	
 
 	
+////////////////////////////////////////////////////////
+//
+//
+//	
+void PADSB(uint8_t pd)
+	{
+	if(lock_control[dkB]==0)	
+		{	
+		if(HCUE_adr[dkB][0][pd]!=0xFFFF)
+			{
+			seek_pos[dkB]	= 294*HCUE_adr[dkB][0][pd];
+			need_seek[dkB] = 3;
+			}
+		if(play_enable[dkB]==0)
+			{
+			change_speed[dkB] = NO_CHANGE;	
+			play_enable[dkB] = 1;
+			//change masterdeck	
+			if(play_enable[dkA]==0 && masterdeck!=dkB)
+				{
+				masterdeck = dkB;
+				tempo_need_update[dkA] = 2;
+				tempo_need_update[dkB] = 2;	
+				}	
+			}	
+		}
+	return;	
+	};		
 	
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

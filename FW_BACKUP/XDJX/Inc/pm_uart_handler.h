@@ -46,8 +46,10 @@
 				HAL_GPIO_WritePin(GPIOA, LED_LOAD1_Pin|LED_LOAD0_Pin|LED_ENC_Pin, GPIO_PIN_RESET);
 				HAL_GPIO_WritePin(GPIOH, P8EN_Pin, GPIO_PIN_RESET);	
 
-				HAL_Delay(1000);		
-					
+				HAL_Delay(700);		
+				spk_on = 0;	
+				HAL_GPIO_WritePin(AMP_EN_GPIO_Port, AMP_EN_Pin, GPIO_PIN_RESET);		
+
 				lock_control[dkA] = 1;		
 				pitch[dkA] = 0;	
 				play_enable[dkA] = 0;					

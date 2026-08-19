@@ -422,13 +422,13 @@ void RedrawWaveforms(uint8_t dk, uint32_t position)
 		if(Prev10m[dk]!=(clock_pos/90000)%10)			
 			{
 			Prev10m[dk] = (clock_pos/90000)%10;
-			if(Prev10m[dk]==0)
+			if(all_long[dk]<90000)
 				{
 				BSP_LCD_SetTextColor(LCD_COLOR_BLACK);	
 				}
 			sprintf((char *)Buf , "%0lu", Prev10m[dk]);				//10 Min
 			BSP_LCD_DisplayStringAt(22+h, 170, Buf, LEFT_MODE);				
-			if(Prev10m[dk]==0)
+			if(all_long[dk]<90000)
 				{
 				BSP_LCD_SetTextColor(LCD_COLOR_WHITE);	
 				}	
@@ -663,8 +663,7 @@ void RedrawWaveforms(uint8_t dk, uint32_t position)
 			}	
 		}	
 	return;	
-	}
-
+	};
 
 //////////////////////////////////////////////////
 //
@@ -681,42 +680,19 @@ void DrawWFMSample(uint8_t dk, uint8_t pos)
 		{
 		h = 272;	
 		}
-		
-	if(dk==dkB)
+	if(UT_SET[5]==0)
 		{
-		color = COLOR_MAP[UT_SET[5]][2*((4*(WFORMSTATIC[dk][pos]>>7))+((WFORMSTATIC[dk][pos]&0x1F)%4))];	
-		if((WFORMSTATIC[dk][pos]>>7)==1)
-			{
-			ForceDrawVLine(pos+3+h, 220-(WFORMSTATIC[dk][pos]&0x1F), (WFORMSTATIC[dk][pos]&0x1F)+1, color);			
-			}		
-		else
-			{
-			uint8_t len;
-			len = (WFORMSTATIC[dk][pos]&0x1F)/3;
-			ForceDrawVLine(pos+3+h, 220-len, len+1, color);			
-			color = color_dim(67, 100, color);	
-			ForceDrawVLine(pos+3+h, 220-(WFORMSTATIC[dk][pos]&0x1F), ((WFORMSTATIC[dk][pos]&0x1F)-len)+1, color);
-			}		
+		color = COLOR_MAP[0][2*(WFST_AHB[dk][pos]>>5)];
 		}
 	else
 		{
-		if(UT_SET[5]==0)
-			{
-			color = COLOR_MAP[0][2*(WFST_AHB[dk][pos]>>5)];
-			}
-		else
-			{
-			color = WFST_RGB[dk][pos]; 	
-			}			
-		ForceDrawVLine(pos+3+h, 220-(WFST_AHB[dk][pos]&0x1F), (WFST_AHB[dk][pos]&0x1F)+1, color_dim(67, 100, color));
-		ForceDrawVLine(pos+3+h, 220-WFST_AL[dk][pos], WFST_AL[dk][pos]+1, color);
-		}
+		color = WFST_RGB[dk][pos]; 	
+		}			
+	ForceDrawVLine(pos+3+h, 220-(WFST_AHB[dk][pos]&0x1F), (WFST_AHB[dk][pos]&0x1F)+1, color_dim(67, 100, color));
+	ForceDrawVLine(pos+3+h, 220-WFST_AL[dk][pos], WFST_AL[dk][pos]+1, color);
 	return;	
 	};	
 
-		
-	
-	
 //////////////////////////////////////////////////
 //
 //	Size 202x19	
@@ -1927,35 +1903,35 @@ void ShowTrackName(uint8_t dk)
 			}			
 		}
 	BSP_LCD_SetFont(&Font15P);
-	BSP_LCD_SetTextColor(LCD_COLOR_DARKGRAY);		
+	BSP_LCD_SetTextColor(0x9CE7);		
 	if(dk==dkA)
 		{
-		BSP_LCD_FillRect(26, 123, 214, 17);
-		ForceDrawVLine(25, 123, 17, LCD_COLOR_DDARKGRAY);	
+		BSP_LCD_FillRect(24, 123, 216, 17);
+		//ForceDrawVLine(25, 123, 17, LCD_COLOR_DDARKGRAY);	
 		BSP_LCD_SetTextColor(COLOR_MAP_TRACKBAR[curr_trck_color[dk]]);
-		BSP_LCD_DisplayStringAt(29, 124, artist_n[dk], TRANSPARENT_MODE);
+		BSP_LCD_DisplayStringAt(28, 124, artist_n[dk], TRANSPARENT_MODE);
 		BSP_LCD_SetTextColor(LCD_COLOR_WHITE);	
 		BSP_LCD_DisplayStringAt(3, 141, track_n[dk], TRANSPARENT_MODE);		
 		}
 	else
 		{
-		BSP_LCD_FillRect(266, 123, 214, 17);
-		ForceDrawVLine(265, 123, 17, LCD_COLOR_DDARKGRAY);		
+		BSP_LCD_FillRect(264, 123, 216, 17);
+		//ForceDrawVLine(265, 123, 17, LCD_COLOR_DDARKGRAY);		
 		BSP_LCD_SetTextColor(COLOR_MAP_TRACKBAR[curr_trck_color[dk]]);	
-		BSP_LCD_DisplayStringAt(269, 124, artist_n[dk], TRANSPARENT_MODE);
+		BSP_LCD_DisplayStringAt(268, 124, artist_n[dk], TRANSPARENT_MODE);
 		BSP_LCD_SetTextColor(LCD_COLOR_WHITE);	
 		BSP_LCD_DisplayStringAt(295, 141, track_n[dk], TRANSPARENT_MODE);			
 		}	
-	BSP_LCD_SetTextColor(LCD_COLOR_GRAY);	
+	BSP_LCD_SetTextColor(LCD_COLOR_DARKGRAY);	
 	if(dk==dkA)
 		{
-		BSP_LCD_FillRect(1, 123, 24, 17);				
-		ForceDrawVLine(0, 123, 17, LCD_COLOR_GGRAY);		
+		BSP_LCD_FillRect(0, 123, 24, 17);				
+//		ForceDrawVLine(0, 123, 17, LCD_COLOR_GGRAY);		
 		}
 	else
 		{		
-		BSP_LCD_FillRect(241, 123, 24, 17);	
-		ForceDrawVLine(240, 123, 17, LCD_COLOR_GGRAY);		
+		BSP_LCD_FillRect(240, 123, 24, 17);	
+	//	ForceDrawVLine(240, 123, 17, LCD_COLOR_GGRAY);		
 		}
 	return;	
 	};		
@@ -2067,22 +2043,24 @@ void SwitchInformationLayer(uint8_t LAY)
 		ShowTrackName(dkB);
 		BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
 		sprintf((char *)Buf , "%02lu", TRACK_n_PLAY[dkA]%100);			
-		BSP_LCD_DisplayStringAt(5, 124, Buf, TRANSPARENT_MODE);
+		BSP_LCD_DisplayStringAt(4, 124, Buf, TRANSPARENT_MODE);
 		sprintf((char *)Buf , "%02lu", TRACK_n_PLAY[dkB]%100);		
-		BSP_LCD_DisplayStringAt(245, 124, Buf, TRANSPARENT_MODE);
+		BSP_LCD_DisplayStringAt(244, 124, Buf, TRANSPARENT_MODE);
 		DrawStaticTime(dkA);
 		DrawStaticTime(dkB);
 		tempo_need_update[dkA] = 1;
 		tempo_need_update[dkB] = 1;
 		if(TRACK_n_PLAY[dkA]==0 && TRACK_n_PLAY[dkB]==0)
 			{
-			DrawREKORDBOX();	
+			DrawREKORDBOX();
+			Prev10m[dkA] = 0xFF;	
 			Prev1m[dkA] = 0xFF;
 			Prev10s[dkA] = 0xFF;
 			Prev1s[dkA] = 0xFF;
 			Prev10f[dkA] = 0xFF;
 			Prev1f[dkA] = 0xFF;
 			PrevHf[dkA] = 0xFF;
+			Prev10m[dkB] = 0xFF;	
 			Prev1m[dkB] = 0xFF;
 			Prev10s[dkB] = 0xFF;
 			Prev1s[dkB] = 0xFF;
@@ -4792,7 +4770,14 @@ void UTILITY_PARAMETER(uint8_t n_prmtr)
 			}			
 		case 19:		//SPEAKERS  
 			{
-			sprintf((char*)Buf, "%s", "OFF");	
+			if(spk_on==1)
+				{
+				sprintf((char*)Buf, "%s", "ON");		
+				}				
+			else
+				{
+				sprintf((char*)Buf, "%s", "OFF");		
+				}
 			break;		
 			}	
 		case 20:		//EQ LOW-MID

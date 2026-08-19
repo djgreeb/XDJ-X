@@ -21,21 +21,20 @@ void SEEK_AUDIOFRAME(uint8_t dk, uint32_t seek_adr)
 		{
 		return;	
 		}
-	seek_adr&=0xFFFFE000;	
-	res = f_lseek(&file[dk], ((seek_adr<<2)+44));	
+	res = f_lseek(&file[dk], (((seek_adr&0xFFFFE000)<<2)+44));		
 	if(FR_OK==res)
 		{			
 		end_adata[dk] = (seek_adr>>13);
 		start_adata[dk] = end_adata[dk];
-		prevstrt[dk] = (start_adata[dk]*5628)/all_long[dk];		//	for update mem bar
-		prevfin[dk]	= prevstrt[dk];	
-		play_adr[dk] = seek_adr;
-		//fill_stp[dk] = 0;	
+		play_adr[dk] = seek_adr;	
+		fill_stp[dk] = 0;	
 		if(SLIPEN[dk])					//SLIP MODE ENABLE
 			{	
 			slip_pl_adr[dk] = play_adr[dk];	
-			}			
-		need_redraw_memline[dk] = 1;		
+			}
+		prevstrt[dk] = (start_adata[dk]*5628)/all_long[dk];		//	for update mem bar
+		prevfin[dk]	= prevstrt[dk];				
+		need_redraw_memline[dk] = 1;	
 		}			
 	return;	
 	};

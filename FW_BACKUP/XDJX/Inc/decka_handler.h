@@ -385,223 +385,250 @@
 			RVRS_BTN_pressed[dkA] = 0;		
 			}			
 		
-///////////////////////////////////////////////////JOG MECHANICAL PROCESS///////////////////////////////////////////////			
-		if(inertial_rotation[dkA])
+///////////////////////////////////////////////////JOG MECHANICAL PROCESS///////////////////////////////////////////////	
+		if((GPIOB->IDR & 0x00000200)==0)						//SHIFT BUTTON pressed
 			{
-			if((RVRSEN[dkA]==0 && (ROTDISdkA || (((deckRbuf[4]&0x80)==0) && pitch[dkA]<potenciometr_tempo[dkA]))) || 
-				((RVRSEN[dkA]) && ((ROTDISdkA && (deckRbuf[4]&0x80)==0) || ((deckRbuf[4]&0x80) && pitch[dkA]<potenciometr_tempo[dkA]))))		//if rotation foward and stopped	
-				{
-				inertial_rotation[dkA] = 0;	
-				}
-			}				
-		if(play_enable[dkA] || (need_call_to_cue[dkA]==3 && (ROTDISdkA || (deckRbuf[2]&0x80)!=0)))			//touch disable && rotation disable or play enable
-			{
-			need_call_to_cue[dkA] = 0;	
-			}	
-		else if((deckRbuf[2]&0x80)==0 && need_call_to_cue[dkA]==2)
-			{
-			pitch[dkA] = 0;	
-			play_adr[dkA] = 294*CUE_ADR[dkA];	
-			need_call_to_cue[dkA] = 3;	
-			}		
-			
-		if(((deckRbuf[2]&0x80)!=0 || (play_enable[dkA]==0 && (CUE_ADR[dkA]!=(play_adr[dkA]/294))) || inertial_rotation[dkA]) && (deckTbuf[2][0]&0x08))				/////////////(touch enable	|| play_enable[dkA]==0) && Vinyl mode enable
-			{
-			slip_pitch[dkA] = potenciometr_tempo[dkA];
-			if(JOG_PRESSED[dkA]==0)
-				{
-				if((deckRbuf[2]&0x80)!=0) 			//touch enable
-					{
-					change_speed[dkA] = NEED_DOWN;	
-					JOG_PRESSED[dkA] = 2;	
-					}
-				else
-					{
-					JOG_PRESSED[dkA] = 1;
-					}				
-				}	
-			if(play_enable[dkA]==0)	
-				{
-				if(((deckRbuf[2]&0x80)!=0) && (CUE_ADR[dkA]==(play_adr[dkA]/294)) && need_call_to_cue[dkA]==0)				//touch enable + play _enable==0 + CUE_ADR==(play_adr/294)
-					{
-					need_call_to_cue[dkA] = 1;	
-					}	
-				else if(need_call_to_cue[dkA]==1 && (deckRbuf[2]&0x80)==0)			//touch disable	_/
-					{
-					need_call_to_cue[dkA] = 2;	
-					}					
-				}
 			if(ROTENdkA)					//rotation detect
 				{
-				if(need_call_to_cue[dkA]<2)
-					{					
-					change_speed[dkA] = NO_CHANGE;	
-					
-					if(((deckRbuf[4]&0x80)==0) && end_track[dkA])				//foward rotation + end_track[dkA]
-						{
-						pitch[dkA] = 0;
-						change_speed[dkA] = NO_CHANGE;	
-						}
-					else
-						{
-						ptch = (256*deckRbuf[5]+deckRbuf[6]);
-						if(ptch<86)
-							{
-							ptch = 86;	
-							}
-						ptch = 5574324/ptch;
-						pitch[dkA] = ptch;						
-						}
-					slip_pitch[dkA] = potenciometr_tempo[dkA]; 	
-					inertial_rotation[dkA] = 1;						
+				ptch = (256*deckRbuf[5]+deckRbuf[6]);
+				if(ptch<86)
+					{
+					ptch = 86;	
 					}
-				}		
-			else if(change_speed[dkA]==NO_CHANGE) 
-				{			
-				pitch[dkA] = 0;	
-				}
-
-			if(change_speed[dkA]==NO_CHANGE)
-				{	
+				seek_pos[dkA] = 5418000/ptch;
 				if(deckRbuf[4]&0x80)				//foward/reverse rotation
 					{
-					rvrs[dkA] = 1;
+					need_seek[dkA] = 2;				
 					}
 				else
 					{
-					rvrs[dkA] = 0;	
-					}		
-				}
-			else
-				{
-				if(RVRSEN[dkA])					//reverse diode enable
-					{
-					rvrs[dkA] = 1;
+					need_seek[dkA] = 1;
 					}
-				else
-					{
-					rvrs[dkA] = 0;	
-					}	
-				}
-			deckTbuf[5][0]|=0x10;	//touch enable circle on display
-			//change masterdeck	
-			if(play_enable[dkB] && masterdeck!=dkB)
-				{
-				masterdeck = dkB;
-				tempo_need_update[dkA] = 2;
-				tempo_need_update[dkB] = 2;	
-				}	
-			}		
-		else if(ROTDISdkA && (deckRbuf[2]&0x80)==0)				///////////////////////touch disable and rotation disable
-			{			
-			slip_pitch[dkA] = potenciometr_tempo[dkA];
-			if(JOG_PRESSED[dkA]>0) //jog PRESSED -> UNPRESSED
-				{
-				if(SLIPEN[dkA])					//SLIP MODE ENABLE
-					{	
-					change_speed[dkA] = NO_CHANGE;	
-					}
-				else if(JOG_PRESSED[dkA]==2 && play_enable[dkA])
-					{
-					change_speed[dkA] = NEED_UP;	
-					}					
-				JOG_PRESSED[dkA] = 0;	
-				}
-			if(play_enable[dkA])
-				{	
-				if(end_track[dkA] && RVRSEN[dkA]==0)					//stop on end (to remove noise at the end of the track)
-					{
-					change_speed[dkA] = NO_CHANGE;	
-					pitch[dkA] = 0;	
-					}	
-				else if(change_speed[dkA]==NO_CHANGE)
-					{
-					pitch[dkA] = potenciometr_tempo[dkA];	
-					}
-				if(RVRSEN[dkA])					//reverse diode enable
-					{
-					rvrs[dkA] = 1;
-					}
-				else
-					{
-					rvrs[dkA] = 0;	
-					}		
-				}
-			if(deckTbuf[5][0]&0x10)					//jog UNPRESSED
-				{
-				if(SLIPEN[dkA])					//SLIP MODE ENABLE
-					{	
-					play_adr[dkA] = slip_pl_adr[dkA];	
-					}	
-				deckTbuf[5][0]&=0xEF;				//disable touch circle on display
 				}	
 			}
-		else if(ROTENdkA && play_enable[dkA])						//rotation detected			(pitch bend)	
-			{
-			if(end_track[dkA]==0)
+		else
+			{	
+			if(inertial_rotation[dkA])
 				{
-				ptch = (256*deckRbuf[5]+deckRbuf[6]);
-				if(ptch>139)
+				if((RVRSEN[dkA]==0 && (ROTDISdkA || (((deckRbuf[4]&0x80)==0) && pitch[dkA]<potenciometr_tempo[dkA]))) || 
+					((RVRSEN[dkA]) && ((ROTDISdkA && (deckRbuf[4]&0x80)==0) || ((deckRbuf[4]&0x80) && pitch[dkA]<potenciometr_tempo[dkA]))))		//if rotation foward and stopped	
 					{
-					ptch = ptch-139;	
+					inertial_rotation[dkA] = 0;	
 					}
-				else
+				}				
+			if(play_enable[dkA] || (need_call_to_cue[dkA]==3 && (ROTDISdkA || (deckRbuf[2]&0x80)!=0)))			//touch disable && rotation disable or play enable
+				{
+				need_call_to_cue[dkA] = 0;	
+				}	
+			else if((deckRbuf[2]&0x80)==0 && need_call_to_cue[dkA]==2)
+				{
+				pitch[dkA] = 0;	
+				play_adr[dkA] = 294*CUE_ADR[dkA];	
+				need_call_to_cue[dkA] = 3;	
+				}		
+				
+			if(((deckRbuf[2]&0x80)!=0 || (play_enable[dkA]==0 && (CUE_ADR[dkA]!=(play_adr[dkA]/294))) || inertial_rotation[dkA]) && (deckTbuf[2][0]&0x08))				/////////////(touch enable	|| play_enable[dkA]==0) && Vinyl mode enable
+				{
+				slip_pitch[dkA] = potenciometr_tempo[dkA];
+				if(JOG_PRESSED[dkA]==0)
 					{
-					ptch = 1;	
-					}
-				ptch = 120000/ptch;				//150000
-					
-				if(ptch>4225)
-					{
-					ptch = 4225;	
-					}	
-				if((((deckRbuf[4]&0x80)==0) && (RVRSEN[dkA]==0)) || ((deckRbuf[4]&0x80) && RVRSEN[dkA]))		//foward rotation and reverse off OR reverse rotation and reverse on (pitch bend)			
-					{
-					ptch+= potenciometr_tempo[dkA];
-					if(ptch>20000)
+					if((deckRbuf[2]&0x80)!=0) 			//touch enable
 						{
-						ptch = 20000;	
-						}
-					pitch[dkA] = ptch;
-					}
-				else if(((deckRbuf[4]&0x80) && (RVRSEN[dkA]==0)) || (((deckRbuf[4]&0x80)==0) && RVRSEN[dkA]))	 //reverse rotation and reverse off OR foward rotation and reverse on(pitch bend)	
-					{	
-					if(ptch<potenciometr_tempo[dkA])
-						{
-						pitch[dkA] = potenciometr_tempo[dkA] - ptch;
+						change_speed[dkA] = NEED_DOWN;	
+						JOG_PRESSED[dkA] = 2;	
 						}
 					else
 						{
-						pitch[dkA] = 0;	
-						}
-					}		
-				}
-			else
-				{
-				pitch[dkA] = 0;		
-				}			
-			if(RVRSEN[dkA])					//reverse diode enable
-				{
-				rvrs[dkA] = 1;
-				}
-			else
-				{
-				rvrs[dkA] = 0;	
-				}	
-			if(deckTbuf[5][0]&0x10)					//jog UNPRESSED
-				{
-				if(SLIPEN[dkA])					//SLIP MODE ENABLE
-					{	
-					play_adr[dkA] = slip_pl_adr[dkA];	
+						JOG_PRESSED[dkA] = 1;
+						}				
 					}	
-				deckTbuf[5][0]&=0xEF;				//disable touch circle on display	
-				}	
-			else
-				{
-				slip_pitch[dkA] = pitch[dkA];		
-				}
-			}
+				if(play_enable[dkA]==0)	
+					{
+					if(((deckRbuf[2]&0x80)!=0) && (CUE_ADR[dkA]==(play_adr[dkA]/294)) && need_call_to_cue[dkA]==0)				//touch enable + play _enable==0 + CUE_ADR==(play_adr/294)
+						{
+						need_call_to_cue[dkA] = 1;	
+						}	
+					else if(need_call_to_cue[dkA]==1 && (deckRbuf[2]&0x80)==0)			//touch disable	_/
+						{
+						need_call_to_cue[dkA] = 2;	
+						}					
+					}
+				if(ROTENdkA)					//rotation detect
+					{
+					if(need_call_to_cue[dkA]<2)
+						{
+						change_speed[dkA] = NO_CHANGE;	
+						
+						if(((deckRbuf[4]&0x80)==0) && end_track[dkA])				//foward rotation + end_track[dkA]
+							{
+							pitch[dkA] = 0;
+							change_speed[dkA] = NO_CHANGE;	
+							}
+						else
+							{
+							ptch = (256*deckRbuf[5]+deckRbuf[6]);
+							if(ptch<86)
+								{
+								ptch = 86;	
+								}
+							ptch = 5574324/ptch;
+							pitch[dkA] = ptch;						
+							}
+						slip_pitch[dkA] = potenciometr_tempo[dkA]; 	
+						inertial_rotation[dkA] = 1;												
+						}						
+					}		
+				else if(change_speed[dkA]==NO_CHANGE) 
+					{			
+					pitch[dkA] = 0;	
+					}
 
+				if(change_speed[dkA]==NO_CHANGE)
+					{	
+					if(deckRbuf[4]&0x80)				//foward/reverse rotation
+						{
+						rvrs[dkA] = 1;
+						}
+					else
+						{
+						rvrs[dkA] = 0;	
+						}		
+					}
+				else
+					{
+					if(RVRSEN[dkA])					//reverse diode enable
+						{
+						rvrs[dkA] = 1;
+						}
+					else
+						{
+						rvrs[dkA] = 0;	
+						}	
+					}
+				deckTbuf[5][0]|=0x10;	//touch enable circle on display
+				//change masterdeck	
+				if(play_enable[dkB] && masterdeck!=dkB)
+					{
+					masterdeck = dkB;
+					tempo_need_update[dkA] = 2;
+					tempo_need_update[dkB] = 2;	
+					}	
+				}		
+			else if(ROTDISdkA && (deckRbuf[2]&0x80)==0)				///////////////////////touch disable and rotation disable
+				{			
+				slip_pitch[dkA] = potenciometr_tempo[dkA];
+				if(JOG_PRESSED[dkA]>0) //jog PRESSED -> UNPRESSED
+					{
+					if(SLIPEN[dkA])					//SLIP MODE ENABLE
+						{	
+						change_speed[dkA] = NO_CHANGE;	
+						}
+					else if(JOG_PRESSED[dkA]==2 && play_enable[dkA])
+						{
+						change_speed[dkA] = NEED_UP;	
+						}					
+					JOG_PRESSED[dkA] = 0;	
+					}
+				if(play_enable[dkA])
+					{	
+					if(end_track[dkA] && RVRSEN[dkA]==0)					//stop on end (to remove noise at the end of the track)
+						{
+						change_speed[dkA] = NO_CHANGE;	
+						pitch[dkA] = 0;	
+						}	
+					else if(change_speed[dkA]==NO_CHANGE)
+						{
+						pitch[dkA] = potenciometr_tempo[dkA];	
+						}
+					if(RVRSEN[dkA])					//reverse diode enable
+						{
+						rvrs[dkA] = 1;
+						}
+					else
+						{
+						rvrs[dkA] = 0;	
+						}		
+					}
+				if(deckTbuf[5][0]&0x10)					//jog UNPRESSED
+					{
+					if(SLIPEN[dkA])					//SLIP MODE ENABLE
+						{	
+						play_adr[dkA] = slip_pl_adr[dkA];	
+						}	
+					deckTbuf[5][0]&=0xEF;				//disable touch circle on display
+					}	
+				}
+			else if(ROTENdkA && play_enable[dkA])						//rotation detected			(pitch bend)	
+				{
+				if(end_track[dkA]==0)
+					{
+					ptch = (256*deckRbuf[5]+deckRbuf[6]);
+					if(ptch>139)
+						{
+						ptch = ptch-139;	
+						}
+					else
+						{
+						ptch = 1;	
+						}
+					ptch = 120000/ptch;				//150000
+						
+					if(ptch>4225)
+						{
+						ptch = 4225;	
+						}	
+					if((((deckRbuf[4]&0x80)==0) && (RVRSEN[dkA]==0)) || ((deckRbuf[4]&0x80) && RVRSEN[dkA]))		//foward rotation and reverse off OR reverse rotation and reverse on (pitch bend)			
+						{
+						ptch+= potenciometr_tempo[dkA];
+						if(ptch>20000)
+							{
+							ptch = 20000;	
+							}
+						pitch[dkA] = ptch;
+						}
+					else if(((deckRbuf[4]&0x80) && (RVRSEN[dkA]==0)) || (((deckRbuf[4]&0x80)==0) && RVRSEN[dkA]))	 //reverse rotation and reverse off OR foward rotation and reverse on(pitch bend)	
+						{	
+						if(ptch<potenciometr_tempo[dkA])
+							{
+							pitch[dkA] = potenciometr_tempo[dkA] - ptch;
+							}
+						else
+							{
+							pitch[dkA] = 0;	
+							}
+						}		
+					}
+				else
+					{
+					pitch[dkA] = 0;		
+					}			
+				if(RVRSEN[dkA])					//reverse diode enable
+					{
+					rvrs[dkA] = 1;
+					}
+				else
+					{
+					rvrs[dkA] = 0;	
+					}	
+				if(deckTbuf[5][0]&0x10)					//jog UNPRESSED
+					{
+					if(SLIPEN[dkA])					//SLIP MODE ENABLE
+						{	
+						play_adr[dkA] = slip_pl_adr[dkA];	
+						}	
+					deckTbuf[5][0]&=0xEF;				//disable touch circle on display	
+					}	
+				else
+					{
+					slip_pitch[dkA] = pitch[dkA];		
+					}
+				}	
+			}			
+				
+			
+			
+			
+	
 
 
 			
@@ -852,8 +879,19 @@
 			else if((deckRbuf[2]&0x20) && CALL_NEXT_BTN_pressed[dkA]==0) 							///////////CALL NEXT Button	>
 				{
 				if(lock_control[dkA]==0)	
-					{		
-					CUE_OPERATION[dkA] = MEMORY_NEED_NEXT_SET;
+					{	
+					if((GPIOB->IDR & 0x00000200)==0)						//SHIFT BUTTON pressed
+						{
+						CUE_OPERATION[dkA] = MEMORY_NEED_NEXT_SET;	
+						}
+					else		//beat jump
+						{
+						if(originalBPM[dkA]!=0xFFFF  && originalBPM[dkA]!=0)
+							{
+							seek_pos[dkA] = 2116800000/originalBPM[dkA];	//44100*60*100*8	
+							need_seek[dkA] = 1;	
+							}								
+						}
 					}
 				CALL_NEXT_BTN_pressed[dkA] = 1;	
 				}
@@ -865,7 +903,18 @@
 				{
 				if(lock_control[dkA]==0)	
 					{		
-					CUE_OPERATION[dkA] = MEMORY_NEED_PREVIOUS_SET;
+					if((GPIOB->IDR & 0x00000200)==0)						//SHIFT BUTTON pressed
+						{	
+						CUE_OPERATION[dkA] = MEMORY_NEED_PREVIOUS_SET;
+						}	
+					else		//beat jump
+						{
+						if(originalBPM[dkA]!=0xFFFF  && originalBPM[dkA]!=0)
+							{
+							seek_pos[dkA] = 2116800000/originalBPM[dkA];	//44100*60*100*8	
+							need_seek[dkA] = 2;	
+							}	
+						}	
 					}
 				CALL_PREV_BTN_pressed[dkA] = 1;	
 				}

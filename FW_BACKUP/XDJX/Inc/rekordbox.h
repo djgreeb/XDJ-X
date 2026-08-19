@@ -19,7 +19,7 @@ uint16_t FindCurrBar(uint8_t dk, uint32_t pos);		//search current bar number
 ////////////////////////////////////////////////////////////////////////
 //
 //
-//Rekordbox database parser ver. 0.53
+//Rekordbox database parser ver. 0.55
 //
 //
 //Functions:
@@ -41,12 +41,16 @@ uint16_t FindCurrBar(uint8_t dk, uint32_t pos);		//search current bar number
 //Playlists>20 bug fixed
 //Rekordbox database parser ver. 0.53
 //Added support for reading large audio files when the *.EXT file exceeded the WFORMDYNAMIC buffer size
+//Rekordbox database parser ver. 0.55
+//2-layers static waveform added
+//adaptive code from Pioneer waveform changer utility	added
+//
 //
 ////////////////////////////////////////////////////////////////////////
 uint16_t DATABASE_PARSER(void)
 	{	
 	#if defined(DEBUG_UART_EN)		
-	sprintf((char*)U_TX_DATA, "Start Rekordbox parser ver. 0.53\n\r");	
+	sprintf((char*)U_TX_DATA, "Start Rekordbox parser ver. 0.55\n\r");	
 	UART_TX(&huart4, U_TX_DATA, 34, 55);	
 	#endif		
 	res = f_open(&file[0], path_export, FA_READ);
@@ -1341,7 +1345,7 @@ uint8_t PlaylistID_to_Pos(uint8_t ID)
 												}
 											}
 
-										uint8_t	r, g, b;	
+										uint8_t	r, g, b, b2;	
 										for(E=0;E<8;E++)											//Draw MEMORY on Display
 											{
 											if(HCUE_adr[dk][0][E] != 0xFFFF)
@@ -1458,45 +1462,32 @@ uint8_t PlaylistID_to_Pos(uint8_t ID)
 										for(E=0;E<202;E++)					//Fill Static Waveform 1200->202
 											{
 											y = 1521*E;
-											y>>=8;
-
+											y>>=8;					
+											als = sdram.bf[dk][StPosHead+y*6+2] + 		//average for blue color map
+												sdram.bf[dk][StPosHead+(y+1)*6+2] + 
+												sdram.bf[dk][StPosHead+(y+2)*6+2] + 
+												sdram.bf[dk][StPosHead+(y+3)*6+2] + 
+												sdram.bf[dk][StPosHead+(y+4)*6+2] + 2; 
+											sdram.bf[dk][StPosHead+y*6+2] = als/5;
 												
-											//
-											//
-											//
-											//
-											//
-											//
-											//
-											//
-											//
-											//
-											//				add 5 samples for average RGB
-											//
-											//
-											//
-											//			add average for blue color map
-											//
-											//												
-												
-												
-												
-												
-												
-											als = sdram.bf[dk][StPosHead+y*6+3] + sdram.bf[dk][StPosHead+(y+1)*6+3] + sdram.bf[dk][StPosHead+(y+2)*6+3] + sdram.bf[dk][StPosHead+(y+3)*6+3] + 2; 
-											r = als>>2;
-											als = sdram.bf[dk][StPosHead+y*6+4] + sdram.bf[dk][StPosHead+(y+1)*6+4] + sdram.bf[dk][StPosHead+(y+2)*6+4] + sdram.bf[dk][StPosHead+(y+3)*6+4] + 2; 
-											g = als>>2;
-											als = sdram.bf[dk][StPosHead+y*6+5] + sdram.bf[dk][StPosHead+(y+1)*6+5] + sdram.bf[dk][StPosHead+(y+2)*6+5] + sdram.bf[dk][StPosHead+(y+3)*6+5] + 2; 
-											b = als>>2;
-
-												
-//											r = sdram.bf[dk][StPosHead+y*6+3];	
-//											g = sdram.bf[dk][StPosHead+y*6+4];		
-//											b = sdram.bf[dk][StPosHead+y*6+5];
-
-
-												
+											als = sdram.bf[dk][StPosHead+y*6+3] + 		//average for RGB colors and levels
+												sdram.bf[dk][StPosHead+(y+1)*6+3] + 
+												sdram.bf[dk][StPosHead+(y+2)*6+3] + 
+												sdram.bf[dk][StPosHead+(y+3)*6+3] + 
+												sdram.bf[dk][StPosHead+(y+4)*6+3] + 2; 
+											r = als/5;
+											als = sdram.bf[dk][StPosHead+y*6+4] + 
+												sdram.bf[dk][StPosHead+(y+1)*6+4] + 
+												sdram.bf[dk][StPosHead+(y+2)*6+4] + 
+												sdram.bf[dk][StPosHead+(y+3)*6+4] + 
+												sdram.bf[dk][StPosHead+(y+4)*6+4] + 2; 
+											g = als/5;
+											als = sdram.bf[dk][StPosHead+y*6+5] + 
+												sdram.bf[dk][StPosHead+(y+1)*6+5] + 
+												sdram.bf[dk][StPosHead+(y+2)*6+5] + 
+												sdram.bf[dk][StPosHead+(y+3)*6+5] + 
+												sdram.bf[dk][StPosHead+(y+4)*6+5] + 2; 
+											b = als/5;
 											if(r>127)
 												{
 												r = 0;	
@@ -1509,7 +1500,119 @@ uint8_t PlaylistID_to_Pos(uint8_t ID)
 												{
 												b = 0;	
 												}	
-
+											//////////adaptive code from Pioneer waveform changer utility	
+											if(sdram.bf[dk][StPosHead+y*6+2]>63 && r>64)		//find low freq
+												{
+												b2 = 127;	
+												sdram.bf[dk][StPosHead+y*6+2]+=15;	
+												if(sdram.bf[dk][StPosHead+y*6+2]>127)
+													{
+													sdram.bf[dk][StPosHead+y*6+2] = 127;	
+													}				
+												}
+											else
+												{
+												b2 = 0;	
+												if(sdram.bf[dk][StPosHead+y*6+2]<15)
+													{
+													sdram.bf[dk][StPosHead+y*6+2] = 0;	
+													}
+												else
+													{
+													sdram.bf[dk][StPosHead+y*6+2]-=15;	
+													}													
+												}											
+											if(r<b)
+												{
+												if(g<b)
+													{		 
+													if(r>g) //b max  g min
+														{
+														b = r+1;	//down b
+														}													
+													else	//b max  r min
+														{
+														b = g; 	//down b	
+														}													
+													if(b2==0)
+														{
+														r-=r/3;
+														g-=g/3;		
+														}	
+													else
+														{
+														b-=b/6;	
+														g-=g/5;	
+														}													
+													}												
+												else		//g max
+													{
+													if(b2==0)
+														{	
+														r-=r/3;
+														b-=b/5;
+														if(g>55)
+															{
+															g-=55;
+															g/=3;
+															g+=55;			
+															}														
+														}
+													else
+														{
+														r+=r/4;		//up r
+														if(r>g)
+															{
+															r = g;	
+															}														
+														b-=b/3;	
+														}
+													}												
+												}	
+											else
+												{
+												if(g<r)
+													{			//red is max
+													if(b2==0)
+														{
+														g-=g/4;
+														b-=b/4;			
+														}
+													else
+														{
+														r+=r/5;
+														if(r>127)
+															{
+															r = 127;	
+															}														
+														g-=g/4;	
+														b-=b/3;	
+														}													
+													}												
+												else
+													{		//green is max and blue is min
+													if(b2==0)
+														{
+														r-=r/5;
+														b-=b/5;
+														if(g>55)
+															{
+															g-=55;
+															g/=3;
+															g+=55;			
+															}	
+														}
+													else
+														{
+														r+=r/3;
+														if(r>g)
+															{
+															r = g;	
+															}														
+														b-=b/4;		
+														}													
+													}											
+												}							
 											WFST_AHB[dk][E] = r;			//Find Max color = amplitude
 											if(WFST_AHB[dk][E]<g)
 												{
@@ -1549,7 +1652,7 @@ uint8_t PlaylistID_to_Pos(uint8_t ID)
 
 										for(E=0;E<202;E++)					//amplitude normalization 
 											{
-											y = 1520*E;
+											y = 1521*E;
 											y>>=8;
 										  als = WFST_AHB[dk][E]*20;	//convert amplitude 127->18	
 											als/=r;
